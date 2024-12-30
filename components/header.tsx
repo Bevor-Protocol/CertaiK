@@ -3,15 +3,17 @@ import React from "react";
 
 const Header: React.FC = () => {
   return (
-    <header className="w-full flex justify-start items-center text-white absolute top-0 left-0 z-10">
-      <Link
-        className="cursor-pointer m-4"
-        href="https://www.certaik.xyz"
-        target="_blank"
-        referrerPolicy="no-referrer"
-      >
-        <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
-      </Link>
+    <header className="w-full flex justify-center items-center text-white absolute top-0 px-4 left-0 z-[999]">
+      <div className="w-full max-w-[1200px]">
+        <Link
+          className="cursor-pointer m-4"
+          href="https://www.certaik.xyz"
+          target="_blank"
+          referrerPolicy="no-referrer"
+        >
+          <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
+        </Link>
+      </div>
     </header>
   );
 };
