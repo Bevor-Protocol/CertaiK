@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     try {
       const response = await api.post("/ai/eval", {
-        contract: text,
+        contract_code: text,
         audit_type: promptType,
         encode_code: true,
         as_markdown: true,
