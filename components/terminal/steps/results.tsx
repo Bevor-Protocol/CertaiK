@@ -6,19 +6,20 @@ import TerminalInputBar from "../input-bar";
 type TerminalProps = {
   setAuditContent: Dispatch<SetStateAction<string>>;
   contractContent: string;
-  promptContent: string;
+  promptType: string;
+  auditContent: string;
   state: MessageType[];
 };
 
 export function ResultsStep({
   setAuditContent,
   contractContent,
-  promptContent,
+  promptType,
+  auditContent,
   state,
 }: TerminalProps) {
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [streamedAudit, setStreamedAudit] = useState("");
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -44,36 +45,23 @@ export function ResultsStep({
     setLoading(true);
     const cleanedFileContent = removeComments(contractContent || "");
 
-    let streamedChunks = "";
     const fetchStream = async () => {
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: cleanedFileContent, prompt: promptContent }),
+        body: JSON.stringify({ text: cleanedFileContent, promptType }),
         signal: AbortSignal.timeout(600000),
       });
 
       if (!response.ok) {
         console.log("ERROR", response.statusText);
       }
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      while (reader) {
-        const { value, done } = await reader.read();
-        if (done) {
-          break;
-        }
-        const chunk = decoder.decode(value, { stream: true });
-        streamedChunks += chunk;
-        setStreamedAudit(streamedChunks);
-      }
-      setLoading(false);
+      const data = await response.json();
       // store this in a separate variable so we can access it outside of state.
-      setAuditContent(streamedChunks);
+      setAuditContent(data);
+      setLoading(false);
     };
     try {
       fetchStream();
@@ -85,16 +73,16 @@ export function ResultsStep({
 
   useEffect(() => {
     scrollToBottom();
-  }, [streamedAudit]);
+  }, [auditContent]);
 
   const handleSubmit = () => {};
 
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
-        {streamedAudit && (
+        {auditContent && (
           <ReactMarkdown className="overflow-scroll no-scrollbar markdown">
-            {streamedAudit}
+            {auditContent}
           </ReactMarkdown>
         )}
         {isError && (

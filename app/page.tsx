@@ -17,7 +17,7 @@ import { useState } from "react";
 export default function TerminalAuditPage() {
   const [terminalStep, setTerminalStep] = useState<TerminalStep>(TerminalStep.INITIAL);
   const [contractContent, setContractContent] = useState<string>("");
-  const [promptContent, setPromptContent] = useState<string>("");
+  const [promptType, setPromptType] = useState<string>("");
   const [auditContent, setAuditContent] = useState<string>("");
   const [terminalState, setTerminalState] =
     useState<Record<TerminalStep, MessageType[]>>(initialState);
@@ -122,16 +122,16 @@ export default function TerminalAuditPage() {
                 setTerminalStep={handleGlobalStep}
                 handleGlobalState={handleGlobalState}
                 state={terminalState[TerminalStep.AUDIT_TYPE]}
-                setPromptContent={setPromptContent}
-                promptContent={promptContent}
+                setPromptType={setPromptType}
               />
             )}
             {terminalStep == TerminalStep.RESULTS && (
               <ResultsStep
                 state={terminalState[TerminalStep.RESULTS]}
                 setAuditContent={setAuditContent}
+                auditContent={auditContent}
                 contractContent={contractContent}
-                promptContent={promptContent}
+                promptType={promptType}
               />
             )}
           </div>
