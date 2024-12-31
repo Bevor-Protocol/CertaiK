@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { MessageType } from "@/utils/types";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -20,14 +21,11 @@ export function ResultsStep({
 }: TerminalProps) {
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [jobId, setJobId] = useState("");
+  const [isRetry, setIsRetry] = useState(false);
+  const [allowRetry, setAllowRetry] = useState(true);
 
   const terminalRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-    }
-  };
 
   const removeComments = (report: string): string => {
     report = report.replace(/\/\/.*$/gm, "");
@@ -41,41 +39,87 @@ export function ResultsStep({
   };
 
   useEffect(() => {
+    if (!jobId || !allowRetry) return;
+    setIsRetry(false);
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch(`/api/status/${jobId}`);
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.log(error);
+        return { status: "failed", allow_retry: false };
+      }
+    };
+
+    const intervalId = setInterval(async () => {
+      const data = await fetchStatus();
+      switch (data.status) {
+        case "queued":
+        case "started":
+          break;
+        case "failed":
+        case "stopped":
+          setIsError(true);
+          clearInterval(intervalId);
+        case "canceled":
+          setLoading(false);
+          clearInterval(intervalId);
+          break;
+        case "finished":
+          setAuditContent(data.result);
+          setLoading(false);
+          clearInterval(intervalId);
+      }
+      setAllowRetry(data.allow_retry);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [jobId, allowRetry, isRetry]);
+
+  useEffect(() => {
     if (state.length || loading) return;
     setLoading(true);
     const cleanedFileContent = removeComments(contractContent || "");
 
-    const fetchStream = async () => {
-      const response = await fetch("/api/ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: cleanedFileContent, promptType }),
-        signal: AbortSignal.timeout(600000),
+    fetch("/api/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: cleanedFileContent, promptType }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((result) => {
+        setJobId(result.job_id);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsError(true);
       });
-
-      if (!response.ok) {
-        console.log("ERROR", response.statusText);
-      }
-      const data = await response.json();
-      // store this in a separate variable so we can access it outside of state.
-      setAuditContent(data);
-      setLoading(false);
-    };
-    try {
-      fetchStream();
-    } catch (error) {
-      console.log(error);
-      setIsError(true);
-    }
   }, [state]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [auditContent]);
-
-  const handleSubmit = () => {};
+  const handleRetry = async () => {
+    try {
+      const response = await fetch(`/api/status/${jobId}`, {
+        method: "POST",
+      });
+      const result = await response.json();
+      if (result.success) {
+        setIsRetry(true);
+        setIsError(false);
+        setLoading(true);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsError(false);
+    }
+  };
 
   return (
     <>
@@ -87,12 +131,17 @@ export function ResultsStep({
         )}
         {isError && (
           <div className="mb-2 leading-relaxed whitespace-pre-wrap text-red-400">
-            Something went wrong, try again
+            Something went wrong
+            {allowRetry && (
+              <Button variant="dark" onClick={handleRetry}>
+                Retry
+              </Button>
+            )}
           </div>
         )}
       </div>
       <TerminalInputBar
-        onSubmit={handleSubmit}
+        onSubmit={() => {}}
         onChange={(value: string) => {}}
         disabled={true}
         value={""}
