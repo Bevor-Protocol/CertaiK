@@ -20,7 +20,7 @@ export async function GET(req: Request, { params }: Params) {
 export async function POST(req: Request, { params }: Params) {
   const { jobId } = await params;
   try {
-    const response = await api.get(`/status/job/retry/${jobId}`);
+    const response = await api.post(`/status/job/retry/${jobId}`);
 
     return new Response(JSON.stringify(response.data), { status: 200 });
   } catch (error) {
