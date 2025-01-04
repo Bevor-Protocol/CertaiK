@@ -1,4 +1,5 @@
 import api from "@/lib/api";
+import crypto from "crypto";
 
 type Params = {
   params: Promise<{
@@ -9,7 +10,18 @@ type Params = {
 export async function GET(req: Request, { params }: Params) {
   const { address } = await params;
   try {
-    const response = await api.get(`/blockchain/scan/${address}`);
+    const secret = process.env.SHARED_SECRET!;
+
+    const timestamp = Date.now().toString();
+    const payload = `${timestamp}:/blockchain/scan/${address}`;
+    const signature = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+
+    const response = await api.get(`/blockchain/scan/${address}`, {
+      headers: {
+        "X-Signature": signature,
+        "X-Timestamp": timestamp,
+      },
+    });
 
     const { platform, source_code } = response.data;
 

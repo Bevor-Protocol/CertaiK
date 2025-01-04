@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useWs } from "@/contexts/websocket";
 import { MessageType } from "@/utils/types";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -24,6 +25,16 @@ export function ResultsStep({
   const [jobId, setJobId] = useState("");
   const [isRetry, setIsRetry] = useState(false);
   const [allowRetry, setAllowRetry] = useState(true);
+  const { setOnMessageHandler, sendMessage } = useWs();
+
+  useEffect(() => {
+    setOnMessageHandler((data: any) => {
+      if (data.result) {
+        setAuditContent(data.result);
+        setLoading(false);
+      }
+    });
+  }, [setOnMessageHandler]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -37,45 +48,6 @@ export function ResultsStep({
       .join("\n");
     return report;
   };
-
-  useEffect(() => {
-    if (!jobId || !allowRetry) return;
-    setIsRetry(false);
-    const fetchStatus = async () => {
-      try {
-        const response = await fetch(`/api/status/${jobId}`);
-        const result = await response.json();
-        return result;
-      } catch (error) {
-        console.log(error);
-        return { status: "failed", allow_retry: false };
-      }
-    };
-
-    const intervalId = setInterval(async () => {
-      const data = await fetchStatus();
-      switch (data.status) {
-        case "queued":
-        case "started":
-          break;
-        case "failed":
-        case "stopped":
-          setIsError(true);
-          clearInterval(intervalId);
-        case "canceled":
-          setLoading(false);
-          clearInterval(intervalId);
-          break;
-        case "finished":
-          setAuditContent(data.result);
-          setLoading(false);
-          clearInterval(intervalId);
-      }
-      setAllowRetry(data.allow_retry);
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [jobId, allowRetry, isRetry]);
 
   useEffect(() => {
     if (state.length || loading) return;
@@ -96,7 +68,9 @@ export function ResultsStep({
         return response.json();
       })
       .then((result) => {
-        setJobId(result.job_id);
+        // websocket subscribes to job result
+        console.log("Sending we message", result.job_id);
+        sendMessage(`subscribe:${result.job_id}`);
       })
       .catch((error) => {
         console.log(error);

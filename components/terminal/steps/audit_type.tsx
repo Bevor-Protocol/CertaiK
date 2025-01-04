@@ -45,7 +45,7 @@ export function AuditTypeStep({
           },
         ]);
         setStep(1);
-        setPromptType("SECURITY");
+        setPromptType("security");
         break;
       }
       case "2": {
@@ -61,7 +61,7 @@ export function AuditTypeStep({
           },
         ]);
         setStep(1);
-        setPromptType("GAS");
+        setPromptType("gas");
         break;
       }
       default: {
