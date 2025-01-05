@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useWs } from "@/contexts/websocket";
+import { useWs } from "@/hooks/useContexts";
 import { MessageType } from "@/utils/types";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
