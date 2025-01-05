@@ -1,5 +1,9 @@
 import api from "@/lib/api";
+import { sessionOptions } from "@/lib/config";
+import { SessionData } from "@/utils/types";
 import crypto from "crypto";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
 
 type Params = {
   params: Promise<{
@@ -12,6 +16,14 @@ export async function GET(req: Request, { params }: Params) {
   try {
     const secret = process.env.SHARED_SECRET!;
 
+    const cookieStore = await cookies();
+    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+
+    if (!session.siwe) {
+      throw new Error("Not authenticated");
+    }
+    const userAddress = session.siwe.address;
+
     const timestamp = Date.now().toString();
     const payload = `${timestamp}:/blockchain/scan/${address}`;
     const signature = crypto.createHmac("sha256", secret).update(payload).digest("hex");
@@ -20,6 +32,7 @@ export async function GET(req: Request, { params }: Params) {
       headers: {
         "X-Signature": signature,
         "X-Timestamp": timestamp,
+        "X-Address": userAddress,
       },
     });
 
