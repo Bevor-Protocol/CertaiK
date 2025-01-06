@@ -6,8 +6,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   if (request.method === "POST") {
     const data = await request.json();
-    console.log("WEBHOOK RECEIVED");
-    console.log(data);
-    return { success: true };
+    console.log("RECEIVED", data);
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
   }
 }

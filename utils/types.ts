@@ -28,4 +28,5 @@ export type ModalStateI = {
 export interface SessionData {
   siwe?: SiweMessage;
   nonce?: string;
+  user_id?: string;
 }

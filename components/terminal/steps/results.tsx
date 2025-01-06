@@ -1,3 +1,4 @@
+import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { useWs } from "@/hooks/useContexts";
 import { MessageType } from "@/utils/types";
@@ -52,25 +53,15 @@ export function ResultsStep({
   useEffect(() => {
     if (state.length || loading) return;
     setLoading(true);
+    console.log("IM FIRING");
     const cleanedFileContent = removeComments(contractContent || "");
-
-    fetch("/api/ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: cleanedFileContent, promptType }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        return response.json();
-      })
+    certaikApiAction
+      .runEval(cleanedFileContent, promptType)
       .then((result) => {
+        const { job_id } = result;
         // websocket subscribes to job result
-        console.log("Sending we message", result.job_id);
-        sendMessage(`subscribe:${result.job_id}`);
+        console.log("Sending ws message", job_id);
+        sendMessage(`subscribe:${job_id}`);
       })
       .catch((error) => {
         console.log(error);
@@ -80,11 +71,9 @@ export function ResultsStep({
 
   const handleRetry = async () => {
     try {
-      const response = await fetch(`/api/status/${jobId}`, {
-        method: "POST",
-      });
-      const result = await response.json();
-      if (result.success) {
+      const success = await certaikApiAction.retryFailedEval(jobId);
+
+      if (success) {
         setIsRetry(true);
         setIsError(false);
         setLoading(true);

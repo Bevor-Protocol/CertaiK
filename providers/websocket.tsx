@@ -1,5 +1,6 @@
 "use client";
 
+import { authAction } from "@/actions";
 import { createContext, useEffect, useRef, useState } from "react";
 
 type WebSocketContextType = {
@@ -24,11 +25,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const fetchSigningSecretAndConnect = async () => {
       try {
-        // Fetch the signing secret from your backend
-        const response = await fetch("/api/signing");
-        const { signature, timestamp } = await response.json();
-
-        // Establish WebSocket connection with the signing secret as a query parameter
+        const { signature, timestamp } = await authAction.getSecureSigning();
         const ws = new WebSocket(
           `http://localhost:8000/ws?signature=${signature}&timestamp=${timestamp}`,
         );

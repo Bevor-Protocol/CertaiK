@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
+import { authAction } from "@/actions";
 import RequestAccountChange from "@/components/siwe/account-change";
 import SignIn from "@/components/siwe/signin";
 import * as Modal from "@/components/ui/modal";
@@ -35,7 +36,7 @@ export const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.E
   const [isSuccess, setIsSuccess] = useState(false);
 
   const logout = (): void => {
-    fetch("/api/siwe/logout", { method: "POST" }).then(() => {
+    authAction.logout().then(() => {
       disconnect();
       setIsAuthenticated(false);
       router.refresh();
@@ -50,27 +51,16 @@ export const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.E
     let messageParsed = "";
     setIsPending(true);
     setIsSuccess(false);
-    fetch("/api/siwe/nonce")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        return response.json();
-      })
-      .then((result) => {
-        messageParsed = createSiweMessage(addressUse, chainIdUse, result.nonce);
+    authAction
+      .nonce()
+      .then((nonce) => {
+        messageParsed = createSiweMessage(addressUse, chainIdUse, nonce);
         return signMessageAsync({
           message: messageParsed,
         });
       })
       .then((signature) => {
-        return fetch("/api/siwe/verify", {
-          method: "POST",
-          body: JSON.stringify({
-            message: messageParsed,
-            signature: signature,
-          }),
-        });
+        return authAction.verify(messageParsed, signature);
       })
       .then(() => {
         setIsAuthenticated(true);
@@ -102,51 +92,44 @@ export const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.E
     */
     let timer: ReturnType<typeof setTimeout>;
     const handleChange = async (): Promise<void> => {
-      await fetch("/api/siwe/current")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(response.statusText);
-          }
-          return response.json();
-        })
-        .then((user) => {
-          const ANY_USER_AUTHED = !!user.address; // authenticated address
-          const ANY_WALLET_CONNECTED = !!address; // existing connected address
+      await authAction.getCurrentUser().then((userAddress) => {
+        const ANY_USER_AUTHED = !!userAddress; // authenticated address
+        const ANY_WALLET_CONNECTED = !!address; // existing connected address
 
-          if (ANY_USER_AUTHED && !ANY_WALLET_CONNECTED) {
-            return logout();
-          }
-          if (!ANY_USER_AUTHED && !ANY_WALLET_CONNECTED) {
-            // no action to take here, safely skip and reset states.
+        if (ANY_USER_AUTHED && !ANY_WALLET_CONNECTED) {
+          return logout();
+        }
+        if (!ANY_USER_AUTHED && !ANY_WALLET_CONNECTED) {
+          // no action to take here, safely skip and reset states.
+          setOpen(false);
+          setIsAuthenticated(false);
+          setIsPending(false);
+          return;
+        } // can safely skip all actions.
+        const PROMPT_SIGNIN = !ANY_USER_AUTHED && ANY_WALLET_CONNECTED;
+        const PROMPT_CHANGE = ANY_USER_AUTHED && ANY_WALLET_CONNECTED && address != userAddress;
+
+        if (PROMPT_SIGNIN) {
+          // this will not trigger a re-fire, because address doesn't change.
+          // we'll need to explicitly mark a user as authenticated.
+          setIsPending(false);
+          setContent(<SignIn />);
+          setOpen(true);
+        } else if (PROMPT_CHANGE) {
+          // once changed, then this gets re-fired, and isAuthenticated becomes true.
+          // automatically set the pending state, to reflect that we're waiting on some action.
+          setIsPending(true);
+          setContent(<RequestAccountChange verifiedAddress={userAddress} />);
+          setOpen(true);
+        } else {
+          // authenticated user.
+          setIsPending(false);
+          setIsAuthenticated(true);
+          timer = setTimeout(() => {
             setOpen(false);
-            setIsAuthenticated(false);
-            setIsPending(false);
-            return;
-          } // can safely skip all actions.
-          const PROMPT_SIGNIN = !ANY_USER_AUTHED && ANY_WALLET_CONNECTED;
-          const PROMPT_CHANGE = ANY_USER_AUTHED && ANY_WALLET_CONNECTED && address != user.address;
-
-          if (PROMPT_SIGNIN) {
-            // this will not trigger a re-fire, because address doesn't change.
-            // we'll need to explicitly mark a user as authenticated.
-            setIsPending(false);
-            setContent(<SignIn />);
-            setOpen(true);
-          } else if (PROMPT_CHANGE) {
-            // once changed, then this gets re-fired, and isAuthenticated becomes true.
-            // automatically set the pending state, to reflect that we're waiting on some action.
-            setIsPending(true);
-            setContent(<RequestAccountChange verifiedAddress={user.address!} />);
-            setOpen(true);
-          } else {
-            // authenticated user.
-            setIsPending(false);
-            setIsAuthenticated(true);
-            timer = setTimeout(() => {
-              setOpen(false);
-            }, 1000);
-          }
-        });
+          }, 1000);
+        }
+      });
     };
 
     handleChange();

@@ -1,3 +1,4 @@
+import { certaikApiAction } from "@/actions";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
 import { MessageType } from "@/utils/types";
@@ -51,23 +52,19 @@ export function AddressStep({
     setLoading(true);
     const address = encodeURIComponent(input);
 
-    fetch(`/api/scan/${address}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Bad request");
-        }
-        return response.json();
-      })
+    certaikApiAction
+      .getSourceCode(address)
       .then((result) => {
-        if (result.error) {
-          throw new Error("Bad response");
+        if (!result) {
+          throw new Error("bad response");
         }
-        setContractContent(result.sourceCode);
+        const { source_code } = result;
+        setContractContent(source_code);
         setHistory((prev) => [
           ...prev,
           {
             type: Message.ASSISTANT,
-            content: result.sourceCode,
+            content: source_code,
           },
           {
             type: Message.SYSTEM,
