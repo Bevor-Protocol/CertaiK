@@ -27,20 +27,20 @@ const AdvancedOptionsModal: React.FC<AdvancedOptionsModalProps> = ({ setPromptTe
       onClick={onClose}
     >
       <div
-        className="bg-[#0a0a0a] p-6 rounded-lg max-w-4xl w-full h-[90vh] z-20"
+        className="bg-[#0a0a0a] p-6 rounded-lg max-w-4xl w-full h-[98vh] z-20"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between mb-4 z-20">
-          <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
+          {/* <img src="/logo.svg" alt="Logo" className="h-16 w-auto" /> */}
         </div>
         <button
-          className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white py-2 px-4 rounded mr-2"
+          className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white py-2 px-4 rounded mr-2 mt-10"
           onClick={() => navigator.clipboard.writeText(promptText)}
         >
           Copy
         </button>
         <button
-          className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white py-2 px-4 rounded"
+          className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white py-2 px-4 rounded mt-10"
           onClick={handleDownloadPrompt}
         >
           Download Prompt
