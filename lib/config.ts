@@ -4,7 +4,7 @@ import { injected } from "wagmi/connectors";
 
 import { type SessionOptions } from "iron-session";
 import { createClient } from "viem";
-import { base, localhost, type Chain } from "wagmi/chains";
+import { base, sepolia, type Chain } from "wagmi/chains";
 
 // const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID as string;
 
@@ -13,7 +13,7 @@ import { base, localhost, type Chain } from "wagmi/chains";
 let chains: readonly [Chain, ...Chain[]];
 
 if (process.env.NODE_ENV === "development") {
-  chains = [localhost];
+  chains = [sepolia];
 } else {
   chains = [base];
 }

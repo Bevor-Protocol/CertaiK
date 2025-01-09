@@ -2,7 +2,6 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { sessionOptions, walletConfig } from "@/lib/config";
 import { ModalProvider } from "@/providers/modal";
-import { SiweProvider } from "@/providers/siwe";
 import WalletProvider from "@/providers/wallet";
 import { WebSocketProvider } from "@/providers/websocket";
 import { SessionData } from "@/utils/types";
@@ -46,7 +45,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
     <html lang="en">
       <body className={`${figtree.className} antialiased`}>
         <WalletProvider initialState={initialState}>
-          <SiweProvider>
+          {/* <SiweProvider> */}
             <WebSocketProvider>
               <ModalProvider>
                 <Header address={address} />
@@ -54,7 +53,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
                 <Footer />
               </ModalProvider>
             </WebSocketProvider>
-          </SiweProvider>
+          {/* </SiweProvider> */}
         </WalletProvider>
       </body>
     </html>
