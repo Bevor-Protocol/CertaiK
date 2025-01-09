@@ -1,12 +1,11 @@
 "use client";
 
-import { useWs } from "@/hooks/useContexts";
 import { FileTextIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 const Footer: React.FC = () => {
-  const { isConnected } = useWs();
+  // const { isConnected } = useWs();
   return (
     <footer className="absolute bottom-0 left-0 right-0 w-full text-white z-[100] p-4">
       <div className="max-w-[1200px] flex justify-between m-auto">
@@ -87,7 +86,7 @@ const Footer: React.FC = () => {
             <FileTextIcon height="24" width="24" />
           </Link>
         </div>
-        <div className="text-sm flex items-center">
+        {/* <div className="text-sm flex items-center">
           {isConnected ? (
             <p>
               <span className="h-1 w-1 rounded-full bg-green-400 inline-block align-middle mr-1 animate-pulse" />
@@ -99,7 +98,7 @@ const Footer: React.FC = () => {
               disconnected
             </p>
           )}
-        </div>
+        </div> */}
       </div>
     </footer>
   );

@@ -4,15 +4,14 @@ import { CoinbaseWallet, WalletConnect } from "@/assets/wallet";
 import * as Card from "@/components/ui/card";
 import * as Dropdown from "@/components/ui/dropdown";
 import * as Tooltip from "@/components/ui/tooltip";
-import { useModal, useSiwe } from "@/hooks/useContexts";
+import { useModal } from "@/hooks/useContexts";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { walletConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { getNetworkImage, sortWallets, trimAddress } from "@/utils/helpers";
-import { Check, ChevronDown, Copy, LayoutDashboardIcon, LogOut, X } from "lucide-react";
-import Link from "next/link";
+import { Check, ChevronDown, Copy, LogOut, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Connector, useAccount, useConnect, useConnectors } from "wagmi";
+import { Connector, useAccount, useConnect, useConnectors, useDisconnect } from "wagmi";
 import Networks from "../Dropdown/networks";
 import { Icon, Social } from "../ui/icon";
 
@@ -24,8 +23,9 @@ export const Profile = ({
   close?: () => void;
 }): JSX.Element => {
   const { chain, connector } = useAccount();
+  const { disconnect } = useDisconnect();
   const { isCopied, copy } = useCopyToClipboard();
-  const { logout } = useSiwe();
+  // const { logout } = useSiwe();
 
   return (
     <Card.Main className="text-xs min-w-52">
@@ -65,16 +65,17 @@ export const Profile = ({
       </Card.Content>
       <Card.Footer className="p-1">
         <div className="flex flex-col w-full">
-          <Link href={`/users/${address}`} className="w-full" onClick={close}>
+          {/* <Link href={`/users/${address}`} className="w-full" onClick={close}>
             <div className="flex items-center relative rounded-lg transition-colors px-1 py-2 w-full justify-start gap-2 hover:bg-slate-700/40">
               <LayoutDashboardIcon height="0.85rem" width="0.85rem" stroke="currentColor" />
               <span>Dashboard</span>
             </div>
-          </Link>
+          </Link> */}
           <div
             onClick={(): void => {
               close?.();
-              logout();
+              // logout();
+              disconnect();
             }}
             className="flex items-center relative rounded-lg transition-colors px-1 py-2 w-full justify-start gap-2 cursor-pointer border border-1 border-transparent hover:bg-slate-700/40"
           >
@@ -139,7 +140,7 @@ export const Web3Profile = ({ address }: { address: string }): JSX.Element => {
           )}
         >
           <Icon size="md" seed={address} />
-          <span className="lg:hidden">{trimAddress(address)}</span>
+          <span className="hidden lg:inline-block">{trimAddress(address)}</span>
         </div>
       </Dropdown.Trigger>
       <Dropdown.Content className="top-full right-0" hasCloseTrigger>
