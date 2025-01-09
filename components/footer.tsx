@@ -3,12 +3,14 @@
 import { FileTextIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import NavBar from "./nav-bar";
 
 const Footer: React.FC = () => {
   // const { isConnected } = useWs();
   return (
     <footer className="absolute bottom-0 left-0 right-0 w-full text-white z-[100] p-4">
-      <div className="max-w-[1200px] flex justify-between m-auto">
+      <NavBar className="md:hidden flex mb-2 w-full px-[20%]" />
+      <div className="max-w-[1200px] justify-between m-auto md:flex hidden">
         <div className="flex flex-grow gap-8 items-center *:cursor-pointer z-10">
           <Link
             href="https://x.com/CertaiK_Agent"

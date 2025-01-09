@@ -18,7 +18,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="w-full flex justify-center items-center text-white absolute top-0 px-4 left-0 z-[100]">
-      <div className="w-full max-w-[1200px] p-4 flex justify-between">
+      <div className="w-full max-w-[1200px] p-4 flex justify-between items-center">
         <Link
           className="cursor-pointer max-w-fit block"
           href="https://www.certaik.xyz"
@@ -27,7 +27,7 @@ const Header: React.FC = () => {
         >
           <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
         </Link>
-        <NavBar />
+        <NavBar className="md:flex hidden" />
         <div className="gap-2 items-center relative flex">
           {!!address ? (
             <>

@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-const NavBar: React.FC = () => {
-  const [selected, setSelected] = useState<"terminal" | "api">("");
+const NavBar: React.FC<{ className: string }> = ({ className }) => {
+  const [selected, setSelected] = useState<"terminal" | "api">("terminal");
 
   useEffect(() => {
     const currentPath = window.location.pathname;
@@ -19,9 +19,9 @@ const NavBar: React.FC = () => {
   return (
     <div
       className={cn(
-        "bg-black/90 border border-gray-800 rounded-lg p-4",
-        "flex flex-col sm:flex-row justify-around items-center mt-[10px] h-auto sm:h-[50px] w-full max-w-[500px]",
-        "text-sm sm:text-base", // Added text size adjustment for mobile
+        "bg-black/90 border border-gray-800 rounded-lg px-8 py-2 w-[300px]",
+        "flex justify-between items-center",
+        className,
       )}
     >
       <Link href="/" passHref>
