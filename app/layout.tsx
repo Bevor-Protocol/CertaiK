@@ -3,7 +3,6 @@ import Header from "@/components/header";
 import { walletConfig } from "@/lib/config";
 import { ModalProvider } from "@/providers/modal";
 import WalletProvider from "@/providers/wallet";
-import { WebSocketProvider } from "@/providers/websocket";
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import { headers } from "next/headers";
@@ -41,13 +40,11 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
       <body className={`${figtree.className} antialiased`}>
         <WalletProvider initialState={initialState}>
           {/* <SiweProvider> */}
-          <WebSocketProvider>
-            <ModalProvider>
-              <Header />
-              {children}
-              <Footer />
-            </ModalProvider>
-          </WebSocketProvider>
+          <ModalProvider>
+            <Header />
+            {children}
+            <Footer />
+          </ModalProvider>
           {/* </SiweProvider> */}
         </WalletProvider>
       </body>
