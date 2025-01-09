@@ -82,7 +82,7 @@ export default function TerminalAuditPage() {
         <div
           className={cn(
             "bg-black/90 border border-gray-800 rounded-lg p-4",
-            "flex flex-row w-full h-full max-w-[1200px] max-h-[600px]",
+            "flex flex-row w-full h-full max-w-[1200px] max-h-[600px] mt-5",
           )}
         >
           <div className="flex flex-col w-full h-full flex-1 no-scrollbar">

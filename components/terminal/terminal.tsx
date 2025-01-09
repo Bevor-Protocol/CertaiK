@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import React, { useEffect, useRef, useState } from 'react';
 
 type Message = {
   type: 'system' | 'user' | 'assistant' | 'error';
@@ -78,6 +78,7 @@ export function Terminal({ className, onSubmit }: TerminalProps) {
             {message.content}
           </div>
         ))}
+        
         {isProcessing && (
           <div className="text-yellow-400">Processing...</div>
         )}

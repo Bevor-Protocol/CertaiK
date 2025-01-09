@@ -1,28 +1,44 @@
-import { BookOpenText } from 'lucide-react';
 import Link from "next/link";
 import React from "react";
+import { useAccount } from "wagmi";
+import NavBar from "./nav-bar";
+import { Button } from "./ui/button";
+import { Wallets, Web3Network } from "./Web3";
 
 const Header: React.FC = () => {
+  const { show } = useModal();
+  const { address } = useAccount();
+
+  const handleWalletModal = (): void => {
+    console.log("clicked");
+    show(<Wallets />);
+  };
+
   return (
-    <header className="w-full flex justify-between items-center text-white absolute top-0 left-0 z-30">
-      <Link
-        className="cursor-pointer m-4"
-        href="https://www.certaik.xyz"
-        target="_blank"
-        referrerPolicy="no-referrer"
-      >
-        <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
-      </Link>
-      <div className="flex space-x-2 ml-auto mr-5">
+    <header className="w-full flex justify-center items-center text-white absolute top-0 px-4 left-0 z-[100]">
+      <div className="w-full max-w-[1200px] p-4 flex justify-between">
         <Link
-          className="cursor-pointer flex items-center"
-          href="https://docs.certaik.xyz"
+          className="cursor-pointer max-w-fit block hidden sm:block"
+          href="https://www.certaik.xyz"
           target="_blank"
-          rel="noopener noreferrer"
+          referrerPolicy="no-referrer"
         >
-          <BookOpenText className="mr-2" />
-          Docs
+          <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
         </Link>
+        <NavBar />
+        <div className="gap-2 items-center relative flex">
+          {!!address ? (
+            <>
+              <Web3Network />
+              {/* <Web3Profile address={address} /> */}
+              <Button variant="dark">{`${address.slice(0, 4)}...${address.slice(-3)}`}</Button>
+            </>
+          ) : (
+            <Button onClick={handleWalletModal} variant="dark">
+              connect
+            </Button>
+          )}
+        </div>
       </div>
     </header>
   );
