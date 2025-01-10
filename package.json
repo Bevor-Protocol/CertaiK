@@ -9,11 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "^14.2.15",
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-progress": "^1.1.0",
     "@react-three/drei": "^9.118.0",
     "@react-three/fiber": "^9.0.0-alpha.8",
+    "@tanstack/react-query": "^5.62.15",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -29,22 +29,24 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.171.0",
+    "viem": "^2.22.2",
+    "wagmi": "^2.14.6",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^15.1.2",
+    "@next/eslint-plugin-next": "^15.1.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@typescript-eslint/eslint-plugin": "^8.18.1",
-    "@typescript-eslint/parser": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
     "eslint": "^8",
-    "eslint-config-airbnb-typescript": "^18.0.0",
-    "eslint-config-next": "15.0.3",
+    "eslint-config-next": "^15.1.4",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "postcss": "^8",
     "prettier": "^3.4.2",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5.7.3"
   }
 }

@@ -1,4 +1,5 @@
-export default `
+/* eslint-disable max-len */
+const prompt = `
 # Prompt for Generating a Smart Contract Gas Audit Report
 
 You are tasked with generating a smart contract gas audit report. Please adhere strictly to the following guidelines and don't make mistakes:
@@ -128,3 +129,5 @@ Enforce these principles to ensure efficient gas usage in smart contracts.
 
 <{prompt}>
 `;
+
+export default prompt;

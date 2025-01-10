@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { useTexture, OrbitControls } from "@react-three/drei"
-import * as THREE from "three"
+import { OrbitControls, useTexture } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useState } from "react";
+import * as THREE from "three";
 
 interface CoinProps {
-  imageUrl: string
+  imageUrl: string;
 }
 
-function Coin({ imageUrl }: CoinProps) {
-  const meshRef = useRef<THREE.Mesh>(null)
-  const texture = useTexture(imageUrl)
+function Coin({ imageUrl }: CoinProps): JSX.Element {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const texture = useTexture(imageUrl);
 
   // Rotate the coin
   useFrame((state, delta) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x += delta * 0.5
-      meshRef.current.rotation.y += delta
+      meshRef.current.rotation.x += delta * 0.5;
+      meshRef.current.rotation.y += delta;
     }
-  })
+  });
 
   return (
     <mesh ref={meshRef} scale={[2.5, 2.5, 2.5]}>
@@ -28,11 +28,11 @@ function Coin({ imageUrl }: CoinProps) {
       <meshStandardMaterial map={texture} attach="material-1" />
       <meshStandardMaterial color="#66ffff" attach="material-2" />
     </mesh>
-  )
+  );
 }
 
-export default function SpinningCoin() {
-  const [imageUrl] = useState("/anime-coin.webp?height=200&width=200")
+export default function SpinningCoin(): JSX.Element {
+  const [imageUrl] = useState("/anime-coin.webp?height=200&width=200");
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center">
@@ -45,6 +45,5 @@ export default function SpinningCoin() {
         </Canvas>
       </div>
     </div>
-  )
+  );
 }
-

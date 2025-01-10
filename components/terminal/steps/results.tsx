@@ -10,19 +10,19 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function ResultsStep({
+export const ResultsStep = ({
   setAuditContent,
   contractContent,
   promptContent,
   state,
-}: TerminalProps) {
+}: TerminalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [streamedAudit, setStreamedAudit] = useState("");
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
@@ -45,7 +45,7 @@ export function ResultsStep({
     const cleanedFileContent = removeComments(contractContent || "");
 
     let streamedChunks = "";
-    const fetchStream = async () => {
+    const fetchStream = async (): Promise<void> => {
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: {
@@ -81,13 +81,14 @@ export function ResultsStep({
       console.log(error);
       setIsError(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   useEffect(() => {
     scrollToBottom();
   }, [streamedAudit]);
 
-  const handleSubmit = () => {};
+  const handleSubmit = (): void => {};
 
   return (
     <>
@@ -105,7 +106,7 @@ export function ResultsStep({
       </div>
       <TerminalInputBar
         onSubmit={handleSubmit}
-        onChange={(value: string) => {}}
+        onChange={() => {}}
         disabled={true}
         value={""}
         overrideLoading={loading}
@@ -113,4 +114,4 @@ export function ResultsStep({
       />
     </>
   );
-}
+};

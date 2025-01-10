@@ -1,4 +1,5 @@
-export default `
+/* eslint-disable max-len */
+const prompt = `
 # Prompt for Generating a Smart Contract Audit Report
 
 You are tasked with generating a smart contract audit report. Please adhere strictly to the following guidelines and don't make mistakes:
@@ -83,3 +84,5 @@ You are tasked with generating a smart contract audit report. Please adhere stri
 
 <{prompt}>
 `;
+
+export default prompt;

@@ -1,3 +1,6 @@
+"use client";
+import { useModal } from "@/hooks/useContexts";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 import { useAccount } from "wagmi";
@@ -14,8 +17,13 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="w-full flex justify-center items-center text-white absolute top-0 px-4 left-0 z-[100]">
-      <div className="w-full max-w-[1200px] p-4 flex justify-between items-center">
+    <header
+      className={cn(
+        "w-full flex justify-center items-center",
+        "text-white absolute top-0 px-4 left-0 z-[100]",
+      )}
+    >
+      <div className="w-full max-w-[1200px] p-4 flex justify-between items-center relative">
         <Link
           className="cursor-pointer max-w-fit block"
           href="https://www.certaik.xyz"
@@ -24,17 +32,12 @@ const Header: React.FC = () => {
         >
           <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
         </Link>
-        <NavBar className="md:flex hidden" />
+        <NavBar className="md:flex hidden absolute left-1/2 -translate-x-1/2" />
         <div className="gap-2 items-center relative flex">
-          {!!address ? (
+          {address ? (
             <>
               <Web3Network />
-<<<<<<< HEAD
-              {/* <Web3Profile address={address} /> */}
-              <Button variant="dark">{`${address.slice(0, 4)}...${address.slice(-3)}`}</Button>
-=======
               <Web3Profile address={address} />
->>>>>>> ba0ae76 (fix shit)
             </>
           ) : (
             <Button onClick={handleWalletModal} variant="dark">

@@ -6,7 +6,7 @@ type Params = {
   }>;
 };
 
-export async function GET(req: Request, { params }: Params) {
+export async function GET(req: Request, { params }: Params): Promise<Response | undefined> {
   const { address } = await params;
   try {
     const response = await api.get(`/blockchain/scan/${address}`);
@@ -14,7 +14,7 @@ export async function GET(req: Request, { params }: Params) {
     const { platform, source_code } = response.data;
 
     return new Response(JSON.stringify({ platform, sourceCode: source_code }), { status: 200 });
-  } catch (error) {
+  } catch {
     return new Response(
       JSON.stringify({ error: "No source code found for the given address on any platform" }),
       { status: 400 },

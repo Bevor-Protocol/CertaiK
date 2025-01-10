@@ -4,6 +4,7 @@
 
 body {
   font-family: "Figtree", sans-serif;
+  color: white;
 }
 
 @layer base {
@@ -38,16 +39,6 @@ body {
     background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(0, 0, 255, 0.4) 120%);
     filter: blur(60px) opacity(0.8);
     z-index: 0;
-  }
-
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  input[type="number"] {
-    -moz-appearance: textfield;
   }
 
   .markdown {
@@ -120,6 +111,23 @@ body {
       @apply border-gray-600 my-4;
     }
   }
+
+  .avatar {
+    height: var(--size-mobile);
+    width: var(--size-mobile);
+    min-height: var(--size-mobile);
+    min-width: var(--size-mobile);
+    @apply rounded-full transition-all bg-no-repeat bg-cover bg-center;
+  }
+
+  @media screen(md) {
+    .avatar {
+      height: var(--size-desktop);
+      width: var(--size-desktop);
+      min-height: var(--size-desktop);
+      min-width: var(--size-desktop);
+    }
+  }
 }
 
 @layer utilities {
@@ -131,5 +139,32 @@ body {
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+  }
+
+  .conic-full {
+    aspect-ratio: 1 / 1;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    @apply aspect-square z-0 p-[3px] rounded-full;
+  }
+
+  .conic {
+    aspect-ratio: 1 / 1;
+    background: conic-gradient(theme("colors.white"), theme("colors.transparent"));
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    @apply aspect-square z-0 p-[3px] rounded-full;
   }
 }

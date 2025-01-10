@@ -8,3 +8,39 @@ export const stepText = {
   [TerminalStep.AUDIT_TYPE]: "audit type",
   [TerminalStep.RESULTS]: "results",
 };
+
+export const iconSizeMapper: Record<string, Record<string, string>> = {
+  xs: {
+    desktop: "20px",
+    mobile: "20px",
+  },
+  sm: {
+    desktop: "25px",
+    mobile: "25px",
+  },
+  md: {
+    desktop: "30px",
+    mobile: "25px",
+  },
+  lg: {
+    desktop: "75px",
+    mobile: "60px",
+  },
+  xl: {
+    desktop: "90px",
+    mobile: "75px",
+  },
+  xxl: {
+    desktop: "120px",
+    mobile: "90px",
+  },
+};
+
+export const ChainPresets: Record<number, string> = {
+  // Base
+  8453: "/base.png",
+  // Localhost
+  1337: "/unknown.svg",
+  // Default
+  99999: "/unknown.svg",
+};

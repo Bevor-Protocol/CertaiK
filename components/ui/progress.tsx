@@ -19,7 +19,11 @@ const Progress = React.forwardRef<
       className={cn("relative h-4 w-full overflow-hidden rounded-full bg-gray-900", className)}
       {...props}
     >
-      <ProgressPrimitive.Indicator className="h-full w-full flex-1 transition-all bg-gradient-to-r from-cyan-500 to-red-500" />
+      <ProgressPrimitive.Indicator
+        className={cn(
+          "h-full w-full flex-1 transition-all bg-gradient-to-r from-cyan-500 to-red-500",
+        )}
+      />
       <ProgressPrimitive.Indicator
         className="h-full w-full flex-1 transition-all bg-green absolute right-0 top-0 bg-gray-900"
         style={{ width: `${100 - asPercent}%` }}

@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 export const maxDuration = 60; // This function can run for a maximum of 60 seconds
 export const dynamic = "force-dynamic";
 
-const streamer = (stream: any) => {
+const streamer = (stream: any): ReadableStream => {
   const decoder = new TextDecoder();
   return new ReadableStream({
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     async start(controller) {
       stream.on("data", (chunk: any) => {
         const text = decoder.decode(chunk, { stream: true });
@@ -23,7 +24,7 @@ const streamer = (stream: any) => {
   });
 };
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<Response | undefined> {
   if (request.method === "POST") {
     const data = await request.json();
     const { text, prompt } = data;

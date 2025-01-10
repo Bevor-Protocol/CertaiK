@@ -35,7 +35,7 @@ const Networks = ({ close }: { close?: () => void }): JSX.Element => {
           >
             <Icon
               size="sm"
-              image={ChainPresets[chain && chain.id in ChainPresets ? chain.id : 84531]}
+              image={ChainPresets[chain && chain.id in ChainPresets ? chain.id : 99999]}
               className={cn(
                 currentChain?.id == chain.id && "opacity-disable",
                 chain.name === "baseGoerli" && "!bg-auto",

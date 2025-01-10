@@ -1,4 +1,5 @@
-export default function CoinAscii() {
+/* eslint-disable max-len */
+export default function CoinAscii(): JSX.Element {
   return (
     <pre className="text-white-100 whitespace-pre-wrap text-[0.15rem] leading-tight md:text-[0.20rem]">
       {`                                                                                                                                                                      

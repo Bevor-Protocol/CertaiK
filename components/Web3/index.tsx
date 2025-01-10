@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 "use client";
 
 import { CoinbaseWallet, WalletConnect } from "@/assets/wallet";
@@ -77,7 +78,11 @@ export const Profile = ({
               // logout();
               disconnect();
             }}
-            className="flex items-center relative rounded-lg transition-colors px-1 py-2 w-full justify-start gap-2 cursor-pointer border border-1 border-transparent hover:bg-slate-700/40"
+            className={cn(
+              "flex items-center relative rounded-lg transition-colors",
+              "px-1 py-2 w-full justify-start gap-2 cursor-pointer border",
+              "border-1 border-transparent hover:bg-slate-700/40",
+            )}
           >
             <LogOut height="0.85rem" width="0.85rem" />
             <span>Disconnect</span>
@@ -100,7 +105,11 @@ export const Web3Network = (): JSX.Element => {
       <Dropdown.Trigger>
         <Tooltip.Reference shouldShow={!chain}>
           <Tooltip.Trigger>
-            <div className="flex justify-center items-center gap-2 px-2 h-12 rounded-lg hover:bg-slate-700/40">
+            <div
+              className={cn(
+                "flex justify-center items-center gap-2 px-2 h-12 rounded-lg hover:bg-slate-700/40",
+              )}
+            >
               <Icon
                 size="sm"
                 image={networkImg}

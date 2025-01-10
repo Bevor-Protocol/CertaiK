@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import BalanceBox from "@/components/api/balance-box";
@@ -6,12 +7,12 @@ import { useCertaiBalance } from "@/hooks/useBalances";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-export default function SimplePage() {
+export default function SimplePage(): JSX.Element {
   const [inputValue, setInputValue] = useState("");
 
-  const { certaiBalance, creditBalance, isLoading } = useCertaiBalance();
+  const { certaiBalance, creditBalance, curPromotion, isLoading } = useCertaiBalance();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     // Placeholder logic for form submission
     console.log("Form submitted with input:", inputValue);

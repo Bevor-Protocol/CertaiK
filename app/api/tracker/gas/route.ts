@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 
-export async function GET(req: Request) {
+export async function GET(): Promise<Response | undefined> {
   try {
     const response = await api.get("/blockchain/gas");
     return new Response(JSON.stringify(response.data), { status: 200 });

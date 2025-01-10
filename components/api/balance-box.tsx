@@ -5,10 +5,10 @@ export default function BalanceBox({
   curCredit,
   isLoading,
 }: {
-  curBalance: string | null;
-  curCredit: string | null;
+  curBalance?: string | undefined;
+  curCredit?: string | undefined;
   isLoading: boolean;
-}) {
+}): JSX.Element {
   // Create dynamic padding based on the maximum length
   console.log(curBalance, curCredit);
   const certaiPadding = "\u00A0".repeat(

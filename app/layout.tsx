@@ -39,15 +39,15 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
     <html lang="en">
       <body className={`${figtree.className} antialiased`}>
         <WalletProvider initialState={initialState}>
-          {/* <SiweProvider> */}
           <ModalProvider>
             <Header />
             {children}
             <Footer />
           </ModalProvider>
-          {/* </SiweProvider> */}
         </WalletProvider>
       </body>
     </html>
   );
 };
+
+export default RootLayout;

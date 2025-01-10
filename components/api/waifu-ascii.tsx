@@ -1,4 +1,5 @@
-export default function WaifuAscii() {
+/* eslint-disable max-len */
+export default function WaifuAscii(): JSX.Element {
   return (
     <pre className="text-blue-100 whitespace-pre-wrap text-[0.2rem] leading-tight">
       {`                                                                                                                                                                                               

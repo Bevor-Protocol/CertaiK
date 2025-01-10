@@ -2,7 +2,6 @@ import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 // import { walletConnect, injected, coinbaseWallet } from "wagmi/connectors";
 import { injected } from "wagmi/connectors";
 
-import { type SessionOptions } from "iron-session";
 import { createClient } from "viem";
 import { base, sepolia, type Chain } from "wagmi/chains";
 
@@ -35,13 +34,5 @@ declare module "wagmi" {
   }
 }
 
-const sessionOptions: SessionOptions = {
-  password: process.env.COOKIE_PSWD as string,
-  cookieName: "siwe",
-  cookieOptions: {
-    secure: process.env.NODE_ENV === "production",
-  },
-};
-
 // export { config, projectId };
-export { sessionOptions, walletConfig };
+export { walletConfig };

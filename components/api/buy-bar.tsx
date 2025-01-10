@@ -15,12 +15,14 @@ import {
 export default function BuyBar({
   curBalance,
   curCredit,
+  curPromotion,
   isLoading,
 }: {
-  curBalance: string | null;
-  curCredit: string | null;
+  curBalance?: string | undefined;
+  curCredit?: string | undefined;
+  curPromotion?: string | undefined;
   isLoading: boolean;
-}) {
+}): JSX.Element {
   const [amount, setAmount] = useState(0);
 
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
@@ -37,6 +39,7 @@ export default function BuyBar({
     if (!disabled && inputRef.current) {
       inputRef.current.focus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buying, refunding, curBalance]);
 
   const { data: buyData } = useSimulateContract({
@@ -69,7 +72,8 @@ export default function BuyBar({
       contractAddress?.startsWith("0x")
         ? (contractAddress as `0x${string}`)
         : "0x0000000000000000000000000000000000000000",
-      BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"), // Infinite approval in bigint
+      // Infinite approval in bigint
+      BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
     ],
   });
 
@@ -77,19 +81,20 @@ export default function BuyBar({
 
   const { address } = useAccount();
 
-  const { data: allowanceData } = address
-    ? useReadContract({
-        address: certaiContractAddress as `0x${string}`,
-        abi: erc20Abi,
-        functionName: "allowance",
-        args: [
-          address, // owner
-          contractAddress?.startsWith("0x")
-            ? (contractAddress as `0x${string}`)
-            : "0x0000000000000000000000000000000000000000", // spender
-        ],
-      })
-    : { data: undefined };
+  const { data: allowanceData } = useReadContract({
+    address: certaiContractAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "allowance",
+    args: [
+      address as `0x${string}`, // owner
+      contractAddress?.startsWith("0x")
+        ? (contractAddress as `0x${string}`)
+        : "0x0000000000000000000000000000000000000000", // spender
+    ],
+    query: {
+      enabled: !!address,
+    },
+  });
 
   useWatchContractEvent({
     address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,
@@ -106,7 +111,7 @@ export default function BuyBar({
     },
   });
 
-  const handleCreditsPurchased = (log: any) => {
+  const handleCreditsPurchased = (log: any): void => {
     // Extract relevant data from the log
     const { args } = log;
     // Update your application state or UI
@@ -135,7 +140,7 @@ export default function BuyBar({
     },
   });
 
-  const handleApproveEvent = (log: any) => {
+  const handleApproveEvent = (log: any): void => {
     // Extract relevant data from the log
     const { args } = log;
     // Update your application state or UI
@@ -149,20 +154,20 @@ export default function BuyBar({
     // For example, you might update a state variable to reflect the new balance
   };
 
-  const handleApprove = () => {
+  const handleApprove = (): void => {
     if (approveData && approveData.request) {
       console.log("Approving CERTAI tokens");
       approveWriteContract(approveData.request);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setAmount(Number(e.target.value));
     setPurchaseSuccess(false);
     setRefundSuccess(false);
   };
 
-  const handleBuy = () => {
+  const handleBuy = (): void => {
     console.log(buyData);
 
     setBuying(true);
@@ -180,7 +185,7 @@ export default function BuyBar({
     }
   };
 
-  const handleRefund = () => {
+  const handleRefund = (): void => {
     if (refundData && refundData.request) {
       setRefunding(true);
 
@@ -191,8 +196,14 @@ export default function BuyBar({
   return (
     <>
       <p className="text-white mt-2 font-mono">
-        <span className="text-blue-400 font-bold">{amount * 1.25}</span> credits [includes{" "}
-        <span className="text-green-400 font-bold">{amount * 0.25}</span> bonus credits!]
+        <span className="text-blue-400 font-bold">
+          {curPromotion ? amount * Number(curPromotion) : amount}
+        </span>{" "}
+        credits [includes{" "}
+        <span className="text-green-400 font-bold">
+          {curPromotion ? amount * Number(curPromotion) - amount : 0}
+        </span>{" "}
+        bonus credits!]
         {purchaseSuccess && (
           <span className="text-green-400 text-bold">&nbsp;Credit Purchase Successful!</span>
         )}
@@ -202,7 +213,7 @@ export default function BuyBar({
       </p>
       <div className="flex w-full items-center justify-between gap-y-8 gap-x-8 font-mono flex-wrap">
         <div className="flex max-w-full">
-          <span className="text-green-400 mr-2">{`>`}</span>
+          <span className="text-green-400 mr-2">{">"}</span>
           <input
             ref={inputRef}
             autoFocus={true}
