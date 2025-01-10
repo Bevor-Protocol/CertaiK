@@ -13,7 +13,7 @@ export const useCertaiBalance = (): {
   const { address } = useAccount();
   const queryClient = useQueryClient();
 
-  const certaiContractAddress = process.env.NEXT_PUBLIC_CERTAI_ADDRESS || "0x0";
+  const certaiContractAddress = process.env.NEXT_PUBLIC_CERTAI_ADDRESS;
 
   const {
     data: certaiData,
@@ -29,12 +29,17 @@ export const useCertaiBalance = (): {
     },
   });
 
+  if (certaiData) {
+    console.log("Certai data found:", certaiData);
+    console.log("Type of certaiData:", typeof certaiData);
+  }
+
   const {
     data: creditData,
     isLoading: isCreditLoading,
     queryKey: creditQueryKey,
   } = useReadContract({
-    address: (process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS || "0x0") as `0x${string}`,
+    address: process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS as `0x${string}`,
     abi: abiJSON.abi,
     functionName: "depositAmount",
     args: [address as `0x${string}`],
@@ -79,17 +84,11 @@ export const useCertaiBalance = (): {
   });
 
   const parsedBalances = useMemo(() => {
-    if (!certaiData || !creditData || !curPromotion)
-      return {
-        certaiBalance: undefined,
-        creditBalance: undefined,
-        curPromotion: undefined,
-      };
     if (typeof certaiData === "bigint" && typeof creditData === "bigint") {
       return {
         certaiBalance: (certaiData / 1000000n).toString(),
         creditBalance: (creditData / 1000000n).toString(),
-        curPromotion: curPromotion.toString(),
+        curPromotion: curPromotion?.toString(),
       };
     }
     return {
@@ -101,6 +100,6 @@ export const useCertaiBalance = (): {
 
   return {
     ...parsedBalances,
-    isLoading: isCertaiLoading || isCreditLoading || isPromotionLoading,
+    isLoading: ((isCertaiLoading || isCreditLoading || isPromotionLoading) && certaiData === undefined),
   };
 };
