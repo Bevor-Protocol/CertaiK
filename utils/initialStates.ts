@@ -5,7 +5,8 @@ export const initialState = {
     {
       type: Message.SYSTEM,
       content:
-        "Welcome to Smart Contract Auditor AI. Choose an option (Type just the number such as \"1\"):\n\n+-------------------------------------+\n| 1. Input contract address           |\n| 2. Upload file                      |\n| 3. Paste code                       |\n+-------------------------------------+",
+        'How would like you get started? Choose an option (Type just the number such as "1"):\n\n1. Input contract address\n2. Upload file\n3. Paste code',
+      // "Welcome to Smart Contract Auditor AI. Choose an option (Type just the number such as \"1\"):\n\n+-------------------------------------+\n| 1. Input contract address           |\n| 2. Upload file                      |\n| 3. Paste code                       |\n+-------------------------------------+",
     },
   ],
   [TerminalStep.INPUT_ADDRESS]: [
