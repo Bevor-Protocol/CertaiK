@@ -15,11 +15,13 @@ import {
 export default function BuyBar({
   curBalance,
   curCredit,
+  curDeposit,
   curPromotion,
   isLoading,
 }: {
   curBalance?: string | undefined;
   curCredit?: string | undefined;
+  curDeposit?: string | undefined;
   curPromotion?: string | undefined;
   isLoading: boolean;
 }): JSX.Element {
@@ -29,6 +31,8 @@ export default function BuyBar({
   const [refundSuccess, setRefundSuccess] = useState(false);
   const [buying, setBuying] = useState(false);
   const [refunding, setRefunding] = useState(false);
+  const [approved, setApproved] = useState(false);
+  const [approving, setApproving] = useState(false);
 
   const contractAddress = process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS;
 
@@ -46,7 +50,7 @@ export default function BuyBar({
     address: contractAddress as `0x${string}`,
     abi: abiJSON.abi,
     functionName: "purchaseCredits",
-    args: [parseUnits(amount.toString(), 6)], // TODO: CHANGE BACK TO 18 FOR MAINNET
+    args: [parseUnits(amount.toString(), 18)], // TODO: CHANGE BACK TO 18 FOR MAINNET
   });
 
   const { writeContract: buyWriteContract } = useWriteContract();
@@ -55,7 +59,7 @@ export default function BuyBar({
     address: contractAddress as `0x${string}`,
     abi: abiJSON.abi,
     functionName: "refundDeposit",
-    args: [parseUnits(amount.toString(), 6)], // TODO: CHANGE BACK TO 18 FOR MAINNET
+    args: [parseUnits(amount.toString(), 18)], // TODO: CHANGE BACK TO 18 FOR MAINNET
   });
 
   const { writeContract: refundWriteContract } = useWriteContract();
@@ -150,6 +154,8 @@ export default function BuyBar({
     if (buyData && buyData.request) {
       console.log("Buying credits");
       buyWriteContract(buyData.request);
+      setApproved(true);
+      setApproving(false);
     }
     // For example, you might update a state variable to reflect the new balance
   };
@@ -157,6 +163,7 @@ export default function BuyBar({
   const handleApprove = (): void => {
     if (approveData && approveData.request) {
       console.log("Approving CERTAI tokens");
+      setApproving(true);
       approveWriteContract(approveData.request);
     }
   };
@@ -195,79 +202,98 @@ export default function BuyBar({
 
   return (
     <>
-      <p className="text-white mt-2 font-mono">
-        <span className="text-blue-400 font-bold">
-          {curPromotion ? amount * Number(curPromotion) : amount}
-        </span>{" "}
-        credits [includes{" "}
-        <span className="text-green-400 font-bold">
-          {curPromotion ? amount * Number(curPromotion) - amount : 0}
-        </span>{" "}
-        bonus credits!]
-        {purchaseSuccess && (
-          <span className="text-green-400 text-bold">&nbsp;Credit Purchase Successful!</span>
-        )}
-        {refundSuccess && (
-          <span className="text-green-400 text-bold">&nbsp;Credit Refund Successful!</span>
-        )}
-      </p>
-      <div className="flex w-full items-center justify-between gap-y-8 gap-x-8 font-mono flex-wrap">
-        <div className="flex max-w-full">
-          <span className="text-green-400 mr-2">{">"}</span>
-          <input
-            ref={inputRef}
-            autoFocus={true}
-            id="quantity"
-            type="number"
-            value={amount === 0 ? "" : amount}
-            onChange={handleChange}
-            disabled={buying || refunding || isLoading}
-            className={cn(
-              "flex-1 bg-transparent border-none outline-none w-[270px] max-w-[70%]",
-              "text-white font-mono",
-              "placeholder:text-gray-500",
-              "caret-green-400",
-              buying || refunding || (isLoading && "cursor-not-allowed opacity-50"),
-            )}
-            placeholder={isLoading ? "Loading $CERTAI balance..." : "Input amount"}
-          />
-          <label htmlFor="quantity" className="text-white">
-            $CERTAI
-          </label>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="bright"
-            disabled={
-              buying ||
-              refunding ||
-              isLoading ||
-              amount === 0 ||
-              Number(amount) > Number(curBalance)
-            }
-            onClick={handleBuy}
-          >
-            <span
-              className={`transition-transform duration-500 ${refunding ? "animate-pulse" : ""}`}
+      {!address ? (
+        <p className="text-white mt-2 font-mono">Connect wallet to purchase credits...</p>
+      ) : (
+        <>
+          {((allowanceData === BigInt(0)) && !approved) ? (
+            <Button
+              variant="bright"
+              onClick={handleApprove}
+              disabled={approving}
+              className={approving ? "animate-pulse" : ""}
             >
-              {buying ? "Buying..." : "Buy"}
-            </span>
-          </Button>
-          <Button
-            variant="bright"
-            disabled={
-              refunding || buying || isLoading || amount === 0 || Number(amount) > Number(curCredit)
-            }
-            onClick={handleRefund}
-          >
-            <span
-              className={`transition-transform duration-500 ${refunding ? "animate-pulse" : ""}`}
-            >
-              {refunding ? "Refunding..." : "Refund"}
-            </span>
-          </Button>
-        </div>
-      </div>
+              Approve to purchase credits
+            </Button>
+          ) : (
+            <>
+              <p className="text-white mt-2 font-mono">
+                <span className="text-blue-400 font-bold">
+                  {curPromotion ? amount * Number(curPromotion) : amount}
+                </span>{" "}
+                credits [includes{" "}
+                <span className="text-green-400 font-bold">
+                  {curPromotion ? amount * Number(curPromotion) - amount : 0}
+                </span>{" "}
+                bonus credits!]
+                {purchaseSuccess && (
+                  <span className="text-green-400 text-bold">&nbsp;Credit Purchase Successful!</span>
+                )}
+                {refundSuccess && (
+                  <span className="text-green-400 text-bold">&nbsp;Credit Refund Successful!</span>
+                )}
+              </p>
+              <div className="flex w-full items-center justify-between gap-y-8 gap-x-8 font-mono flex-wrap">
+                <div className="flex max-w-full">
+                  <span className="text-green-400 mr-2">{">"}</span>
+                  <input
+                    ref={inputRef}
+                    autoFocus={true}
+                    id="quantity"
+                    type="number"
+                    value={amount === 0 ? "" : amount}
+                    onChange={handleChange}
+                    disabled={buying || refunding || isLoading}
+                    className={cn(
+                      "flex-1 bg-transparent border-none outline-none w-[270px] max-w-[70%]",
+                      "text-white font-mono",
+                      "placeholder:text-gray-500",
+                      "caret-green-400",
+                      buying || refunding || (isLoading && "cursor-not-allowed opacity-50"),
+                    )}
+                    placeholder={isLoading ? "Loading $CERTAI balance..." : "Input amount"}
+                  />
+                  <label htmlFor="quantity" className="text-white">
+                    $CERTAI
+                  </label>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="bright"
+                    disabled={
+                      buying ||
+                      refunding ||
+                      isLoading ||
+                      amount === 0 ||
+                      Number(amount) > Number(curBalance)
+                    }
+                    onClick={handleBuy}
+                  >
+                    <span
+                      className={`transition-transform duration-500 ${refunding ? "animate-pulse" : ""}`}
+                    >
+                      {buying ? "Buying..." : "Buy"}
+                    </span>
+                  </Button>
+                  <Button
+                    variant="bright"
+                    disabled={
+                      refunding || buying || isLoading || amount === 0 || Number(amount) > Number(curDeposit)
+                    }
+                    onClick={handleRefund}
+                  >
+                    <span
+                      className={`transition-transform duration-500 ${refunding ? "animate-pulse" : ""}`}
+                    >
+                      {refunding ? "Refunding..." : "Refund"}
+                    </span>
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
     </>
   );
 }

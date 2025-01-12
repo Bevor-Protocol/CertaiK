@@ -7,6 +7,7 @@ import { useAccount, useReadContract, useWatchContractEvent } from "wagmi";
 export const useCertaiBalance = (): {
   certaiBalance?: string | undefined;
   creditBalance?: string | undefined;
+  depositBalance?: string | undefined;
   curPromotion?: string | undefined;
   isLoading: boolean;
 } => {
@@ -41,6 +42,20 @@ export const useCertaiBalance = (): {
   } = useReadContract({
     address: process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS as `0x${string}`,
     abi: abiJSON.abi,
+    functionName: "apiCredits",
+    args: [address as `0x${string}`],
+    query: {
+      enabled: !!address,
+    },
+  });
+
+  const {
+    data: depositData,
+    isLoading: isDepositLoading,
+    queryKey: depositQueryKey,
+  } = useReadContract({
+    address: process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS as `0x${string}`,
+    abi: abiJSON.abi,
     functionName: "depositAmount",
     args: [address as `0x${string}`],
     query: {
@@ -53,14 +68,16 @@ export const useCertaiBalance = (): {
     isLoading: isPromotionLoading,
     queryKey: promotionQueryKey,
   } = useReadContract({
-    address: (process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS || "0x0") as `0x${string}`,
+    address: (process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS) as `0x${string}`,
     abi: abiJSON.abi,
     functionName: "promotionalCreditScalar",
-    args: [address as `0x${string}`],
+    args: [],
     query: {
       enabled: !!address,
     },
   });
+
+  console.log("CUR PROM: " + curPromotion);
 
   const handleCreditsPurchased = (log: any): void => {
     if (!certaiQueryKey || !creditQueryKey) return;
@@ -84,10 +101,11 @@ export const useCertaiBalance = (): {
   });
 
   const parsedBalances = useMemo(() => {
-    if (typeof certaiData === "bigint" && typeof creditData === "bigint") {
+    if (typeof certaiData === "bigint" && typeof creditData === "bigint" && typeof depositData === "bigint") {
       return {
-        certaiBalance: (certaiData / 1000000n).toString(),
-        creditBalance: (creditData / 1000000n).toString(),
+        certaiBalance: (certaiData / 1000000000000000000n).toString(),
+        creditBalance: (creditData / 1000000000000000000n).toString(),
+        depositBalance: (depositData / 1000000000000000000n).toString(), 
         curPromotion: curPromotion?.toString(),
       };
     }
@@ -95,8 +113,9 @@ export const useCertaiBalance = (): {
       certaiBalance: undefined,
       creditBalance: undefined,
       curPromotion: undefined,
+      depositBalance: undefined,
     };
-  }, [certaiData, creditData, curPromotion]);
+  }, [certaiData, creditData, depositData, curPromotion]);
 
   return {
     ...parsedBalances,

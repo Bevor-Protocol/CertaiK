@@ -10,7 +10,7 @@ import { useState } from "react";
 export default function SimplePage(): JSX.Element {
   const [inputValue, setInputValue] = useState("");
 
-  const { certaiBalance, creditBalance, curPromotion, isLoading } = useCertaiBalance();
+  const { certaiBalance, creditBalance, curPromotion, depositBalance, isLoading } = useCertaiBalance();
 
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -43,12 +43,13 @@ export default function SimplePage(): JSX.Element {
               <BalanceBox
                 curBalance={certaiBalance}
                 curCredit={creditBalance}
+                curDeposit={depositBalance}
                 isLoading={isLoading}
               />
               {/* <CoinAscii /> */}
               {/* <WaifuAscii/> */}
             </div>
-            <BuyBar curBalance={certaiBalance} curCredit={creditBalance} isLoading={isLoading} />
+            <BuyBar curBalance={certaiBalance} curCredit={creditBalance} curDeposit={depositBalance} isLoading={isLoading} />
           </div>
         </div>
       </div>

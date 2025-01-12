@@ -7,6 +7,7 @@ export default function BalanceBox({
 }: {
   curBalance?: string | undefined;
   curCredit?: string | undefined;
+  curDeposit?: string | undefined;
   isLoading: boolean;
 }): JSX.Element {
   // Create dynamic padding based on the maximum length
