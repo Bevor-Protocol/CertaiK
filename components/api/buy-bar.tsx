@@ -18,12 +18,16 @@ export default function BuyBar({
   curDeposit,
   curPromotion,
   isLoading,
+  newDepositAmount,
+  setNewDepositValue,
 }: {
   curBalance?: string | undefined;
   curCredit?: string | undefined;
   curDeposit?: string | undefined;
   curPromotion?: string | undefined;
   isLoading: boolean;
+  newDepositAmount: number | undefined;
+  setNewDepositValue: (value: number) => void;
 }): JSX.Element {
   const [amount, setAmount] = useState(0);
 
@@ -121,11 +125,44 @@ export default function BuyBar({
     // Update your application state or UI
     console.log("Credits purchased:", args);
 
-    if (refunding) {
-      setRefundSuccess(true);
-    } else if (buying) {
-      setPurchaseSuccess(true);
-    }
+    setPurchaseSuccess(true);
+
+    setNewDepositValue((newDepositAmount || 0) + amount);
+
+    setAmount(0);
+
+    setRefunding(false);
+    setBuying(false);
+    // For example, you might update a state variable to reflect the new balance
+
+    
+  };
+
+
+  useWatchContractEvent({
+    address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,
+    abi: abiJSON.abi,
+    eventName: "CreditsRefunded",
+    onLogs(log: any) {
+      console.log(log);
+      handleCreditsRefunded(log);
+    },
+    onError(error: any) {
+      console.error("Error occurred:", error);
+      setRefunding(true);
+      setBuying(true);
+    },
+  });
+
+  const handleCreditsRefunded = (log: any): void => {
+    // Extract relevant data from the log
+    const { args } = log;
+    // Update your application state or UI
+    console.log("Credits purchased:", args);
+
+    setRefundSuccess(true);
+
+    setNewDepositValue((newDepositAmount || 0) - amount);
 
     setAmount(0);
 
@@ -133,6 +170,7 @@ export default function BuyBar({
     setBuying(false);
     // For example, you might update a state variable to reflect the new balance
   };
+
 
   useWatchContractEvent({
     address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,

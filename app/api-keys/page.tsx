@@ -9,6 +9,7 @@ import { useState } from "react";
 
 export default function SimplePage(): JSX.Element {
   const [inputValue, setInputValue] = useState("");
+  const [newDepositAmount, setNewDepositValue] = useState(0);
 
   const { certaiBalance, creditBalance, curPromotion, depositBalance, isLoading } = useCertaiBalance();
 
@@ -44,12 +45,14 @@ export default function SimplePage(): JSX.Element {
                 curBalance={certaiBalance}
                 curCredit={creditBalance}
                 curDeposit={depositBalance}
+                newDepositAmount={newDepositAmount}
+                curPromotion={curPromotion}
                 isLoading={isLoading}
               />
               {/* <CoinAscii /> */}
               {/* <WaifuAscii/> */}
             </div>
-            <BuyBar curBalance={certaiBalance} curCredit={creditBalance} curDeposit={depositBalance} isLoading={isLoading} />
+            <BuyBar curBalance={certaiBalance} curCredit={creditBalance} curDeposit={depositBalance} newDepositAmount={newDepositAmount} setNewDepositValue={setNewDepositValue} isLoading={isLoading} />
           </div>
         </div>
       </div>

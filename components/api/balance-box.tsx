@@ -3,11 +3,16 @@
 export default function BalanceBox({
   curBalance,
   curCredit,
+  curDeposit,
+  newDepositAmount,
+  curPromotion,
   isLoading,
 }: {
   curBalance?: string | undefined;
   curCredit?: string | undefined;
   curDeposit?: string | undefined;
+  newDepositAmount?: number | undefined;
+  curPromotion?: string | undefined;
   isLoading: boolean;
 }): JSX.Element {
   // Create dynamic padding based on the maximum length
@@ -25,11 +30,12 @@ export default function BalanceBox({
         <div>+-------------------------------------------+</div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
           | Your $CERTAI Balance:{" "}
-          {(isLoading ? "loading..." : parseFloat(curBalance || "0")).toString()}
+          {(isLoading ? "loading..." : (parseFloat(curBalance || "0") + (newDepositAmount || 0)).toString())}
           {certaiPadding} |
         </div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
-          | Your API Credits: {(isLoading ? "loading..." : parseFloat(curCredit || "0")).toString()}
+          | Your API Credits:{" "}
+          {(isLoading ? "loading..." : Math.ceil(parseFloat(curCredit || "0") + ((newDepositAmount || 0) * (parseInt(curPromotion || "0") / 100))).toString())}
           {creditPadding} |
         </div>
         <div>+-------------------------------------------+</div>
@@ -37,10 +43,11 @@ export default function BalanceBox({
       <div className="sm:hidden inline-block">
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
           Your $CERTAI Balance:
-          {(isLoading ? "loading..." : parseFloat(curBalance || "0")).toString()}
+          {(isLoading ? "loading..." : (parseFloat(curBalance || "0") + (newDepositAmount || 0)).toString())}
         </div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
-          Your API Credits: {(isLoading ? "loading..." : parseFloat(curCredit || "0")).toString()}
+          Your API Credits:{" "}
+          {(isLoading ? "loading..." : Math.ceil(parseFloat(curCredit || "0") + ((newDepositAmount || 0) * (parseInt(curPromotion || "0") / 100))).toString())}
         </div>
       </div>
     </div>
