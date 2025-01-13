@@ -249,9 +249,9 @@ export default function BuyBar({
               variant="bright"
               onClick={handleApprove}
               disabled={approving}
-              className={approving ? "animate-pulse" : ""}
+              className={`transition-transform duration-500 ${approving ? "animate-pulse" : ""}`}
             >
-              Approve to purchase credits
+              {approving ? "Approving..." : "Approve to purchase credits"}
             </Button>
           ) : (
             <>
@@ -308,7 +308,7 @@ export default function BuyBar({
                     onClick={handleBuy}
                   >
                     <span
-                      className={`transition-transform duration-500 ${refunding ? "animate-pulse" : ""}`}
+                      className={`transition-transform duration-500 ${buying ? "animate-pulse" : ""}`}
                     >
                       {buying ? "Buying..." : "Buy"}
                     </span>
