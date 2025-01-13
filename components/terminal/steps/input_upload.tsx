@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
 import { MessageType } from "@/utils/types";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
-import { FileDropZone } from "../file-drop-zone";
+import FileDropZone from "../file-drop-zone";
 import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
@@ -12,19 +12,19 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function UploadStep({
+const UploadStep = ({
   setTerminalStep,
   handleGlobalState,
   setContractContent,
   state,
-}: TerminalProps) {
+}: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [uploadAvailable, setUploadAvailable] = useState(state.length === 1);
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
@@ -34,7 +34,7 @@ export function UploadStep({
     scrollToBottom();
   }, [history]);
 
-  const handleUpload = (content: string) => {
+  const handleUpload = (content: string): void => {
     setContractContent(content);
     setUploadAvailable(false);
     setHistory((prev) => [
@@ -50,7 +50,7 @@ export function UploadStep({
     ]);
   };
 
-  const handleValidate = () => {
+  const handleValidate = (): void => {
     if (!input) {
       setHistory((prev) => [
         ...prev,
@@ -94,7 +94,7 @@ export function UploadStep({
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
     setHistory((prev) => [
       ...prev,
@@ -134,4 +134,6 @@ export function UploadStep({
       />
     </>
   );
-}
+};
+
+export default UploadStep;

@@ -21,7 +21,7 @@ export const SiweContext = createContext<SiweStateI>({
   setIsAuthenticated: () => {},
 });
 
-export const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
+const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
   // controls user Auth UI, and controls a non-toggleable Modal.
   // Similar to what's used in the ModalProvider, but we don't allow for close
   // unless a specific action is taken.
@@ -134,7 +134,7 @@ export const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.E
 
     handleChange();
 
-    return () => {
+    return (): void => {
       if (timer) {
         clearTimeout(timer);
       }
@@ -162,3 +162,5 @@ export const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.E
     </SiweContext.Provider>
   );
 };
+
+export default SiweProvider;

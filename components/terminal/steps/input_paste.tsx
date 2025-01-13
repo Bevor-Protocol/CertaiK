@@ -12,12 +12,12 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function PasteStep({
+const PasteStep = ({
   setTerminalStep,
   handleGlobalState,
   setContractContent,
   state,
-}: TerminalProps) {
+}: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [textAvailable, setTextAvailable] = useState(state.length === 1);
   const [tempInput, setTempInput] = useState("");
@@ -25,7 +25,7 @@ export function PasteStep({
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
@@ -35,7 +35,7 @@ export function PasteStep({
     scrollToBottom();
   }, [history]);
 
-  const handleValidate = () => {
+  const handleValidate = (): void => {
     if (!input) {
       setHistory((prev) => [
         ...prev,
@@ -81,7 +81,7 @@ export function PasteStep({
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
     if (textAvailable) {
       setHistory((prev) => [
@@ -140,4 +140,6 @@ export function PasteStep({
       )}
     </>
   );
-}
+};
+
+export default PasteStep;

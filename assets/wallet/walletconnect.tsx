@@ -1,6 +1,8 @@
+/* eslint-disable max-len */
 import Script from "next/script";
+import { SVGProps } from "react";
 
-const WalletConnect = (props: any): JSX.Element => {
+export default (props: SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -24,5 +26,3 @@ const WalletConnect = (props: any): JSX.Element => {
     </svg>
   );
 };
-
-export default WalletConnect;

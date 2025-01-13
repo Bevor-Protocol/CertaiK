@@ -48,7 +48,12 @@ export const Profile = ({
               )}
             </Social>
           </div>
-          <div className="flex flex-row justify-between items-center text-xxs text-white/60 flex-nowrap">
+          <div
+            className={cn(
+              "flex flex-row justify-between items-center",
+              "text-xxs text-white/60 flex-nowrap",
+            )}
+          >
             <p>{connector?.name}</p>
             <p>
               <span>{chain?.name}</span>
@@ -66,7 +71,12 @@ export const Profile = ({
       <Card.Footer className="p-1">
         <div className="flex flex-col w-full">
           <Link href={`/users/${address}`} className="w-full" onClick={close}>
-            <div className="flex items-center relative rounded-lg transition-colors px-1 py-2 w-full justify-start gap-2 hover:bg-slate-700/40">
+            <div
+              className={cn(
+                "flex items-center relative rounded-lg transition-colors",
+                "px-1 py-2 w-full justify-start gap-2 hover:bg-slate-700/40",
+              )}
+            >
               <LayoutDashboardIcon height="0.85rem" width="0.85rem" stroke="currentColor" />
               <span>Dashboard</span>
             </div>
@@ -76,7 +86,11 @@ export const Profile = ({
               close?.();
               logout();
             }}
-            className="flex items-center relative rounded-lg transition-colors px-1 py-2 w-full justify-start gap-2 cursor-pointer border border-1 border-transparent hover:bg-slate-700/40"
+            className={cn(
+              "flex items-center relative rounded-lg transition-colors",
+              "px-1 py-2 w-full justify-start gap-2 cursor-pointer",
+              "border border-1 border-transparent hover:bg-slate-700/40",
+            )}
           >
             <LogOut height="0.85rem" width="0.85rem" />
             <span>Disconnect</span>
@@ -99,13 +113,19 @@ export const Web3Network = (): JSX.Element => {
       <Dropdown.Trigger>
         <Tooltip.Reference shouldShow={!chain}>
           <Tooltip.Trigger>
-            <div className="flex justify-center items-center gap-2 px-2 h-12 rounded-lg hover:bg-slate-700/40">
+            <div
+              className={cn(
+                "flex justify-center items-center gap-2 px-2",
+                "h-12 rounded-lg hover:bg-slate-700/40",
+              )}
+            >
               <Icon
                 size="sm"
                 image={networkImg}
                 className={cn(
                   !supported && "!bg-auto",
-                  supported && networkImg.includes("unknown") && "!bg-auto", // for localhost for now.
+                  // for localhost for now.
+                  supported && networkImg.includes("unknown") && "!bg-auto",
                 )}
               />
               <ChevronDown />
@@ -139,7 +159,7 @@ export const Web3Profile = ({ address }: { address: string }): JSX.Element => {
           )}
         >
           <Icon size="md" seed={address} />
-          <span className="lg:hidden">{trimAddress(address)}</span>
+          <span className="lg:inline-block hidden">{trimAddress(address)}</span>
         </div>
       </Dropdown.Trigger>
       <Dropdown.Content className="top-full right-0" hasCloseTrigger>

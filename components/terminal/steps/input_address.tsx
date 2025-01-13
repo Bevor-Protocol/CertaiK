@@ -12,12 +12,12 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function AddressStep({
+const AddressStep = ({
   setTerminalStep,
   handleGlobalState,
   setContractContent,
   state,
-}: TerminalProps) {
+}: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
@@ -25,7 +25,7 @@ export function AddressStep({
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
@@ -35,7 +35,7 @@ export function AddressStep({
     scrollToBottom();
   }, [history]);
 
-  const handleScan = () => {
+  const handleScan = (): void => {
     if (!input) {
       setHistory((prev) => [
         ...prev,
@@ -88,7 +88,7 @@ export function AddressStep({
       });
   };
 
-  const handleValidate = () => {
+  const handleValidate = (): void => {
     if (!input) {
       setHistory((prev) => [
         ...prev,
@@ -132,7 +132,7 @@ export function AddressStep({
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
     setHistory((prev) => [
       ...prev,
@@ -176,4 +176,6 @@ export function AddressStep({
       />
     </>
   );
-}
+};
+
+export default AddressStep;

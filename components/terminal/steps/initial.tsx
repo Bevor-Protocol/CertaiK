@@ -10,13 +10,13 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function InitialStep({ setTerminalStep, handleGlobalState, state }: TerminalProps) {
+const InitialStep = ({ setTerminalStep, handleGlobalState, state }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
@@ -26,7 +26,7 @@ export function InitialStep({ setTerminalStep, handleGlobalState, state }: Termi
     scrollToBottom();
   }, [history]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
     switch (input) {
       case "1": {
@@ -84,4 +84,6 @@ export function InitialStep({ setTerminalStep, handleGlobalState, state }: Termi
       />
     </>
   );
-}
+};
+
+export default InitialStep;

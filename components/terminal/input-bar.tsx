@@ -10,14 +10,14 @@ interface InputBarProps {
   placeholder?: string;
 }
 
-const TerminalInputBar: React.FC<InputBarProps> = ({
+const TerminalInputBar = ({
   value,
   onChange,
   onSubmit,
   disabled,
   overrideLoading,
   placeholder,
-}) => {
+}: InputBarProps): JSX.Element => {
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (!disabled && !overrideLoading && inputRef.current) {
@@ -41,7 +41,7 @@ const TerminalInputBar: React.FC<InputBarProps> = ({
           "caret-green-400",
           disabled && "cursor-not-allowed opacity-50",
         )}
-        placeholder={overrideLoading ? "" : !!placeholder ? placeholder : "Type your command..."}
+        placeholder={overrideLoading ? "" : placeholder ? placeholder : "Type your command..."}
       />
       {overrideLoading && (
         <div className="absolute left-5 font-mono text-gray-500 pointer-events-none">

@@ -12,25 +12,25 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function AuditTypeStep({
+const AuditTypeStep = ({
   setTerminalStep,
   handleGlobalState,
   setPromptType,
   state,
-}: TerminalProps) {
+}: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [step, setStep] = useState(state.length === 1 ? 0 : 1);
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   };
 
-  const handlePrompt = () => {
+  const handlePrompt = (): void => {
     switch (input) {
       case "1": {
         setHistory((prev) => [
@@ -78,7 +78,7 @@ export function AuditTypeStep({
     setInput("");
   };
 
-  const handleReady = () => {
+  const handleReady = (): void => {
     if (!input) {
       setHistory((prev) => [
         ...prev,
@@ -119,7 +119,7 @@ export function AuditTypeStep({
     scrollToBottom();
   }, [history]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
     if (step === 0) {
       handlePrompt();
@@ -155,4 +155,6 @@ export function AuditTypeStep({
       />
     </>
   );
-}
+};
+
+export default AuditTypeStep;

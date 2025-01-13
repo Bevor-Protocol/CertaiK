@@ -1,12 +1,12 @@
 import { ModalContext } from "@/providers/modal";
 import { SiweContext } from "@/providers/siwe";
-import { WebSocketContext } from "@/providers/websocket";
-import { ModalStateI } from "@/utils/types";
+import { WebSocketContext, WebSocketContextType } from "@/providers/websocket";
+import { ModalStateI, SiweStateI } from "@/utils/types";
 import { useContext } from "react";
 
-export const useWs = () => useContext(WebSocketContext);
+export const useWs = (): WebSocketContextType => useContext(WebSocketContext);
 
-export const useSiwe = () => useContext(SiweContext);
+export const useSiwe = (): SiweStateI => useContext(SiweContext);
 
 export const useModal = (): ModalStateI => {
   const model = useContext(ModalContext);

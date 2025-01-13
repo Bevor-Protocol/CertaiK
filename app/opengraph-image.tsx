@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "next/og";
 
 // Route segment config
@@ -9,7 +10,7 @@ export const size = { width: 1200, height: 630 };
 // Image content type
 export const contentType = "image/png";
 
-export default async function Image() {
+export default async function Image(): Promise<ImageResponse> {
   return new ImageResponse(
     (
       <div

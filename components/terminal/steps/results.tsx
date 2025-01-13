@@ -14,28 +14,30 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function ResultsStep({
+const ResultsStep = ({
   setAuditContent,
   contractContent,
   promptType,
   auditContent,
   state,
-}: TerminalProps) {
+}: TerminalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [jobId, setJobId] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isRetry, setIsRetry] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [allowRetry, setAllowRetry] = useState(true);
   const { setOnMessageHandler, sendMessage } = useWs();
 
   useEffect(() => {
-    setOnMessageHandler((data: any) => {
+    setOnMessageHandler((data: any): void => {
       if (data.result) {
         setAuditContent(data.result);
         setLoading(false);
       }
     });
-  }, [setOnMessageHandler]);
+  }, [setOnMessageHandler, setAuditContent]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -53,13 +55,13 @@ export function ResultsStep({
   useEffect(() => {
     if (state.length || loading) return;
     setLoading(true);
-    console.log("IM FIRING");
     const cleanedFileContent = removeComments(contractContent || "");
     certaikApiAction
       .runEval(cleanedFileContent, promptType)
       .then((result) => {
         const { job_id } = result;
         // websocket subscribes to job result
+        setJobId(job_id);
         console.log("Sending ws message", job_id);
         sendMessage(`subscribe:${job_id}`);
       })
@@ -69,7 +71,7 @@ export function ResultsStep({
       });
   }, [state]);
 
-  const handleRetry = async () => {
+  const handleRetry = async (): Promise<void> => {
     try {
       const success = await certaikApiAction.retryFailedEval(jobId);
 
@@ -105,7 +107,7 @@ export function ResultsStep({
       </div>
       <TerminalInputBar
         onSubmit={() => {}}
-        onChange={(value: string) => {}}
+        onChange={() => {}}
         disabled={true}
         value={""}
         overrideLoading={loading}
@@ -113,4 +115,6 @@ export function ResultsStep({
       />
     </>
   );
-}
+};
+
+export default ResultsStep;

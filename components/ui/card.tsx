@@ -9,7 +9,8 @@ export const Main: React.FC<Props> = ({ children, className, hover = false, ...r
   return (
     <div
       className={cn(
-        "flex flex-col bg-black shadow rounded-lg divide-gray-200/10 divide-y divide-solid border border-white",
+        "flex flex-col bg-black shadow rounded-lg",
+        "divide-gray-200/10 divide-y divide-solid border border-white",
         hover && "transition-colors hover:bg-slate-700/40",
         className,
       )}

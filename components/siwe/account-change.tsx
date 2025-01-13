@@ -8,6 +8,7 @@ import { Icon } from "@/components/ui/icon";
 import { Loader } from "@/components/ui/loader";
 import { useSiwe } from "@/hooks/useContexts";
 import { trimAddress } from "@/utils/helpers";
+import React from "react";
 import { Button } from "../ui/button";
 
 const IconMapper: Record<string, React.ReactNode> = {
@@ -15,7 +16,11 @@ const IconMapper: Record<string, React.ReactNode> = {
   coinbaseWalletSDK: <CoinbaseWallet height="20" width="20" />,
 };
 
-const RequestAccountChange = ({ verifiedAddress }: { verifiedAddress: string }): JSX.Element => {
+type Props = {
+  verifiedAddress: string;
+};
+
+const RequestAccountChange = ({ verifiedAddress }: Props): JSX.Element => {
   const { connector: activeConnector } = useAccount();
   const { logout, isPending } = useSiwe();
 

@@ -1,10 +1,10 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { sessionOptions, walletConfig } from "@/lib/config";
-import { ModalProvider } from "@/providers/modal";
-import { SiweProvider } from "@/providers/siwe";
+import ModalProvider from "@/providers/modal";
+import SiweProvider from "@/providers/siwe";
 import WalletProvider from "@/providers/wallet";
-import { WebSocketProvider } from "@/providers/websocket";
+import WebSocketProvider from "@/providers/websocket";
 import { SessionData } from "@/utils/types";
 import { getIronSession } from "iron-session";
 import type { Metadata } from "next";
@@ -40,7 +40,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
   const headerList = await headers();
   const cookieStore = await cookies();
   const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
-  const address = !!session.siwe ? session.siwe.address : null;
+  const address = session.siwe ? session.siwe.address : null;
   const initialState = cookieToInitialState(walletConfig, headerList.get("cookie"));
   return (
     <html lang="en">
