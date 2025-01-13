@@ -18,10 +18,10 @@ export default function BalanceBox({
   // Create dynamic padding based on the maximum length
   console.log(curBalance, curCredit);
   const certaiPadding = "\u00A0".repeat(
-    19 - (isLoading ? "loading...".length : (curBalance || "0")?.length),
+    22 - (isLoading ? "loading...".length : (curBalance || "0")?.length),
   );
   const creditPadding = "\u00A0".repeat(
-    23 - (isLoading ? "loading...".length : (curCredit || "0")?.length),
+    24 - (isLoading ? "loading...".length : (curCredit || "0")?.length),
   );
 
   return (
@@ -29,14 +29,14 @@ export default function BalanceBox({
       <div className="sm:inline-block hidden">
         <div>+-------------------------------------------+</div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
-          | Your $CERTAI Balance:{" "}
+        Your $CERTAI Balance:{" "}
           {(isLoading ? "loading..." : parseFloat(curBalance || "0") - (newDepositAmount || 0))}
-          {certaiPadding} |
+
         </div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
-          | Your API Credits:{" "}
+        Your API Credits:{" "}
           {(isLoading ? "loading..." : (parseFloat(curCredit || "0") + ((newDepositAmount || 0) * (parseInt(curPromotion || "0") / 100))).toString())}
-          {creditPadding} |
+
         </div>
         <div>+-------------------------------------------+</div>
       </div>

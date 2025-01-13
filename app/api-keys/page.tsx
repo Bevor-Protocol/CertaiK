@@ -41,7 +41,6 @@ export default function SimplePage(): JSX.Element {
                 * API credits enable integration into your app and access to premium services and
                 features *
               </div>
-              {creditBalance}TEST
               <BalanceBox
                 curBalance={certaiBalance}
                 curCredit={creditBalance}
