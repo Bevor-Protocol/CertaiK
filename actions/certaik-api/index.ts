@@ -28,8 +28,12 @@ const getCurrentGas = async (): Promise<number> => {
   return certaikApiController.getCurrentGas();
 };
 
-const getAudits = async (): Promise<any[]> => {
+const getAudits = async (): Promise<{ results: any[]; more: boolean }> => {
   return certaikApiController.getAudits();
 };
 
-export { getAudits, getCurrentGas, getSourceCode, retryFailedEval, runEval };
+const getStats = async (): Promise<any> => {
+  return certaikApiController.getStats();
+};
+
+export { getAudits, getCurrentGas, getSourceCode, getStats, retryFailedEval, runEval };

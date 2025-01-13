@@ -24,8 +24,8 @@ class CertaikApiService {
           encode_code: true,
           response_type: "markdown",
           // webhook_url: `${process.env.VERCEL_URL}/api/webhook`,
-          // webhook_url: "https://webhook.site/5eec6efd-1fda-486a-aac5-e95a19a0ea5a",
-          webhook_url: "https://i-dont-exist.com",
+          webhook_url: "https://webhook.site/5eec6efd-1fda-486a-aac5-e95a19a0ea5a",
+          // webhook_url: "https://i-dont-exist.com",
         },
         {
           headers: {
@@ -128,7 +128,7 @@ class CertaikApiService {
     }
   }
 
-  async getAudits(): Promise<any[]> {
+  async getAudits(): Promise<{ results: any[]; more: boolean }> {
     const address = await this.authService.currentUser();
     if (!address) {
       throw new Error("user is not signed in with ethereum");
@@ -139,6 +139,25 @@ class CertaikApiService {
           "X-User-Identifier": address,
         },
       });
+
+      if (!response.data) {
+        throw new Error("Issue retrying this job");
+      }
+
+      return response.data;
+    } catch (error) {
+      console.log("Error fetching audits: ", error);
+      throw error;
+    }
+  }
+
+  async getStats(): Promise<{ results: any[]; more: boolean }> {
+    const address = await this.authService.currentUser();
+    if (!address) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    try {
+      const response = await api.get("/analytics/stats");
 
       if (!response.data) {
         throw new Error("Issue retrying this job");

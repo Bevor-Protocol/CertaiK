@@ -60,12 +60,21 @@ export default {
             transform: "scale(0.7)",
           },
         },
+        "pulse-more": {
+          "0%, 100%": {
+            opacity: "1",
+          },
+          "50%": {
+            opacity: ".2",
+          },
+        },
       },
       animation: {
         "loading-dots": "dots 2s steps(4, end) infinite",
         modal: "modal 0.25s forwards",
         appear: "appear 0.15s forwards",
         disappear: "disappear 0.15s forwards",
+        "pulse-more": "pulse-more 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;",
       },
     },
   },

@@ -27,8 +27,12 @@ class AiController {
     return this.certaikApiService.getCurrentGas();
   }
 
-  async getAudits(): Promise<any[]> {
+  async getAudits(): Promise<{ results: any[]; more: boolean }> {
     return this.certaikApiService.getAudits();
+  }
+
+  async getStats(): Promise<any> {
+    return this.certaikApiService.getStats();
   }
 }
 
