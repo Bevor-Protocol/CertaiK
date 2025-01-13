@@ -41,6 +41,7 @@ export default function SimplePage(): JSX.Element {
                 * API credits enable integration into your app and access to premium services and
                 features *
               </div>
+              {creditBalance}TEST
               <BalanceBox
                 curBalance={certaiBalance}
                 curCredit={creditBalance}
@@ -52,7 +53,7 @@ export default function SimplePage(): JSX.Element {
               {/* <CoinAscii /> */}
               {/* <WaifuAscii/> */}
             </div>
-            <BuyBar curBalance={certaiBalance} curCredit={creditBalance} curDeposit={depositBalance} newDepositAmount={newDepositAmount} setNewDepositValue={setNewDepositValue} isLoading={isLoading} />
+            <BuyBar curBalance={certaiBalance} curPromotion={curPromotion} curCredit={creditBalance} curDeposit={depositBalance} newDepositAmount={newDepositAmount} setNewDepositValue={setNewDepositValue} isLoading={isLoading} />
           </div>
         </div>
       </div>

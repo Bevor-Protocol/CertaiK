@@ -191,7 +191,7 @@ export default function BuyBar({
     console.log(amount);
     if (buyData && buyData.request) {
       console.log("Buying credits");
-      buyWriteContract(buyData.request);
+      //buyWriteContract(buyData.request);
       setApproved(true);
       setApproving(false);
     }
@@ -257,11 +257,11 @@ export default function BuyBar({
             <>
               <p className="text-white mt-2 font-mono">
                 <span className="text-blue-400 font-bold">
-                  {curPromotion ? amount * Number(curPromotion) : amount}
+                  {curPromotion ? (amount * Number(curPromotion)) / 100 : amount}
                 </span>{" "}
                 credits [includes{" "}
                 <span className="text-green-400 font-bold">
-                  {curPromotion ? amount * Number(curPromotion) - amount : 0}
+                  {curPromotion ? (amount * Number(curPromotion)) / 100 - amount : 0}
                 </span>{" "}
                 bonus credits!]
                 {purchaseSuccess && (

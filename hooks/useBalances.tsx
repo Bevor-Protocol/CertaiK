@@ -49,6 +49,10 @@ export const useCertaiBalance = (): {
     },
   });
 
+  if (creditData) {
+    console.log("credit data found: ", creditData)
+  }
+
   const {
     data: depositData,
     isLoading: isDepositLoading,
@@ -101,14 +105,18 @@ export const useCertaiBalance = (): {
   });
 
   const parsedBalances = useMemo(() => {
+
     if (typeof certaiData === "bigint" && typeof creditData === "bigint" && typeof depositData === "bigint") {
+      console.log("CDD: " + (Number(creditData) / 1000000000000000000).toFixed(2));
+
       return {
-        certaiBalance: (certaiData / 1000000000000000000n).toString(),
-        creditBalance: (creditData / 1000000000000000000n).toString(),
+        certaiBalance: (Number(certaiData) / 1000000000000000000).toFixed(2),
+        creditBalance: (Number(creditData) / 1000000000000000000).toFixed(2),
         depositBalance: (depositData / 1000000000000000000n).toString(), 
         curPromotion: curPromotion?.toString(),
       };
     }
+
     return {
       certaiBalance: undefined,
       creditBalance: undefined,

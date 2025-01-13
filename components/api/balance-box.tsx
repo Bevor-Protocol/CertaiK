@@ -30,12 +30,12 @@ export default function BalanceBox({
         <div>+-------------------------------------------+</div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
           | Your $CERTAI Balance:{" "}
-          {(isLoading ? "loading..." : (parseFloat(curBalance || "0") + (newDepositAmount || 0)).toString())}
+          {(isLoading ? "loading..." : parseFloat(curBalance || "0") - (newDepositAmount || 0))}
           {certaiPadding} |
         </div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
           | Your API Credits:{" "}
-          {(isLoading ? "loading..." : Math.ceil(parseFloat(curCredit || "0") + ((newDepositAmount || 0) * (parseInt(curPromotion || "0") / 100))).toString())}
+          {(isLoading ? "loading..." : (parseFloat(curCredit || "0") + ((newDepositAmount || 0) * (parseInt(curPromotion || "0") / 100))).toString())}
           {creditPadding} |
         </div>
         <div>+-------------------------------------------+</div>
@@ -43,11 +43,11 @@ export default function BalanceBox({
       <div className="sm:hidden inline-block">
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
           Your $CERTAI Balance:
-          {(isLoading ? "loading..." : (parseFloat(curBalance || "0") + (newDepositAmount || 0)).toString())}
+          {(isLoading ? "loading..." : parseFloat(curBalance || "0") - (newDepositAmount || 0))}
         </div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
           Your API Credits:{" "}
-          {(isLoading ? "loading..." : Math.ceil(parseFloat(curCredit || "0") + ((newDepositAmount || 0) * (parseInt(curPromotion || "0") / 100))).toString())}
+          {(isLoading ? "loading..." : parseFloat(curCredit || "0") + ((newDepositAmount || 0) * (parseInt(curPromotion || "0") / 100)))}
         </div>
       </div>
     </div>
