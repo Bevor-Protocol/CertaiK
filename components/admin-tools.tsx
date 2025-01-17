@@ -7,7 +7,7 @@ import { useAccount, useReadContract, useSimulateContract, useWriteContract } fr
 export default function AdminTools() {
   const { address } = useAccount();
   const [withdrawing, setWithdrawing] = useState(false);
-  
+
   const isAdmin = address?.toLowerCase() === "0x341ab3097c45588af509db745ce0823722e5fb19";
   const contractAddress = process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS;
 
@@ -34,7 +34,7 @@ export default function AdminTools() {
 
   const handleWithdraw = async () => {
     if (!withdrawData?.request) return;
-    
+
     try {
       setWithdrawing(true);
       await withdrawWriteContract(withdrawData.request);
@@ -68,23 +68,26 @@ export default function AdminTools() {
 
   return (
     <div className="flex gap-2">
-      <Button 
+      <Button
         variant="bright"
-        disabled={withdrawing || !contractBalance || (typeof contractBalance === 'bigint' && contractBalance <= BigInt(0))}
+        disabled={
+          withdrawing ||
+          !contractBalance ||
+          (typeof contractBalance === "bigint" && contractBalance <= BigInt(0))
+        }
         onClick={handleWithdraw}
       >
-        <div> 
-          <span className={`transition-transform duration-500 ${withdrawing ? "animate-pulse" : ""}`}>
+        <div>
+          <span
+            className={`transition-transform duration-500 ${withdrawing ? "animate-pulse" : ""}`}
+          >
             {withdrawing ? "Withdrawing..." : "Withdraw "}
           </span>
           {contractBalance?.toString() ?? "0"}{" "}
         </div>
       </Button>
 
-      <Button
-        variant="bright"
-        onClick={handleLaunch}
-      >
+      <Button variant="bright" onClick={handleLaunch}>
         Launch API
       </Button>
     </div>

@@ -6,11 +6,11 @@ import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
 import { erc20Abi } from "viem";
 import {
-    useAccount,
-    useReadContract,
-    useSimulateContract,
-    useWatchContractEvent,
-    useWriteContract,
+  useAccount,
+  useReadContract,
+  useSimulateContract,
+  useWatchContractEvent,
+  useWriteContract,
 } from "wagmi";
 
 export default function BuyBar({
@@ -135,10 +135,7 @@ export default function BuyBar({
     setRefunding(false);
     setBuying(false);
     // For example, you might update a state variable to reflect the new balance
-
-    
   };
-
 
   useWatchContractEvent({
     address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,
@@ -171,7 +168,6 @@ export default function BuyBar({
     setBuying(false);
     // For example, you might update a state variable to reflect the new balance
   };
-
 
   useWatchContractEvent({
     address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,
@@ -245,7 +241,7 @@ export default function BuyBar({
         <p className="text-white mt-2 font-mono">Connect wallet to purchase credits...</p>
       ) : (
         <>
-          {((allowanceData === BigInt(0)) && !approved) ? (
+          {allowanceData === BigInt(0) && !approved ? (
             <Button
               variant="bright"
               onClick={handleApprove}
@@ -266,7 +262,9 @@ export default function BuyBar({
                 </span>{" "}
                 bonus credits!]
                 {purchaseSuccess && (
-                  <span className="text-green-400 text-bold">&nbsp;Credit Purchase Successful!</span>
+                  <span className="text-green-400 text-bold">
+                    &nbsp;Credit Purchase Successful!
+                  </span>
                 )}
                 {refundSuccess && (
                   <span className="text-green-400 text-bold">&nbsp;Credit Refund Successful!</span>
@@ -317,7 +315,11 @@ export default function BuyBar({
                   <Button
                     variant="bright"
                     disabled={
-                      refunding || buying || isLoading || amount === 0 || Number(amount) > Number(curDeposit)
+                      refunding ||
+                      buying ||
+                      isLoading ||
+                      amount === 0 ||
+                      Number(amount) > Number(curDeposit)
                     }
                     onClick={handleRefund}
                   >

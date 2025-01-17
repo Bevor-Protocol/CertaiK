@@ -50,7 +50,7 @@ export const useCertaiBalance = (): {
   });
 
   if (creditData) {
-    console.log("credit data found: ", creditData)
+    console.log("credit data found: ", creditData);
   }
 
   const {
@@ -72,7 +72,7 @@ export const useCertaiBalance = (): {
     isLoading: isPromotionLoading,
     queryKey: promotionQueryKey,
   } = useReadContract({
-    address: (process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS) as `0x${string}`,
+    address: process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS as `0x${string}`,
     abi: abiJSON.abi,
     functionName: "promotionalCreditScalar",
     args: [],
@@ -105,14 +105,17 @@ export const useCertaiBalance = (): {
   });
 
   const parsedBalances = useMemo(() => {
-
-    if (typeof certaiData === "bigint" && typeof creditData === "bigint" && typeof depositData === "bigint") {
+    if (
+      typeof certaiData === "bigint" &&
+      typeof creditData === "bigint" &&
+      typeof depositData === "bigint"
+    ) {
       console.log("CDD: " + (Number(creditData) / 1000000000000000000).toFixed(2));
 
       return {
         certaiBalance: (Number(certaiData) / 1000000000000000000).toFixed(2),
         creditBalance: (Number(creditData) / 1000000000000000000).toFixed(2),
-        depositBalance: (depositData / 1000000000000000000n).toString(), 
+        depositBalance: (depositData / 1000000000000000000n).toString(),
         curPromotion: curPromotion?.toString(),
       };
     }
@@ -127,6 +130,7 @@ export const useCertaiBalance = (): {
 
   return {
     ...parsedBalances,
-    isLoading: ((isCertaiLoading || isCreditLoading || isPromotionLoading) && certaiData === undefined),
+    isLoading:
+      (isCertaiLoading || isCreditLoading || isPromotionLoading) && certaiData === undefined,
   };
 };
