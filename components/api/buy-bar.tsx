@@ -6,11 +6,11 @@ import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
 import { erc20Abi } from "viem";
 import {
-  useAccount,
-  useReadContract,
-  useSimulateContract,
-  useWatchContractEvent,
-  useWriteContract,
+    useAccount,
+    useReadContract,
+    useSimulateContract,
+    useWatchContractEvent,
+    useWriteContract,
 } from "wagmi";
 
 export default function BuyBar({
@@ -331,7 +331,9 @@ export default function BuyBar({
                     onClick={handleRefund}
                   >
                     <span
-                      className={`transition-transform duration-500 ${refunding ? "animate-pulse" : ""}`}
+                      className={`transition-transform duration-500 ${
+                        refunding ? "animate-pulse" : ""
+                      }`}
                     >
                       {refunding ? "Refunding..." : "Refund"}
                     </span>
