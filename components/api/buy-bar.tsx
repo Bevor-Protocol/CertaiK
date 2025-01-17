@@ -1,15 +1,16 @@
 import abiJSON from "@/abis/APICredits.json";
+import AdminTools from "@/components/admin-tools";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
 import { erc20Abi } from "viem";
 import {
-  useAccount,
-  useReadContract,
-  useSimulateContract,
-  useWatchContractEvent,
-  useWriteContract,
+    useAccount,
+    useReadContract,
+    useSimulateContract,
+    useWatchContractEvent,
+    useWriteContract,
 } from "wagmi";
 
 export default function BuyBar({
@@ -326,6 +327,7 @@ export default function BuyBar({
                       {refunding ? "Refunding..." : "Refund"}
                     </span>
                   </Button>
+                  <AdminTools />
                 </div>
               </div>
             </>
