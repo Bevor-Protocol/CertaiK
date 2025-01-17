@@ -6,11 +6,11 @@ import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
 import { erc20Abi } from "viem";
 import {
-    useAccount,
-    useReadContract,
-    useSimulateContract,
-    useWatchContractEvent,
-    useWriteContract,
+  useAccount,
+  useReadContract,
+  useSimulateContract,
+  useWatchContractEvent,
+  useWriteContract,
 } from "wagmi";
 
 export default function BuyBar({
