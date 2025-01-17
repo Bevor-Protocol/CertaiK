@@ -3,7 +3,7 @@
 export default function BalanceBox({
   curBalance,
   curCredit,
-  curDeposit,
+  //curDeposit,
   newDepositAmount,
   curPromotion,
   isLoading,
@@ -17,12 +17,12 @@ export default function BalanceBox({
 }): JSX.Element {
   // Create dynamic padding based on the maximum length
   console.log(curBalance, curCredit);
-  const certaiPadding = "\u00A0".repeat(
-    22 - (isLoading ? "loading...".length : (curBalance || "0")?.length),
-  );
-  const creditPadding = "\u00A0".repeat(
-    24 - (isLoading ? "loading...".length : (curCredit || "0")?.length),
-  );
+//   const certaiPadding = "\u00A0".repeat(
+//     22 - (isLoading ? "loading...".length : (curBalance || "0")?.length),
+//   );
+//   const creditPadding = "\u00A0".repeat(
+//     24 - (isLoading ? "loading...".length : (curCredit || "0")?.length),
+//   );
 
   return (
     <div className="text-green-400 font-mono">

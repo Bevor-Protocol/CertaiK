@@ -6,16 +6,16 @@ import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
 import { erc20Abi } from "viem";
 import {
-  useAccount,
-  useReadContract,
-  useSimulateContract,
-  useWatchContractEvent,
-  useWriteContract,
+    useAccount,
+    useReadContract,
+    useSimulateContract,
+    useWatchContractEvent,
+    useWriteContract,
 } from "wagmi";
 
 export default function BuyBar({
   curBalance,
-  curCredit,
+  // curCredit,
   curDeposit,
   curPromotion,
   isLoading,
@@ -270,7 +270,10 @@ export default function BuyBar({
                   <span className="text-green-400 text-bold">&nbsp;Credit Refund Successful!</span>
                 )}
               </p>
-              <div className="flex w-full items-center justify-between gap-y-8 gap-x-8 font-mono flex-wrap">
+              <div
+                className="flex w-full items-center justify-between font-mono flex-wrap"
+                style={{ gap: "2rem" }}
+              >
                 <div className="flex max-w-full">
                   <span className="text-green-400 mr-2">{">"}</span>
                   <input
@@ -307,7 +310,11 @@ export default function BuyBar({
                     onClick={handleBuy}
                   >
                     <span
-                      className={`transition-transform duration-500 ${buying ? "animate-pulse" : ""}`}
+                      className={`
+                        transition-transform 
+                        duration-500 
+                        ${buying ? "animate-pulse" : ""}
+                      `}
                     >
                       {buying ? "Buying..." : "Buy"}
                     </span>
