@@ -11,7 +11,8 @@ export default function SimplePage(): JSX.Element {
   const [inputValue, setInputValue] = useState("");
   const [newDepositAmount, setNewDepositValue] = useState(0);
 
-  const { certaiBalance, creditBalance, curPromotion, depositBalance, isLoading } = useCertaiBalance();
+  const { certaiBalance, creditBalance, curPromotion, depositBalance, isLoading } =
+    useCertaiBalance();
 
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -52,7 +53,15 @@ export default function SimplePage(): JSX.Element {
               {/* <CoinAscii /> */}
               {/* <WaifuAscii/> */}
             </div>
-            <BuyBar curBalance={certaiBalance} curPromotion={curPromotion} curCredit={creditBalance} curDeposit={depositBalance} newDepositAmount={newDepositAmount} setNewDepositValue={setNewDepositValue} isLoading={isLoading} />
+            <BuyBar
+              curBalance={certaiBalance}
+              curPromotion={curPromotion}
+              curCredit={creditBalance}
+              curDeposit={depositBalance}
+              newDepositAmount={newDepositAmount}
+              setNewDepositValue={setNewDepositValue}
+              isLoading={isLoading}
+            />
           </div>
         </div>
       </div>
