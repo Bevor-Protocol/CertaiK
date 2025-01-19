@@ -2,19 +2,20 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const NavBar: React.FC<{ className: string }> = ({ className }) => {
   const [selected, setSelected] = useState<"terminal" | "api">("terminal");
+  const pathname = usePathname();
 
   useEffect(() => {
-    const currentPath = window.location.pathname;
-    if (currentPath === "/api-keys") {
+    if (pathname === "/api-keys") {
       setSelected("api");
     } else {
       setSelected("terminal");
     }
-  }, []);
+  }, [pathname]);
 
   return (
     <div

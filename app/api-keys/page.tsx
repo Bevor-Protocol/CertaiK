@@ -34,9 +34,11 @@ export default function SimplePage(): JSX.Element {
               <div className="text-blue-400">Welcome to the CertaiK API!</div>
               <div className="text-blue-400 my-2">
                 The presale is live and you can receive{" "}
-                <span className="font-bold text-green-400">1.25x</span> in API credits from your
-                purchase! Buyers will be heavily rewarded for participating in the pre-sale but
-                credits are fully refundable before the API launches.
+                <span className="font-bold text-green-400">
+                  {Number(curPromotion || 0n) / 100}x
+                </span>{" "}
+                in API credits from your purchase! Buyers will be heavily rewarded for participating
+                in the pre-sale but credits are fully refundable before the API launches.
               </div>
               <div className="text-yellow-400 my-2">
                 * API credits enable integration into your app and access to premium services and

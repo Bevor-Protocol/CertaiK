@@ -38,7 +38,9 @@ export const iconSizeMapper: Record<string, Record<string, string>> = {
 
 export const ChainPresets: Record<number, string> = {
   // Base
-  8453: "/base.png",
+  8453: "/base.svg",
+  // Sepolia
+  11155111: "/base.svg",
   // Localhost
   1337: "/unknown.svg",
   // Default

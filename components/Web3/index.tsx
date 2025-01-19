@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 "use client";
 
 import { CoinbaseWallet, WalletConnect } from "@/assets/wallet";
@@ -103,7 +102,7 @@ export const Web3Network = (): JSX.Element => {
       tabIndex={0}
     >
       <Dropdown.Trigger>
-        <Tooltip.Reference shouldShow={!chain}>
+        <Tooltip.Reference shouldShow={!supported}>
           <Tooltip.Trigger>
             <div
               className={cn(

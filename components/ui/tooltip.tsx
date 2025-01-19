@@ -27,6 +27,8 @@ export const Reference: React.FC<ReferenceProps> = ({
   const childContent = filterChildren(children, "Tooltip.Content");
   const childTrigger = filterChildren(children, "Tooltip.Trigger");
 
+  console.log("SHOULD SHOW", shouldShow);
+
   return (
     <div
       className={cn("relative", className)}

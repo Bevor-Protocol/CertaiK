@@ -1,3 +1,4 @@
+import { walletConfig } from "@/lib/config";
 import { Address, Chain } from "viem";
 import { Connector } from "wagmi";
 import { ChainPresets } from "./constants";
@@ -9,8 +10,10 @@ export const trimAddress = (address: Address | string | undefined): string => {
 export const getNetworkImage = (
   chain: Chain | undefined,
 ): { supported: boolean; networkImg: string } => {
+  const { chains } = walletConfig;
+  const availableChains = chains.map((c) => c.id);
   const result = { supported: false, networkImg: ChainPresets[99999] };
-  if (chain && chain.id in ChainPresets) {
+  if (chain && chain.id in ChainPresets && availableChains.includes(chain.id)) {
     result.supported = true;
     result.networkImg = ChainPresets[chain.id];
   }

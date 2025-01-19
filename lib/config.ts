@@ -3,7 +3,7 @@ import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 import { injected } from "wagmi/connectors";
 
 import { createClient } from "viem";
-import { base, sepolia, type Chain } from "wagmi/chains";
+import { anvil, base, sepolia, type Chain } from "wagmi/chains";
 
 // const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID as string;
 
@@ -11,7 +11,9 @@ import { base, sepolia, type Chain } from "wagmi/chains";
 
 let chains: readonly [Chain, ...Chain[]];
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NEXT_PUBLIC_VERCEL_ENV === "development") {
+  chains = [anvil];
+} else if (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") {
   chains = [sepolia];
 } else {
   chains = [base];

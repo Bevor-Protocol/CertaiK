@@ -81,8 +81,6 @@ export const useCertaiBalance = (): {
     },
   });
 
-  console.log("CUR PROM: " + curPromotion);
-
   const handleCreditsPurchased = (log: any): void => {
     if (!certaiQueryKey || !creditQueryKey) return;
     // Extract relevant data from the log
