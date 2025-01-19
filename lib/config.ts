@@ -1,8 +1,8 @@
-import { cookieStorage, createConfig, createStorage, http } from "wagmi";
+import { cookieStorage, createConfig, createStorage } from "wagmi";
 // import { walletConnect, injected, coinbaseWallet } from "wagmi/connectors";
 import { injected } from "wagmi/connectors";
 
-import { createClient } from "viem";
+import { createClient, fallback, http } from "viem";
 import { anvil, base, sepolia, type Chain } from "wagmi/chains";
 
 // const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID as string;
@@ -19,10 +19,19 @@ if (process.env.NEXT_PUBLIC_VERCEL_ENV === "development") {
   chains = [base];
 }
 
+const alchemy = http(
+  `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
+);
+
 const walletConfig = createConfig({
   chains,
   // transports,
-  client: ({ chain }) => createClient({ chain, transport: http() }),
+  client: ({ chain }) =>
+    createClient({
+      chain,
+      // transport: http(),
+      transport: fallback([alchemy]),
+    }),
   connectors: [injected({ shimDisconnect: true })],
   ssr: true,
   storage: createStorage({

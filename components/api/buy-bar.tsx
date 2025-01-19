@@ -2,6 +2,7 @@ import abiJSON from "@/abis/APICredits.json";
 import AdminTools from "@/components/admin-tools";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
 import { erc20Abi } from "viem";
@@ -31,13 +32,14 @@ export default function BuyBar({
   setNewDepositValue: (value: number) => void;
 }): JSX.Element {
   const [amount, setAmount] = useState(0);
+  const queryClient = useQueryClient();
 
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [refundSuccess, setRefundSuccess] = useState(false);
   const [buying, setBuying] = useState(false);
   const [refunding, setRefunding] = useState(false);
-  const [approved, setApproved] = useState(false);
-  const [approving, setApproving] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
 
   const contractAddress = process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS;
 
@@ -90,7 +92,11 @@ export default function BuyBar({
 
   const { address } = useAccount();
 
-  const { data: allowanceData } = useReadContract({
+  const {
+    data: allowanceData,
+    isLoading: allowanceLoading,
+    queryKey: allowanceQueryKey,
+  } = useReadContract({
     address: certaiContractAddress as `0x${string}`,
     abi: erc20Abi,
     functionName: "allowance",
@@ -106,7 +112,7 @@ export default function BuyBar({
   });
 
   useWatchContractEvent({
-    address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,
+    address: contractAddress as `0x${string}`,
     abi: abiJSON.abi,
     eventName: "CreditsPurchased",
     onLogs(log: any) {
@@ -114,7 +120,7 @@ export default function BuyBar({
       handleCreditsPurchased(log);
     },
     onError(error: any) {
-      console.error("Error occurred:", error);
+      console.error("Error occurred in creditsPurchased:", error);
       setRefunding(true);
       setBuying(true);
     },
@@ -138,7 +144,7 @@ export default function BuyBar({
   };
 
   useWatchContractEvent({
-    address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,
+    address: contractAddress as `0x${string}`,
     abi: abiJSON.abi,
     eventName: "CreditsRefunded",
     onLogs(log: any) {
@@ -146,7 +152,7 @@ export default function BuyBar({
       handleCreditsRefunded(log);
     },
     onError(error: any) {
-      console.error("Error occurred:", error);
+      console.error("Error occurred in credits refunded:", error);
       setRefunding(true);
       setBuying(true);
     },
@@ -170,35 +176,38 @@ export default function BuyBar({
   };
 
   useWatchContractEvent({
-    address: contractAddress?.startsWith("0x") ? (contractAddress as `0x${string}`) : undefined,
-    abi: abiJSON.abi,
-    eventName: "Approve",
+    address: certaiContractAddress as `0x${string}`,
+    abi: erc20Abi,
+    eventName: "Approval",
     onLogs(log: any) {
       console.log(log);
       handleApproveEvent(log);
     },
   });
 
-  const handleApproveEvent = (log: any): void => {
+  const handleApproveEvent = async (log: any): Promise<void> => {
     // Extract relevant data from the log
     const { args } = log;
     // Update your application state or UI
     console.log("Approval complete:", args);
 
     console.log(amount);
-    if (buyData && buyData.request) {
-      console.log("Buying credits");
-      //buyWriteContract(buyData.request);
-      setApproved(true);
-      setApproving(false);
-    }
-    // For example, you might update a state variable to reflect the new balance
+    setIsApproving(false);
+    setIsApproved(true);
+    console.log("Buying credits");
+    //buyWriteContract(buyData.request);
+    await queryClient.invalidateQueries({
+      queryKey: [allowanceQueryKey],
+    });
   };
 
-  const handleApprove = (): void => {
+  const handleApprove = async (): Promise<void> => {
     if (approveData && approveData.request) {
       console.log("Approving CERTAI tokens");
-      setApproving(true);
+      await queryClient.invalidateQueries({
+        queryKey: [allowanceQueryKey],
+      });
+      setIsApproving(true);
       approveWriteContract(approveData.request);
     }
   };
@@ -235,20 +244,22 @@ export default function BuyBar({
     }
   };
 
+  console.log("ALLOWANCE", allowanceData, allowanceLoading);
+
   return (
     <>
       {!address ? (
         <p className="text-white mt-2 font-mono">Connect wallet to purchase credits...</p>
       ) : (
         <>
-          {allowanceData === BigInt(0) && !approved ? (
+          {(allowanceData === BigInt(0) || allowanceLoading) && !isApproved ? (
             <Button
               variant="bright"
               onClick={handleApprove}
-              disabled={approving}
-              className={`transition-transform duration-500 ${approving ? "animate-pulse" : ""}`}
+              disabled={allowanceLoading || isApproving}
+              className={`transition-transform duration-500 ${allowanceLoading ? "animate-pulse" : ""}`}
             >
-              {approving ? "Approving..." : "Approve to purchase credits"}
+              {isApproving ? "Approving..." : "Approve to purchase credits"}
             </Button>
           ) : (
             <>
