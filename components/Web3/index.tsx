@@ -189,6 +189,9 @@ export const Wallets = (): JSX.Element => {
   }, []);
 
   const handleConnect = ({ connector }: { connector: Connector }): void => {
+    if (connector.name === "WalletConnect") {
+      hide();
+    }
     connectAsync({ connector })
       .catch((error) => console.log(error))
       .finally(hide);

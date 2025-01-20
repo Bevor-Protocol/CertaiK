@@ -2,6 +2,7 @@ import abiJSON from "@/abis/APICredits.json";
 import AdminTools from "@/components/admin-tools";
 import { Button } from "@/components/ui/button";
 import { useCertaiBalance } from "@/hooks/useBalances";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { cn } from "@/lib/utils";
 import { getNetworkImage } from "@/utils/helpers";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,6 +15,7 @@ const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
 const contractAddress = process.env.NEXT_PUBLIC_CREDIT_CONTRACT_ADDRESS as `0x${string}`;
 
 const BuyBar = (): JSX.Element => {
+  const isMobile = useIsMobile();
   const [amount, setAmount] = useState(0);
   const [method, setMethod] = useState<"purchase" | "refund" | "approve" | null>(null);
   const [signState, setSignState] = useState<"sign" | "loading" | "error" | "success" | null>();
@@ -49,10 +51,10 @@ const BuyBar = (): JSX.Element => {
 
   useEffect(() => {
     const disabled = signState === "sign" || signState === "loading" || amount > token.data;
-    if (!disabled && inputRef.current) {
+    if (!disabled && inputRef.current && !isMobile) {
       inputRef.current.focus();
     }
-  }, [signState, amount, token.data]);
+  }, [signState, amount, token.data, isMobile]);
 
   const { data: buyData } = useSimulateContract({
     address: contractAddress,
@@ -230,7 +232,6 @@ const BuyBar = (): JSX.Element => {
                   <span className="text-green-400 mr-2">{">"}</span>
                   <input
                     ref={inputRef}
-                    autoFocus={true}
                     id="quantity"
                     type="number"
                     value={amount === 0 ? "" : amount}

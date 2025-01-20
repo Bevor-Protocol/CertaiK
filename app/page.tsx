@@ -77,7 +77,7 @@ export default function TerminalAuditPage(): JSX.Element {
   };
 
   return (
-    <main className="h-screen w-screen bg-black text-white z-1">
+    <main className="h-svh w-screen bg-black text-white z-1">
       <div className="relative px-4 py-24 z-20 size-full flex flex-col items-center justify-center">
         <div
           className={cn(

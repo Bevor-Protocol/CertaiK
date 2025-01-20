@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef } from "react";
 
@@ -18,18 +19,18 @@ const TerminalInputBar: React.FC<InputBarProps> = ({
   overrideLoading,
   placeholder,
 }) => {
+  const isMobile = useIsMobile();
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (!disabled && !overrideLoading && inputRef.current) {
+    if (!disabled && !overrideLoading && inputRef.current && !isMobile) {
       inputRef.current.focus();
     }
-  }, [disabled, overrideLoading]);
+  }, [disabled, overrideLoading, isMobile]);
   return (
     <form onSubmit={onSubmit} className="mt-4 flex items-center relative">
       <span className="text-green-400 mr-2">{">"}</span>
       <input
         ref={inputRef}
-        autoFocus={true}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
