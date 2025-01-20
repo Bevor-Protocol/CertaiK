@@ -10,6 +10,12 @@ import { anvil, base, sepolia, type Chain } from "wagmi/chains";
 // if (!projectId) throw new Error("Project ID is not defined");
 
 let chains: readonly [Chain, ...Chain[]];
+const alchemyTransports = {
+  /// base
+  8453: http(`https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`),
+  // sepolia
+  11155111: http(`https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`),
+};
 
 if (process.env.NEXT_PUBLIC_VERCEL_ENV === "development") {
   chains = [anvil];
@@ -19,19 +25,26 @@ if (process.env.NEXT_PUBLIC_VERCEL_ENV === "development") {
   chains = [base];
 }
 
-const alchemy = http(
-  `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
-);
+const getTransport = (chain: Chain) => {
+  if (chain.id === 31337) {
+    // anvil, use local RPC provided via anvil
+    return http("http://127.0.0.1:8545");
+  }
+  const alchemy = alchemyTransports[chain.id as keyof typeof alchemyTransports];
+  return fallback([alchemy, http()]);
+};
 
 const walletConfig = createConfig({
   chains,
   // transports,
-  client: ({ chain }) =>
-    createClient({
+  client: ({ chain }) => {
+    const transport = getTransport(chain);
+    return createClient({
       chain,
       // transport: http(),
-      transport: fallback([alchemy]),
-    }),
+      transport,
+    });
+  },
   connectors: [injected({ shimDisconnect: true })],
   ssr: true,
   storage: createStorage({

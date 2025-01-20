@@ -5,20 +5,9 @@ import BalanceBox from "@/components/api/balance-box";
 import BuyBar from "@/components/api/buy-bar";
 import { useCertaiBalance } from "@/hooks/useBalances";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 export default function SimplePage(): JSX.Element {
-  const [inputValue, setInputValue] = useState("");
-  const [newDepositAmount, setNewDepositValue] = useState(0);
-
-  const { certaiBalance, creditBalance, curPromotion, depositBalance, isLoading } =
-    useCertaiBalance();
-
-  const handleSubmit = (e: React.FormEvent): void => {
-    e.preventDefault();
-    // Placeholder logic for form submission
-    console.log("Form submitted with input:", inputValue);
-  };
+  const { promotion } = useCertaiBalance();
 
   return (
     <main className="h-screen w-screen bg-black text-white z-1">
@@ -34,36 +23,19 @@ export default function SimplePage(): JSX.Element {
               <div className="text-blue-400">Welcome to the CertaiK API!</div>
               <div className="text-blue-400 my-2">
                 The presale is live and you can receive{" "}
-                <span className="font-bold text-green-400">
-                  {Number(curPromotion || 0n) / 100}x
-                </span>{" "}
-                in API credits from your purchase! Buyers will be heavily rewarded for participating
-                in the pre-sale but credits are fully refundable before the API launches.
+                <span className="font-bold text-green-400">{promotion.data}x</span> in API credits
+                from your purchase! Buyers will be heavily rewarded for participating in the
+                pre-sale but credits are fully refundable before the API launches.
               </div>
               <div className="text-yellow-400 my-2">
                 * API credits enable integration into your app and access to premium services and
                 features *
               </div>
-              <BalanceBox
-                curBalance={certaiBalance}
-                curCredit={creditBalance}
-                curDeposit={depositBalance}
-                newDepositAmount={newDepositAmount}
-                curPromotion={curPromotion}
-                isLoading={isLoading}
-              />
+              <BalanceBox />
               {/* <CoinAscii /> */}
               {/* <WaifuAscii/> */}
             </div>
-            <BuyBar
-              curBalance={certaiBalance}
-              curPromotion={curPromotion}
-              curCredit={creditBalance}
-              curDeposit={depositBalance}
-              newDepositAmount={newDepositAmount}
-              setNewDepositValue={setNewDepositValue}
-              isLoading={isLoading}
-            />
+            <BuyBar />
           </div>
         </div>
       </div>

@@ -1,250 +1,178 @@
 import abiJSON from "@/abis/APICredits.json";
 import AdminTools from "@/components/admin-tools";
 import { Button } from "@/components/ui/button";
+import { useCertaiBalance } from "@/hooks/useBalances";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
 import { erc20Abi } from "viem";
-import {
-  useAccount,
-  useReadContract,
-  useSimulateContract,
-  useWatchContractEvent,
-  useWriteContract,
-} from "wagmi";
+import { useAccount, useSimulateContract, useWatchContractEvent, useWriteContract } from "wagmi";
 
-export default function BuyBar({
-  curBalance,
-  // curCredit,
-  curDeposit,
-  curPromotion,
-  isLoading,
-  newDepositAmount,
-  setNewDepositValue,
-}: {
-  curBalance?: string | undefined;
-  curCredit?: string | undefined;
-  curDeposit?: string | undefined;
-  curPromotion?: string | undefined;
-  isLoading: boolean;
-  newDepositAmount: number | undefined;
-  setNewDepositValue: (value: number) => void;
-}): JSX.Element {
+const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
+const contractAddress = process.env.NEXT_PUBLIC_CREDIT_CONTRACT_ADDRESS as `0x${string}`;
+
+const BuyBar = (): JSX.Element => {
   const [amount, setAmount] = useState(0);
-  const queryClient = useQueryClient();
-
-  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
-  const [refundSuccess, setRefundSuccess] = useState(false);
-  const [buying, setBuying] = useState(false);
-  const [refunding, setRefunding] = useState(false);
-  const [isApproving, setIsApproving] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
-
-  const contractAddress = process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS;
-
+  const [method, setMethod] = useState<"purchase" | "refund" | "approve" | null>(null);
+  const [signState, setSignState] = useState<"sign" | "loading" | "error" | "success" | null>();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const queryClient = useQueryClient();
+  const { address } = useAccount();
+
+  const { token, credit, deposit, allowance, promotion } = useCertaiBalance();
+
+  const { writeContract: buyWriteContract } = useWriteContract({
+    mutation: {
+      onMutate: () => setSignState("sign"),
+      onSuccess: () => setSignState("loading"),
+      onError: () => setSignState("error"),
+    },
+  });
+  const { writeContract: refundWriteContract } = useWriteContract({
+    mutation: {
+      onMutate: () => setSignState("sign"),
+      onSuccess: () => setSignState("loading"),
+      onError: () => setSignState("error"),
+    },
+  });
+  const { writeContract: approveWriteContract } = useWriteContract({
+    mutation: {
+      onMutate: () => setSignState("sign"),
+      onSuccess: () => setSignState("loading"),
+      onError: () => setSignState("error"),
+    },
+  });
+
   useEffect(() => {
-    const disabled =
-      buying || refunding || isLoading || amount === 0 || Number(amount) > Number(curBalance);
+    const disabled = signState === "sign" || signState === "loading" || amount > token.data;
     if (!disabled && inputRef.current) {
       inputRef.current.focus();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [buying, refunding, curBalance]);
+  }, [signState, amount, token.data]);
 
   const { data: buyData } = useSimulateContract({
-    address: contractAddress as `0x${string}`,
+    address: contractAddress,
     abi: abiJSON.abi,
     functionName: "purchaseCredits",
     args: [parseUnits(amount.toString(), 18)], // TODO: CHANGE BACK TO 18 FOR MAINNET
   });
 
-  const { writeContract: buyWriteContract } = useWriteContract();
-
   const { data: refundData } = useSimulateContract({
-    address: contractAddress as `0x${string}`,
+    address: contractAddress,
     abi: abiJSON.abi,
     functionName: "refundDeposit",
     args: [parseUnits(amount.toString(), 18)], // TODO: CHANGE BACK TO 18 FOR MAINNET
   });
 
-  const { writeContract: refundWriteContract } = useWriteContract();
-
-  const certaiContractAddress = process.env.NEXT_PUBLIC_CERTAI_ADDRESS;
-
   const { data: approveData } = useSimulateContract({
-    address: certaiContractAddress?.startsWith("0x")
-      ? (certaiContractAddress as `0x${string}`)
-      : undefined,
+    address: tokenAddress,
     abi: erc20Abi,
     functionName: "approve",
     args: [
-      contractAddress?.startsWith("0x")
-        ? (contractAddress as `0x${string}`)
-        : "0x0000000000000000000000000000000000000000",
+      contractAddress,
       // Infinite approval in bigint
       BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
     ],
   });
 
-  const { writeContract: approveWriteContract } = useWriteContract();
-
-  const { address } = useAccount();
-
-  const {
-    data: allowanceData,
-    isLoading: allowanceLoading,
-    queryKey: allowanceQueryKey,
-  } = useReadContract({
-    address: certaiContractAddress as `0x${string}`,
-    abi: erc20Abi,
-    functionName: "allowance",
-    args: [
-      address as `0x${string}`, // owner
-      contractAddress?.startsWith("0x")
-        ? (contractAddress as `0x${string}`)
-        : "0x0000000000000000000000000000000000000000", // spender
-    ],
-    query: {
-      enabled: !!address,
-    },
-  });
-
   useWatchContractEvent({
-    address: contractAddress as `0x${string}`,
+    address: contractAddress,
     abi: abiJSON.abi,
     eventName: "CreditsPurchased",
     onLogs(log: any) {
       console.log(log);
-      handleCreditsPurchased(log);
+      queryClient.invalidateQueries({
+        queryKey: credit.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: token.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: deposit.queryKey,
+      });
+      setSignState("success");
+      setAmount(0);
     },
     onError(error: any) {
-      console.error("Error occurred in creditsPurchased:", error);
-      setRefunding(true);
-      setBuying(true);
+      setSignState("error");
+      console.error("Error occurred in CreditsPurchased:", error);
     },
   });
 
-  const handleCreditsPurchased = (log: any): void => {
-    // Extract relevant data from the log
-    const { args } = log;
-    // Update your application state or UI
-    console.log("Credits purchased:", args);
-
-    setPurchaseSuccess(true);
-
-    setNewDepositValue((newDepositAmount || 0) + amount);
-
-    setAmount(0);
-
-    setRefunding(false);
-    setBuying(false);
-    // For example, you might update a state variable to reflect the new balance
-  };
-
   useWatchContractEvent({
-    address: contractAddress as `0x${string}`,
+    address: contractAddress,
     abi: abiJSON.abi,
     eventName: "CreditsRefunded",
     onLogs(log: any) {
       console.log(log);
-      handleCreditsRefunded(log);
+      queryClient.invalidateQueries({
+        queryKey: credit.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: token.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: deposit.queryKey,
+      });
+      setSignState("success");
+      setAmount(0);
     },
     onError(error: any) {
-      console.error("Error occurred in credits refunded:", error);
-      setRefunding(true);
-      setBuying(true);
+      setSignState("error");
+      console.error("Error occurred in CreditsRefunded:", error);
     },
   });
 
-  const handleCreditsRefunded = (log: any): void => {
-    // Extract relevant data from the log
-    const { args } = log;
-    // Update your application state or UI
-    console.log("Credits purchased:", args);
-
-    setRefundSuccess(true);
-
-    setNewDepositValue((newDepositAmount || 0) - amount);
-
-    setAmount(0);
-
-    setRefunding(false);
-    setBuying(false);
-    // For example, you might update a state variable to reflect the new balance
-  };
-
   useWatchContractEvent({
-    address: certaiContractAddress as `0x${string}`,
+    address: tokenAddress,
     abi: erc20Abi,
     eventName: "Approval",
     onLogs(log: any) {
-      console.log(log);
-      handleApproveEvent(log);
+      console.log("APPROVAL LOG", log);
+      queryClient.invalidateQueries({
+        queryKey: allowance.queryKey,
+      });
+      setSignState("success");
+    },
+    onError(error: any) {
+      setSignState("error");
+      console.error("Error occurred in CreditsRefunded:", error);
     },
   });
 
-  const handleApproveEvent = async (log: any): Promise<void> => {
-    // Extract relevant data from the log
-    const { args } = log;
-    // Update your application state or UI
-    console.log("Approval complete:", args);
-
-    console.log(amount);
-    setIsApproving(false);
-    setIsApproved(true);
-    console.log("Buying credits");
-    //buyWriteContract(buyData.request);
-    await queryClient.invalidateQueries({
-      queryKey: [allowanceQueryKey],
-    });
-  };
-
   const handleApprove = async (): Promise<void> => {
+    console.log(approveData);
     if (approveData && approveData.request) {
+      setMethod("approve");
       console.log("Approving CERTAI tokens");
-      await queryClient.invalidateQueries({
-        queryKey: [allowanceQueryKey],
-      });
-      setIsApproving(true);
+      setSignState("sign");
       approveWriteContract(approveData.request);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setAmount(Number(e.target.value));
-    setPurchaseSuccess(false);
-    setRefundSuccess(false);
   };
 
   const handleBuy = (): void => {
     console.log(buyData);
 
-    setBuying(true);
-
-    console.log("ALLOWANCE DATA");
-    console.log(allowanceData);
-
-    if (allowanceData !== undefined && allowanceData > 0) {
-      if (buyData && buyData.request) {
-        console.log("Buying credits");
-        buyWriteContract(buyData.request);
-      }
-    } else {
-      handleApprove();
+    if (buyData && buyData.request) {
+      setMethod("purchase");
+      console.log("Buying credits");
+      buyWriteContract(buyData.request);
     }
   };
 
   const handleRefund = (): void => {
+    console.log(refundData);
     if (refundData && refundData.request) {
-      setRefunding(true);
-
+      setMethod("refund");
       refundWriteContract(refundData.request);
     }
   };
-
-  console.log("ALLOWANCE", allowanceData, allowanceLoading);
 
   return (
     <>
@@ -252,32 +180,41 @@ export default function BuyBar({
         <p className="text-white mt-2 font-mono">Connect wallet to purchase credits...</p>
       ) : (
         <>
-          {(allowanceData === BigInt(0) || allowanceLoading) && !isApproved ? (
+          {allowance.data === 0 || allowance.isLoading ? (
             <Button
               variant="bright"
               onClick={handleApprove}
-              disabled={allowanceLoading || isApproving}
-              className={`transition-transform duration-500 ${allowanceLoading ? "animate-pulse" : ""}`}
+              disabled={allowance.isLoading || signState === "sign" || signState === "loading"}
+              className={cn(
+                "transition-transform duration-500",
+                allowance.isLoading && "animate-pulse",
+              )}
             >
-              {isApproving ? "Approving..." : "Approve to purchase credits"}
+              {allowance.isLoading
+                ? "Loading..."
+                : signState === "sign"
+                  ? "Signing..."
+                  : signState === "loading"
+                    ? "Approving..."
+                    : "Approve to purchase credits"}
             </Button>
           ) : (
             <>
               <p className="text-white mt-2 font-mono">
                 <span className="text-blue-400 font-bold">
-                  {curPromotion ? (amount * Number(curPromotion)) / 100 : amount}
+                  {promotion.data ? amount * promotion.data : amount}
                 </span>{" "}
                 credits [includes{" "}
                 <span className="text-green-400 font-bold">
-                  {curPromotion ? (amount * Number(curPromotion)) / 100 - amount : 0}
+                  {promotion.data ? amount * promotion.data - amount : 0}
                 </span>{" "}
                 bonus credits!]
-                {purchaseSuccess && (
+                {signState === "success" && method === "purchase" && (
                   <span className="text-green-400 text-bold">
                     &nbsp;Credit Purchase Successful!
                   </span>
                 )}
-                {refundSuccess && (
+                {signState === "success" && method === "refund" && (
                   <span className="text-green-400 text-bold">&nbsp;Credit Refund Successful!</span>
                 )}
               </p>
@@ -294,15 +231,16 @@ export default function BuyBar({
                     type="number"
                     value={amount === 0 ? "" : amount}
                     onChange={handleChange}
-                    disabled={buying || refunding || isLoading}
+                    disabled={signState === "loading" || signState === "sign"}
                     className={cn(
                       "flex-1 bg-transparent border-none outline-none w-[270px] max-w-[70%]",
                       "text-white font-mono",
                       "placeholder:text-gray-500",
-                      "caret-green-400",
-                      buying || refunding || (isLoading && "cursor-not-allowed opacity-50"),
+                      "caret-green-400 appearance-none",
+                      signState === "loading" ||
+                        (signState === "sign" && "cursor-not-allowed opacity-50"),
                     )}
-                    placeholder={isLoading ? "Loading $CERTAI balance..." : "Input amount"}
+                    placeholder={token.isLoading ? "Loading $CERTAI balance..." : "Input amount"}
                   />
                   <label htmlFor="quantity" className="text-white">
                     $CERTAI
@@ -312,41 +250,51 @@ export default function BuyBar({
                   <Button
                     variant="bright"
                     disabled={
-                      buying ||
-                      refunding ||
-                      isLoading ||
+                      signState === "loading" ||
+                      signState === "sign" ||
                       amount === 0 ||
-                      Number(amount) > Number(curBalance)
+                      amount > token.data
                     }
                     onClick={handleBuy}
                   >
                     <span
-                      className={`
-                        transition-transform 
-                        duration-500 
-                        ${buying ? "animate-pulse" : ""}
-                      `}
+                      className={cn(
+                        "transition-transform duration-500",
+                        method === "purchase" &&
+                          (signState === "loading" || signState === "sign") &&
+                          "animate-pulse",
+                      )}
                     >
-                      {buying ? "Buying..." : "Buy"}
+                      {method === "purchase" && signState === "sign"
+                        ? "Signing..."
+                        : method === "purchase" && signState === "loading"
+                          ? "Buying..."
+                          : "Buy"}
                     </span>
                   </Button>
                   <Button
                     variant="bright"
                     disabled={
-                      refunding ||
-                      buying ||
-                      isLoading ||
+                      signState === "loading" ||
+                      signState === "sign" ||
                       amount === 0 ||
-                      Number(amount) > Number(curDeposit)
+                      amount > deposit.data
                     }
                     onClick={handleRefund}
                   >
                     <span
-                      className={`transition-transform duration-500 ${
-                        refunding ? "animate-pulse" : ""
-                      }`}
+                      className={cn(
+                        "transition-transform duration-500",
+                        method === "refund" &&
+                          (signState === "loading" || signState === "sign") &&
+                          "animate-pulse",
+                      )}
                     >
-                      {refunding ? "Refunding..." : "Refund"}
+                      {method === "refund" && signState === "sign"
+                        ? "Signing..."
+                        : method === "refund" && signState === "loading"
+                          ? "Refunding..."
+                          : "Refund"}
                     </span>
                   </Button>
                   <AdminTools />
@@ -358,4 +306,6 @@ export default function BuyBar({
       )}
     </>
   );
-}
+};
+
+export default BuyBar;

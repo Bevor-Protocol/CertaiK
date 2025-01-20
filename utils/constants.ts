@@ -43,6 +43,8 @@ export const ChainPresets: Record<number, string> = {
   11155111: "/base.svg",
   // Localhost
   1337: "/unknown.svg",
+  // anvil
+  31337: "/unknown.svg",
   // Default
   99999: "/unknown.svg",
 };
