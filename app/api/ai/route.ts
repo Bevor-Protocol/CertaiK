@@ -1,16 +1,17 @@
 // Import the necessary modules
 import api from "@/lib/api";
 import { NextResponse } from "next/server";
+import { Readable } from "stream";
 
 export const maxDuration = 60; // This function can run for a maximum of 60 seconds
 export const dynamic = "force-dynamic";
 
-const streamer = (stream: any): ReadableStream => {
+const streamer = (stream: Readable): ReadableStream => {
   const decoder = new TextDecoder();
   return new ReadableStream({
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     async start(controller) {
-      stream.on("data", (chunk: any) => {
+      stream.on("data", (chunk: Buffer) => {
         const text = decoder.decode(chunk, { stream: true });
         controller.enqueue(text);
       });

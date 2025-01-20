@@ -9,8 +9,8 @@ export default function AdminTools(): JSX.Element {
   const [withdrawing, setWithdrawing] = useState(false);
 
   const isAdmin = address?.toLowerCase() === "0x341ab3097c45588af509db745ce0823722e5fb19";
-  const contractAddress = process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS;
-  const tokenAddress = process.env.NEXT_PUBLIC_CERTAI_ADDRESS;
+  const contractAddress = process.env.NEXT_PUBLIC_CREDIT_CONTRACT_ADDRESS;
+  const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
 
   const { data: contractBalance } = useReadContract({
     address: tokenAddress as `0x${string}`,

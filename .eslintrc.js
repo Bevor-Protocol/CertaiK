@@ -6,11 +6,11 @@ module.exports = {
     sourceType: "module",
   },
   extends: [
-    "next", // Next.js recommended rules
     "next/core-web-vitals", // Core Web Vitals for Next.js
     "eslint:recommended", // Basic ESLint rules
     "plugin:@typescript-eslint/recommended", // TypeScript recommended rules
     "plugin:prettier/recommended", // Prettier plugin for auto-formatting
+    "next", // Next.js recommended rules
   ],
   plugins: ["@typescript-eslint", "prettier", "@next/eslint-plugin-next"],
   rules: {
@@ -37,11 +37,6 @@ module.exports = {
 
     // Prettier rules
     "prettier/prettier": ["error", { endOfLine: "auto" }], // Prettier formatting
-  },
-  env: {
-    browser: true,
-    node: true,
-    jest: true,
   },
   settings: {
     "import/resolver": {

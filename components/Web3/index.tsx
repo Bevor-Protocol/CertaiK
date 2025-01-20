@@ -48,7 +48,12 @@ export const Profile = ({
               )}
             </Social>
           </div>
-          <div className="flex flex-row justify-between items-center text-xxs text-white/60 flex-nowrap">
+          <div
+            className={cn(
+              "flex flex-row justify-between items-center",
+              "text-xxs text-white/60 flex-nowrap",
+            )}
+          >
             <p>{connector?.name}</p>
             <p>
               <span>{chain?.name}</span>
@@ -66,7 +71,10 @@ export const Profile = ({
       <Card.Footer className="p-1">
         <div className="flex flex-col w-full">
           {/* <Link href={`/users/${address}`} className="w-full" onClick={close}>
-            <div className="flex items-center relative rounded-lg transition-colors px-1 py-2 w-full justify-start gap-2 hover:bg-slate-700/40">
+            <div className={cn(
+            "flex items-center relative rounded-lg transition-colors",
+            "px-1 py-2 w-full justify-start gap-2 hover:bg-slate-700/40"
+          )}>
               <LayoutDashboardIcon height="0.85rem" width="0.85rem" stroke="currentColor" />
               <span>Dashboard</span>
             </div>
@@ -114,7 +122,7 @@ export const Web3Network = (): JSX.Element => {
                 image={networkImg}
                 className={cn(
                   !supported && "!bg-auto",
-                  supported && networkImg.includes("unknown") && "!bg-auto", // for localhost for now.
+                  supported && networkImg.includes("unknown") && "!bg-auto",
                 )}
               />
               <ChevronDown />

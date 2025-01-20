@@ -3,10 +3,11 @@ import AdminTools from "@/components/admin-tools";
 import { Button } from "@/components/ui/button";
 import { useCertaiBalance } from "@/hooks/useBalances";
 import { cn } from "@/lib/utils";
+import { getNetworkImage } from "@/utils/helpers";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
-import { erc20Abi } from "viem";
+import { erc20Abi, type Log } from "viem";
 import { useAccount, useSimulateContract, useWatchContractEvent, useWriteContract } from "wagmi";
 
 const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
@@ -19,7 +20,8 @@ const BuyBar = (): JSX.Element => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
+  const { supported } = getNetworkImage(chain);
 
   const { token, credit, deposit, allowance, promotion } = useCertaiBalance();
 
@@ -81,7 +83,7 @@ const BuyBar = (): JSX.Element => {
     address: contractAddress,
     abi: abiJSON.abi,
     eventName: "CreditsPurchased",
-    onLogs(log: any) {
+    onLogs(log: Log[]) {
       console.log(log);
       queryClient.invalidateQueries({
         queryKey: credit.queryKey,
@@ -95,7 +97,7 @@ const BuyBar = (): JSX.Element => {
       setSignState("success");
       setAmount(0);
     },
-    onError(error: any) {
+    onError(error: Error) {
       setSignState("error");
       console.error("Error occurred in CreditsPurchased:", error);
     },
@@ -105,7 +107,7 @@ const BuyBar = (): JSX.Element => {
     address: contractAddress,
     abi: abiJSON.abi,
     eventName: "CreditsRefunded",
-    onLogs(log: any) {
+    onLogs(log: Log[]) {
       console.log(log);
       queryClient.invalidateQueries({
         queryKey: credit.queryKey,
@@ -119,7 +121,7 @@ const BuyBar = (): JSX.Element => {
       setSignState("success");
       setAmount(0);
     },
-    onError(error: any) {
+    onError(error: Error) {
       setSignState("error");
       console.error("Error occurred in CreditsRefunded:", error);
     },
@@ -129,14 +131,14 @@ const BuyBar = (): JSX.Element => {
     address: tokenAddress,
     abi: erc20Abi,
     eventName: "Approval",
-    onLogs(log: any) {
+    onLogs(log: Log[]) {
       console.log("APPROVAL LOG", log);
       queryClient.invalidateQueries({
         queryKey: allowance.queryKey,
       });
       setSignState("success");
     },
-    onError(error: any) {
+    onError(error: Error) {
       setSignState("error");
       console.error("Error occurred in CreditsRefunded:", error);
     },
@@ -178,6 +180,8 @@ const BuyBar = (): JSX.Element => {
     <>
       {!address ? (
         <p className="text-white mt-2 font-mono">Connect wallet to purchase credits...</p>
+      ) : !supported ? (
+        <p className="text-white mt-2 font-mono">Change network to purchase credits...</p>
       ) : (
         <>
           {allowance.data === 0 || allowance.isLoading ? (

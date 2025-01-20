@@ -1,6 +1,7 @@
 "use client";
 import { useModal } from "@/hooks/useContexts";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { useAccount } from "wagmi";
@@ -30,7 +31,7 @@ const Header: React.FC = () => {
           target="_blank"
           referrerPolicy="no-referrer"
         >
-          <img src="/logo.svg" alt="Logo" className="h-16 w-auto" />
+          <Image src="/logo.svg" alt="Logo" className="h-16 w-auto" width={64} height={64} />
         </Link>
         <NavBar className="md:flex hidden absolute left-1/2 -translate-x-1/2" />
         <div className="gap-2 items-center relative flex">

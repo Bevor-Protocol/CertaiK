@@ -2,7 +2,7 @@ import { cookieStorage, createConfig, createStorage } from "wagmi";
 // import { walletConnect, injected, coinbaseWallet } from "wagmi/connectors";
 import { injected } from "wagmi/connectors";
 
-import { createClient, fallback, http } from "viem";
+import { createClient, fallback, FallbackTransport, http, HttpTransport } from "viem";
 import { anvil, base, sepolia, type Chain } from "wagmi/chains";
 
 // const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID as string;
@@ -25,7 +25,7 @@ if (process.env.NEXT_PUBLIC_VERCEL_ENV === "development") {
   chains = [base];
 }
 
-const getTransport = (chain: Chain) => {
+const getTransport = (chain: Chain): HttpTransport | FallbackTransport => {
   if (chain.id === 31337) {
     // anvil, use local RPC provided via anvil
     return http("http://127.0.0.1:8545");
