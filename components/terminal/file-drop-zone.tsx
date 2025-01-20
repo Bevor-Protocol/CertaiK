@@ -6,14 +6,14 @@ interface FileDropZoneProps {
   className?: string;
 }
 
-export function FileDropZone({ onFileSelect, className }: FileDropZoneProps) {
+export const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JSX.Element => {
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
 
   const handleFile = useCallback(
     (file: File) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = (e): void => {
         const content = e.target?.result as string;
         onFileSelect(content);
       };
@@ -64,7 +64,7 @@ export function FileDropZone({ onFileSelect, className }: FileDropZoneProps) {
     [handleFile],
   );
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
     if (file) {
       handleFile(file);
@@ -102,4 +102,4 @@ export function FileDropZone({ onFileSelect, className }: FileDropZoneProps) {
       </div>
     </div>
   );
-}
+};

@@ -10,13 +10,17 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export function InitialStep({ setTerminalStep, handleGlobalState, state }: TerminalProps) {
+export const InitialStep = ({
+  setTerminalStep,
+  handleGlobalState,
+  state,
+}: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
@@ -26,7 +30,7 @@ export function InitialStep({ setTerminalStep, handleGlobalState, state }: Termi
     scrollToBottom();
   }, [history]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
     switch (input) {
       case "1": {
@@ -61,11 +65,21 @@ export function InitialStep({ setTerminalStep, handleGlobalState, state }: Termi
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
+        <div className="sm:inline-block hidden text-white mb-4">
+          <div>+--------------------------------------------------+</div>
+          <div className="w-full">| Welcome to CertaiK {"\u00A0".repeat(30)}|</div>
+          <div>| I&apos;m an AI agent for smart contract auditing {"\u00A0".repeat(4)} |</div>
+          <div>+--------------------------------------------------+</div>
+        </div>
+        <div className="sm:hidden inline-block text-white mb-4">
+          <div className="w-full">Welcome to CertaiK</div>
+          <div className="w-full">I&apos;m an AI agent for smart contract auditing</div>
+        </div>
         {history.map((message, i) => (
           <div
             key={i}
             className={cn(
-              "mb-2 leading-relaxed whitespace-pre",
+              "mb-2 leading-relaxed whitespace-pre-wrap",
               message.type === Message.SYSTEM && "text-blue-400",
               message.type === Message.USER && "text-green-400",
               message.type === Message.ERROR && "text-red-400",
@@ -84,4 +98,4 @@ export function InitialStep({ setTerminalStep, handleGlobalState, state }: Termi
       />
     </>
   );
-}
+};

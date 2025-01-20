@@ -14,7 +14,7 @@ import { initialState } from "@/utils/initialStates";
 import { MessageType } from "@/utils/types";
 import { useState } from "react";
 
-export default function TerminalAuditPage() {
+export default function TerminalAuditPage(): JSX.Element {
   const [terminalStep, setTerminalStep] = useState<TerminalStep>(TerminalStep.INITIAL);
   const [contractContent, setContractContent] = useState<string>("");
   const [promptContent, setPromptContent] = useState<string>("");
@@ -23,16 +23,16 @@ export default function TerminalAuditPage() {
     useState<Record<TerminalStep, MessageType[]>>(initialState);
   const [stack, setStack] = useState<TerminalStep[]>([TerminalStep.INITIAL]);
 
-  const handleGlobalStep = (step: TerminalStep) => {
+  const handleGlobalStep = (step: TerminalStep): void => {
     setStack((prev) => [...prev, step]);
     setTerminalStep(step);
   };
 
-  const handleGlobalState = (step: TerminalStep, history: MessageType[]) => {
+  const handleGlobalState = (step: TerminalStep, history: MessageType[]): void => {
     setTerminalState((prev) => ({ ...prev, [step]: history }));
   };
 
-  const handleDownload = () => {
+  const handleDownload = (): void => {
     if (!(terminalStep === TerminalStep.RESULTS && auditContent)) return;
     const blob = new Blob([auditContent], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
@@ -45,12 +45,12 @@ export default function TerminalAuditPage() {
     URL.revokeObjectURL(url);
   };
 
-  const handleRewind = (s: TerminalStep) => {
+  const handleRewind = (s: TerminalStep): void => {
     // if going back, need to reset state for proceeding steps
-    let interStack = stack;
+    const interStack = stack;
     const interState = terminalState;
 
-    let shouldResetAudit = true; // result doesnt get added to stack for now, always true
+    const shouldResetAudit = true; // result doesnt get added to stack for now, always true
     let shouldResetContract = false;
     let poppedElement = interStack.pop();
 
@@ -77,12 +77,12 @@ export default function TerminalAuditPage() {
   };
 
   return (
-    <main className="h-screen w-screen bg-black text-white z-1">
+    <main className="h-svh w-screen bg-black text-white z-1">
       <div className="relative px-4 py-24 z-20 size-full flex flex-col items-center justify-center">
         <div
           className={cn(
             "bg-black/90 border border-gray-800 rounded-lg p-4",
-            "flex flex-row w-full h-full max-w-[1200px] max-h-[600px]",
+            "flex flex-row w-full h-full max-w-[1200px] max-h-[600px] mt-5",
           )}
         >
           <div className="flex flex-col w-full h-full flex-1 no-scrollbar">
@@ -137,8 +137,8 @@ export default function TerminalAuditPage() {
           </div>
           <div
             className={cn(
-              "hidden flex-col z-1 justify-between gap-1 border-l-[1px] border-l-gray-500 pl-2 ml-2",
-              "md:flex",
+              "hidden flex-col z-1 justify-between gap-1 border-l-[1px]",
+              "border-l-gray-500 pl-2 ml-2 md:flex",
             )}
           >
             <div className="z-10">
@@ -155,7 +155,12 @@ export default function TerminalAuditPage() {
                 >
                   {stepText[s]}
                   {s === terminalStep && (
-                    <div className="absolute -right-4 top-1/2 -translate-y-1/2 bg-green-500 w-1 h-1 z-1 rounded-full" />
+                    <div
+                      className={cn(
+                        "absolute -right-4 top-1/2 -translate-y-1/2 bg-green-500",
+                        "w-1 h-1 z-1 rounded-full",
+                      )}
+                    />
                   )}
                 </div>
               ))}

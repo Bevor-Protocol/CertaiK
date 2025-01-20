@@ -1,7 +1,12 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import type { Metadata } from "next";
+import { walletConfig } from "@/lib/config";
+import { ModalProvider } from "@/providers/modal";
+import WalletProvider from "@/providers/wallet";
+import type { Metadata, Viewport } from "next";
 import { Figtree } from "next/font/google";
+import { headers } from "next/headers";
+import { cookieToInitialState } from "wagmi";
 import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"] });
@@ -27,18 +32,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
+const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<JSX.Element> => {
+  const headerList = await headers();
+  const initialState = cookieToInitialState(walletConfig, headerList.get("cookie"));
   return (
     <html lang="en">
       <body className={`${figtree.className} antialiased`}>
-        <Header />
-        {children}
-        <Footer />
+        <WalletProvider initialState={initialState}>
+          <ModalProvider>
+            <Header />
+            {children}
+            <Footer />
+          </ModalProvider>
+        </WalletProvider>
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
