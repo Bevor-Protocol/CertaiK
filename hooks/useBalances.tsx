@@ -103,9 +103,6 @@ export const useCertaiBalance = (): {
     abi: abiJSON.abi,
     functionName: "promotionalCreditScalar",
     args: [],
-    query: {
-      enabled: !!address,
-    },
   });
 
   // console.log("TOKEN", tokenData, isTokenDataLoading, isFetching, isRefetching);
@@ -116,22 +113,22 @@ export const useCertaiBalance = (): {
 
   return {
     token: {
-      data: typeof tokenData === "bigint" ? Number(tokenData / 1000000000000000000n) : 0,
+      data: typeof tokenData === "bigint" ? Number(tokenData) / 10 ** 18 : 0,
       isLoading: isTokenDataLoading,
       queryKey: tokenQueryKey,
     },
     allowance: {
-      data: typeof allowanceData === "bigint" ? Number(allowanceData / 1000000000000000000n) : 0,
+      data: typeof allowanceData === "bigint" ? Number(allowanceData) / 10 ** 18 : 0,
       isLoading: isAllowanceLoading,
       queryKey: allowanceQueryKey,
     },
     credit: {
-      data: typeof creditData === "bigint" ? Number(creditData / 1000000000000000000n) : 0,
+      data: typeof creditData === "bigint" ? Number(creditData) / 10 ** 18 : 0,
       isLoading: isCreditDataLoading,
       queryKey: creditQueryKey,
     },
     deposit: {
-      data: typeof depositData === "bigint" ? Number(depositData / 1000000000000000000n) : 0,
+      data: typeof depositData === "bigint" ? Number(depositData) / 10 ** 18 : 0,
       isLoading: isDepositDataLoading,
       queryKey: depositQueryKey,
     },
