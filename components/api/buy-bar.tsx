@@ -2,20 +2,22 @@ import abiJSON from "@/abis/APICredits.json";
 import AdminTools from "@/components/admin-tools";
 import { Button } from "@/components/ui/button";
 import { useCertaiBalance } from "@/hooks/useBalances";
+import { useContractWrite } from "@/hooks/useContractWrite";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { cn } from "@/lib/utils";
 import { getNetworkImage } from "@/utils/helpers";
-import { useQueryClient } from "@tanstack/react-query";
+import { QueryKey, useQueryClient } from "@tanstack/react-query";
 import { parseUnits } from "ethers/utils";
 import { useEffect, useRef, useState } from "react";
-import { erc20Abi, type Log } from "viem";
-import { useAccount, useSimulateContract, useWatchContractEvent, useWriteContract } from "wagmi";
+import { Abi, erc20Abi } from "viem";
+import { useAccount } from "wagmi";
 
 const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
 const contractAddress = process.env.NEXT_PUBLIC_CREDIT_CONTRACT_ADDRESS as `0x${string}`;
 
 const BuyBar = (): JSX.Element => {
   const isMobile = useIsMobile();
+  const [txn, setTxn] = useState("");
   const [amount, setAmount] = useState(0);
   const [method, setMethod] = useState<"purchase" | "refund" | "approve" | null>(null);
   const [signState, setSignState] = useState<"sign" | "loading" | "error" | "success" | null>();
@@ -27,26 +29,49 @@ const BuyBar = (): JSX.Element => {
 
   const { token, credit, deposit, allowance, promotion } = useCertaiBalance();
 
-  const { writeContract: buyWriteContract } = useWriteContract({
-    mutation: {
-      onMutate: () => setSignState("sign"),
-      onSuccess: () => setSignState("loading"),
-      onError: () => setSignState("error"),
-    },
+  const onMutate = () => {
+    setSignState("sign");
+  };
+
+  const onSuccess = ({ receipt, keys }: { receipt: any; keys: QueryKey[] }) => {
+    setSignState("success");
+    setAmount(0);
+    // can't seem to invalidate in one call?.
+    keys.forEach((key) => {
+      queryClient.invalidateQueries({
+        queryKey: key,
+      });
+    });
+  };
+
+  const onTxn = (hash: string) => {
+    console.log("TXN", hash);
+    setTxn(hash);
+    setSignState("loading");
+  };
+
+  const onError = (error: Error) => {
+    console.log("ERROR", error);
+    setSignState("error");
+    setAmount(0);
+  };
+
+  const { writeContractWithEvents: purchaseWrite } = useContractWrite({
+    address: contractAddress,
+    abi: abiJSON.abi as Abi,
+    functionName: "purchaseCredits",
   });
-  const { writeContract: refundWriteContract } = useWriteContract({
-    mutation: {
-      onMutate: () => setSignState("sign"),
-      onSuccess: () => setSignState("loading"),
-      onError: () => setSignState("error"),
-    },
+
+  const { writeContractWithEvents: refundWrite } = useContractWrite({
+    address: contractAddress,
+    abi: abiJSON.abi as Abi,
+    functionName: "refundDeposit",
   });
-  const { writeContract: approveWriteContract } = useWriteContract({
-    mutation: {
-      onMutate: () => setSignState("sign"),
-      onSuccess: () => setSignState("loading"),
-      onError: () => setSignState("error"),
-    },
+
+  const { writeContractWithEvents: approveWrite } = useContractWrite({
+    address: tokenAddress,
+    abi: erc20Abi,
+    functionName: "approve",
   });
 
   useEffect(() => {
@@ -56,126 +81,44 @@ const BuyBar = (): JSX.Element => {
     }
   }, [signState, amount, token.data, isMobile]);
 
-  const { data: buyData } = useSimulateContract({
-    address: contractAddress,
-    abi: abiJSON.abi,
-    functionName: "purchaseCredits",
-    args: [parseUnits(amount.toString(), 18)], // TODO: CHANGE BACK TO 18 FOR MAINNET
-  });
-
-  const { data: refundData } = useSimulateContract({
-    address: contractAddress,
-    abi: abiJSON.abi,
-    functionName: "refundDeposit",
-    args: [parseUnits(amount.toString(), 18)], // TODO: CHANGE BACK TO 18 FOR MAINNET
-  });
-
-  const { data: approveData } = useSimulateContract({
-    address: tokenAddress,
-    abi: erc20Abi,
-    functionName: "approve",
-    args: [
-      contractAddress,
-      // Infinite approval in bigint
-      BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
-    ],
-  });
-
-  useWatchContractEvent({
-    address: contractAddress,
-    abi: abiJSON.abi,
-    eventName: "CreditsPurchased",
-    onLogs(log: Log[]) {
-      console.log(log);
-      queryClient.invalidateQueries({
-        queryKey: credit.queryKey,
-      });
-      queryClient.invalidateQueries({
-        queryKey: token.queryKey,
-      });
-      queryClient.invalidateQueries({
-        queryKey: deposit.queryKey,
-      });
-      setSignState("success");
-      setAmount(0);
-    },
-    onError(error: Error) {
-      setSignState("error");
-      console.error("Error occurred in CreditsPurchased:", error);
-    },
-  });
-
-  useWatchContractEvent({
-    address: contractAddress,
-    abi: abiJSON.abi,
-    eventName: "CreditsRefunded",
-    onLogs(log: Log[]) {
-      console.log(log);
-      queryClient.invalidateQueries({
-        queryKey: credit.queryKey,
-      });
-      queryClient.invalidateQueries({
-        queryKey: token.queryKey,
-      });
-      queryClient.invalidateQueries({
-        queryKey: deposit.queryKey,
-      });
-      setSignState("success");
-      setAmount(0);
-    },
-    onError(error: Error) {
-      setSignState("error");
-      console.error("Error occurred in CreditsRefunded:", error);
-    },
-  });
-
-  useWatchContractEvent({
-    address: tokenAddress,
-    abi: erc20Abi,
-    eventName: "Approval",
-    onLogs(log: Log[]) {
-      console.log("APPROVAL LOG", log);
-      queryClient.invalidateQueries({
-        queryKey: allowance.queryKey,
-      });
-      setSignState("success");
-    },
-    onError(error: Error) {
-      setSignState("error");
-      console.error("Error occurred in CreditsRefunded:", error);
-    },
-  });
-
-  const handleApprove = async (): Promise<void> => {
-    console.log(approveData);
-    if (approveData && approveData.request) {
-      setMethod("approve");
-      console.log("Approving CERTAI tokens");
-      setSignState("sign");
-      approveWriteContract(approveData.request);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setAmount(Number(e.target.value));
+  const handleApprove = (): void => {
+    setMethod("approve");
+    approveWrite({
+      args: [
+        contractAddress,
+        BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
+      ],
+      onError,
+      onMutate,
+      onTxn,
+      onSuccess: (receipt) => onSuccess({ receipt, keys: [allowance.queryKey] }),
+    });
   };
 
   const handleBuy = (): void => {
-    console.log(buyData);
-
-    if (buyData && buyData.request) {
-      setMethod("purchase");
-      console.log("Buying credits");
-      buyWriteContract(buyData.request);
-    }
+    setMethod("purchase");
+    if (!amount) return;
+    purchaseWrite({
+      args: [parseUnits(amount.toString(), 18)],
+      onError,
+      onMutate,
+      onTxn,
+      onSuccess: (receipt) =>
+        onSuccess({ receipt, keys: [credit.queryKey, token.queryKey, deposit.queryKey] }),
+    });
   };
 
   const handleRefund = (): void => {
-    console.log(refundData);
-    if (refundData && refundData.request) {
-      setMethod("refund");
-      refundWriteContract(refundData.request);
-    }
+    setMethod("refund");
+    if (!amount) return;
+    refundWrite({
+      args: [parseUnits(amount.toString(), 18)],
+      onError,
+      onMutate,
+      onTxn,
+      onSuccess: (receipt) =>
+        onSuccess({ receipt, keys: [credit.queryKey, token.queryKey, deposit.queryKey] }),
+    });
   };
 
   return (
@@ -235,15 +178,15 @@ const BuyBar = (): JSX.Element => {
                     id="quantity"
                     type="number"
                     value={amount === 0 ? "" : amount}
-                    onChange={handleChange}
+                    onChange={(e) => setAmount(Number(e.target.value))}
                     disabled={signState === "loading" || signState === "sign"}
                     className={cn(
                       "flex-1 bg-transparent border-none outline-none w-[270px] max-w-[70%]",
                       "text-white font-mono",
                       "placeholder:text-gray-500",
                       "caret-green-400 appearance-none",
-                      signState === "loading" ||
-                        (signState === "sign" && "cursor-not-allowed opacity-50"),
+                      (signState === "loading" || signState === "sign") &&
+                        "cursor-not-allowed opacity-50",
                     )}
                     placeholder={token.isLoading ? "Loading $CERTAI balance..." : "Input amount"}
                   />
