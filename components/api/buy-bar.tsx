@@ -17,7 +17,7 @@ const contractAddress = process.env.NEXT_PUBLIC_CREDIT_CONTRACT_ADDRESS as `0x${
 
 const BuyBar = (): JSX.Element => {
   const isMobile = useIsMobile();
-  const [txn, setTxn] = useState("");
+  // const [txn, setTxn] = useState("");
   const [amount, setAmount] = useState(0);
   const [method, setMethod] = useState<"purchase" | "refund" | "approve" | null>(null);
   const [signState, setSignState] = useState<"sign" | "loading" | "error" | "success" | null>();
@@ -29,11 +29,11 @@ const BuyBar = (): JSX.Element => {
 
   const { token, credit, deposit, allowance, promotion } = useCertaiBalance();
 
-  const onMutate = () => {
+  const onMutate = (): void => {
     setSignState("sign");
   };
 
-  const onSuccess = ({ receipt, keys }: { receipt: any; keys: QueryKey[] }) => {
+  const onSuccess = ({ keys }: { keys: QueryKey[] }): void => {
     setSignState("success");
     setAmount(0);
     // can't seem to invalidate in one call?.
@@ -44,13 +44,13 @@ const BuyBar = (): JSX.Element => {
     });
   };
 
-  const onTxn = (hash: string) => {
+  const onTxn = (hash: string): void => {
     console.log("TXN", hash);
-    setTxn(hash);
+    // setTxn(hash);
     setSignState("loading");
   };
 
-  const onError = (error: Error) => {
+  const onError = (error: Error): void => {
     console.log("ERROR", error);
     setSignState("error");
     setAmount(0);
@@ -91,7 +91,7 @@ const BuyBar = (): JSX.Element => {
       onError,
       onMutate,
       onTxn,
-      onSuccess: (receipt) => onSuccess({ receipt, keys: [allowance.queryKey] }),
+      onSuccess: () => onSuccess({ keys: [allowance.queryKey] }),
     });
   };
 
@@ -103,8 +103,7 @@ const BuyBar = (): JSX.Element => {
       onError,
       onMutate,
       onTxn,
-      onSuccess: (receipt) =>
-        onSuccess({ receipt, keys: [credit.queryKey, token.queryKey, deposit.queryKey] }),
+      onSuccess: () => onSuccess({ keys: [credit.queryKey, token.queryKey, deposit.queryKey] }),
     });
   };
 
@@ -116,8 +115,7 @@ const BuyBar = (): JSX.Element => {
       onError,
       onMutate,
       onTxn,
-      onSuccess: (receipt) =>
-        onSuccess({ receipt, keys: [credit.queryKey, token.queryKey, deposit.queryKey] }),
+      onSuccess: () => onSuccess({ keys: [credit.queryKey, token.queryKey, deposit.queryKey] }),
     });
   };
 

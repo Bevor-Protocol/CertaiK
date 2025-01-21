@@ -15,6 +15,6 @@ export const filterChildren = (children: ReactNode, name: string): ReactElement 
   }) as ReactElement;
 };
 
-export const roundToDecimals = (value: number, decimals: number = 4) => {
+export const roundToDecimals = (value: number, decimals: number = 4): number => {
   return Math.round(value * 10 ** decimals) / 10 ** decimals;
 };
