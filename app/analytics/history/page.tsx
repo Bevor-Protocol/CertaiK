@@ -1,55 +1,5 @@
-import { certaikApiAction } from "@/actions";
-import AuditsSearch from "@/components/screens/history";
-import { Button } from "@/components/ui/button";
-import { LoadWaifu } from "@/components/ui/loader";
+import { AuditsSearch, Content } from "@/components/screens/history";
 import { cn } from "@/lib/utils";
-import { trimAddress } from "@/utils/helpers";
-import Link from "next/link";
-import { Suspense } from "react";
-
-const Content = async ({
-  filters,
-}: {
-  filters?: { [key: string]: string };
-}): Promise<JSX.Element> => {
-  const data = await certaikApiAction.getAudits(filters || {});
-  return (
-    <div className="flex flex-col flex-grow justify-between">
-      <div>
-        {data.results.map((audit, ind) => (
-          <Link
-            key={audit.id}
-            href={`/audit/${audit.id}`}
-            className="border-t border-gray-800 hover:bg-gray-900 cursor-pointer block"
-          >
-            <div className="w-full flex *:p-2 *:text-center">
-              <div className="basis-[10%]">{ind + 1}</div>
-              <div className="basis-[20%]">{trimAddress(audit.user_id)}</div>
-              <div className="basis-[20%]">{audit.audit_type}</div>
-              <div className="basis-[20%]">{audit.contract.method}</div>
-              <div className="basis-[20%]">
-                {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
-              </div>
-              <div className="basis-[10%]">{audit.contract.network || "N/A"}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-center pt-4 mt-4">
-        <div className="flex items-center gap-4">
-          <Button disabled={false} variant="transparent">
-            ←
-          </Button>
-          <span className="text-sm text-gray-400">Page 1</span>
-          <Button disabled={!data.more} variant="transparent">
-            →
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default async ({
   searchParams,
@@ -68,19 +18,18 @@ export default async ({
           )}
         >
           <div className="flex gap-4 h-full">
-            <AuditsSearch />
+            <AuditsSearch className="mt-8" query={queryParams} />
             <div className="flex-grow flex flex-col">
               <div className="border-gray-800 flex *:text-center *:pb-2">
-                <div className="basis-[10%]">#</div>
-                <div className="basis-[20%]">User</div>
-                <div className="basis-[20%]">Type</div>
-                <div className="basis-[20%]">Method</div>
-                <div className="basis-[20%]">Address</div>
+                <div className="basis-[5%]">#</div>
+                <div className="basis-[25%]">User</div>
+                <div className="basis-[10%]">Type</div>
+                <div className="basis-[10%]">Method</div>
+                <div className="basis-[25%]">Address</div>
                 <div className="basis-[10%]">Network</div>
+                <div className="basis-[15%]">Created</div>
               </div>
-              <Suspense fallback={<LoadWaifu />}>
-                <Content filters={queryParams} />
-              </Suspense>
+              <Content query={queryParams} />
             </div>
           </div>
         </div>

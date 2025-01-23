@@ -12,7 +12,8 @@ const Button: React.FC<ButtonProps> = (props) => {
     <button
       type={type}
       className={cn(
-        "flex items-center justify-center",
+        "flex items-center justify-center outline-none",
+        "focus-within:opacity-80 focus:opacity-80",
         "appearance-none bg-gradient-to-r text-white rounded-md text-md",
         variant !== "transparent" && "min-w-36 h-9 py-2 px-5",
         variant === "transparent" && "border border-gray-800 px-2",

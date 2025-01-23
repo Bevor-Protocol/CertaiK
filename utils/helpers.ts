@@ -1,3 +1,4 @@
+import { DropdownOption } from "@/utils/types";
 import { SiweMessage } from "siwe";
 import { Address, Chain } from "viem";
 import { Connector } from "wagmi";
@@ -50,4 +51,39 @@ export const sortWallets = (
   }
 
   return arraySorted;
+};
+
+export const constructSearchQuery = ({
+  audits,
+  networks,
+  address,
+  contract,
+  page,
+}: {
+  audits: DropdownOption[];
+  networks: DropdownOption[];
+  address: string;
+  contract: string;
+  page?: string;
+}): URLSearchParams => {
+  const search = new URLSearchParams();
+  if (audits.length) {
+    const params = audits.map((audit) => audit.value);
+    search.append("audit_type", params.join(","));
+  }
+  if (networks.length) {
+    const params = networks.map((audit) => audit.value);
+    search.append("network", params.join(","));
+  }
+  if (address) {
+    search.append("user_id", address);
+  }
+  if (contract) {
+    search.append("contract_address", contract);
+  }
+  if (page) {
+    search.append("page", page);
+  }
+
+  return search;
 };
