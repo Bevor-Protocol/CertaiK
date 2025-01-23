@@ -33,9 +33,12 @@ const NavBar: React.FC<{ className: string }> = ({ className }) => {
       </Link>
       <Link href="/analytics" passHref>
         <div
-          className={cn("cursor-pointer relative", pathname === "/analytics" && " text-green-400")}
+          className={cn(
+            "cursor-pointer relative",
+            pathname.includes("/analytics") && " text-green-400",
+          )}
         >
-          {pathname === "/analytics" && (
+          {pathname.includes("/analytics") && (
             <span className="absolute left-0 -translate-x-full">{">"}</span>
           )}
           analytics

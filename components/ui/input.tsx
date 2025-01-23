@@ -7,7 +7,11 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
     return (
       <input
         type={type}
-        className={cn("appearance-none md:text-sm", className)}
+        className={cn(
+          "appearance-none bg-transparent border-none outline-none flex-1 block",
+          "text-white placeholder:text-gray-500 caret-green-400 max-h-fit",
+          className,
+        )}
         ref={ref}
         {...props}
       />

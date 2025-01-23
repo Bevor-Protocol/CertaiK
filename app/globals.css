@@ -13,6 +13,14 @@ body {
   }
 }
 
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
 @layer components {
   main {
     position: relative;
@@ -36,7 +44,7 @@ body {
     width: 100%;
     max-width: 900px;
     height: 16rem;
-    background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(0, 0, 255, 0.4) 120%);
+    background: radial-gradient(circle, black 0%, rgba(0, 0, 255, 0.4) 120%);
     filter: blur(60px) opacity(0.8);
     z-index: 0;
   }

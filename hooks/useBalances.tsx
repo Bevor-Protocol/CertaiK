@@ -1,31 +1,66 @@
 import abiJSON from "@/abis/APICredits.json";
-import { useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { QueryKey } from "@tanstack/react-query";
 import { erc20Abi } from "viem";
-import { useAccount, useChainId, useReadContract, useWatchContractEvent } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
+
+const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
+const contractAddress = process.env.NEXT_PUBLIC_CREDIT_CONTRACT_ADDRESS as `0x${string}`;
 
 export const useCertaiBalance = (): {
-  certaiBalance?: string | undefined;
-  creditBalance?: string | undefined;
-  curPromotion?: string | undefined;
-  isLoading: boolean;
+  token: {
+    data: number;
+    isLoading: boolean;
+    queryKey: QueryKey;
+  };
+  allowance: {
+    data: number;
+    isLoading: boolean;
+    queryKey: QueryKey;
+  };
+  credit: {
+    data: number;
+    isLoading: boolean;
+    queryKey: QueryKey;
+  };
+  deposit: {
+    data: number;
+    isLoading: boolean;
+    queryKey: QueryKey;
+  };
+  promotion: {
+    data: number;
+    isLoading: boolean;
+    queryKey: QueryKey;
+  };
 } => {
   const { address } = useAccount();
-  const chainId = useChainId();
-  const queryClient = useQueryClient();
-
-  const tokenAddress = process.env.NEXT_PUBLIC_CERTAI_ADDRESS;
-  const contractAddress = process.env.NEXT_PUBLIC_API_CREDITS_ADDRESS;
 
   const {
-    data: certaiData,
-    isLoading: isCertaiLoading,
-    queryKey: certaiQueryKey,
+    data: tokenData,
+    isLoading: isTokenDataLoading,
+    queryKey: tokenQueryKey,
   } = useReadContract({
-    address: tokenAddress as `0x${string}`,
+    address: tokenAddress,
     abi: erc20Abi,
     functionName: "balanceOf",
-    args: [address as `0x${string}`],
+    args: [address!],
+    query: {
+      enabled: !!address,
+    },
+  });
+
+  const {
+    data: allowanceData,
+    isLoading: isAllowanceLoading,
+    queryKey: allowanceQueryKey,
+  } = useReadContract({
+    address: tokenAddress,
+    abi: erc20Abi,
+    functionName: "allowance",
+    args: [
+      address!, // owner
+      contractAddress, // spender
+    ],
     query: {
       enabled: !!address,
     },
@@ -33,77 +68,74 @@ export const useCertaiBalance = (): {
 
   const {
     data: creditData,
-    isLoading: isCreditLoading,
+    isLoading: isCreditDataLoading,
     queryKey: creditQueryKey,
-    error: creditError,
   } = useReadContract({
-    address: contractAddress as `0x${string}`,
+    address: contractAddress,
     abi: abiJSON.abi,
-    functionName: "depositAmount",
-    args: [address as `0x${string}`],
+    functionName: "apiCredits",
+    args: [address!],
     query: {
       enabled: !!address,
     },
   });
 
   const {
-    data: curPromotion,
-    isLoading: isPromotionLoading,
-    queryKey: promotionQueryKey,
-    error: promotionError,
+    data: depositData,
+    isLoading: isDepositDataLoading,
+    queryKey: depositQueryKey,
   } = useReadContract({
-    address: contractAddress as `0x${string}`,
+    address: contractAddress,
     abi: abiJSON.abi,
-    functionName: "promotionalCreditScalar",
+    functionName: "depositAmount",
+    args: [address!],
     query: {
       enabled: !!address,
     },
   });
 
-  const handleCreditsPurchased = (log: any): void => {
-    if (!certaiQueryKey || !creditQueryKey) return;
-    // Extract relevant data from the log
-    const { args } = log;
-    // Update your application state or UI
-    queryClient.invalidateQueries({
-      queryKey: [creditQueryKey, certaiQueryKey, promotionQueryKey],
-    });
-    console.log("Credits purchased:", args);
-  };
-
-  useWatchContractEvent({
-    address: contractAddress as `0x${string}`,
+  const {
+    data: promotionData,
+    isLoading: isPromotionDataLoading,
+    queryKey: promotionQueryKey,
+  } = useReadContract({
+    address: contractAddress,
     abi: abiJSON.abi,
-    eventName: "CreditsPurchased",
-    onLogs(log: any) {
-      console.log(log);
-      handleCreditsPurchased(log);
-    },
+    functionName: "promotionalCreditScalar",
+    args: [],
   });
 
-  const parsedBalances = useMemo(() => {
-    console.log(certaiData, creditData, curPromotion);
-    if (
-      // typeof certaiData === "bigint" &&
-      typeof creditData === "bigint" &&
-      typeof curPromotion === "bigint"
-    ) {
-      return {
-        certaiBalance: ((certaiData || 0n) / 1000000n).toString(),
-        creditBalance: (creditData / 1000000n).toString(),
-        curPromotion: curPromotion?.toString(),
-      };
-    }
-    return {
-      certaiBalance: undefined,
-      creditBalance: undefined,
-      curPromotion: undefined,
-    };
-  }, [certaiData, creditData, curPromotion]);
+  // console.log("TOKEN", tokenData, isTokenDataLoading, isFetching, isRefetching);
+  // console.log("ALLOWANCE", allowanceData, isAllowanceLoading);
+  // console.log("CREDIT", creditData, isCreditDataLoading);
+  // console.log("DEPOSIT", depositData, isDepositDataLoading);
+  // console.log("PROMOTION", promotionData, isPromotionDataLoading);
 
   return {
-    ...parsedBalances,
-    isLoading:
-      (isCertaiLoading || isCreditLoading || isPromotionLoading) && certaiData === undefined,
+    token: {
+      data: typeof tokenData === "bigint" ? Number(tokenData) / 10 ** 18 : 0,
+      isLoading: isTokenDataLoading,
+      queryKey: tokenQueryKey,
+    },
+    allowance: {
+      data: typeof allowanceData === "bigint" ? Number(allowanceData) / 10 ** 18 : 0,
+      isLoading: isAllowanceLoading,
+      queryKey: allowanceQueryKey,
+    },
+    credit: {
+      data: typeof creditData === "bigint" ? Number(creditData) / 10 ** 18 : 0,
+      isLoading: isCreditDataLoading,
+      queryKey: creditQueryKey,
+    },
+    deposit: {
+      data: typeof depositData === "bigint" ? Number(depositData) / 10 ** 18 : 0,
+      isLoading: isDepositDataLoading,
+      queryKey: depositQueryKey,
+    },
+    promotion: {
+      data: Number(promotionData || 0n) / 100,
+      isLoading: isPromotionDataLoading,
+      queryKey: promotionQueryKey,
+    },
   };
 };

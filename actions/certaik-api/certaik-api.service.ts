@@ -128,13 +128,14 @@ class CertaikApiService {
     }
   }
 
-  async getAudits(): Promise<{ results: any[]; more: boolean }> {
+  async getAudits(filters: { [key: string]: string }): Promise<{ results: any[]; more: boolean }> {
     const address = await this.authService.currentUser();
     if (!address) {
       throw new Error("user is not signed in with ethereum");
     }
+    const searchParams = new URLSearchParams(filters);
     try {
-      const response = await api.get("/analytics/audits", {
+      const response = await api.get(`/analytics/audits?${searchParams.toString()}`, {
         headers: {
           "X-User-Identifier": address,
         },

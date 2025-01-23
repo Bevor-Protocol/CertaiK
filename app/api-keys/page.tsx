@@ -5,21 +5,12 @@ import BalanceBox from "@/components/api/balance-box";
 import BuyBar from "@/components/api/buy-bar";
 import { useCertaiBalance } from "@/hooks/useBalances";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
-export default function ApiPage(): JSX.Element {
-  const [inputValue, setInputValue] = useState("");
-
-  const { certaiBalance, creditBalance, curPromotion, isLoading } = useCertaiBalance();
-
-  const handleSubmit = (e: React.FormEvent): void => {
-    e.preventDefault();
-    // Placeholder logic for form submission
-    console.log("Form submitted with input:", inputValue);
-  };
+export default function SimplePage(): JSX.Element {
+  const { promotion } = useCertaiBalance();
 
   return (
-    <main className="h-screen w-screen bg-black text-white z-1">
+    <main className="h-svh w-screen bg-black text-white z-1">
       <div className="relative px-4 py-24 z-20 size-full flex flex-col items-center justify-center">
         <div
           className={cn(
@@ -32,28 +23,17 @@ export default function ApiPage(): JSX.Element {
               <div className="text-blue-400">Welcome to the CertaiK API!</div>
               <div className="text-blue-400 my-2">
                 The presale is live and you can receive{" "}
-                <span className="font-bold text-green-400">
-                  {Number(curPromotion || 0n) / 100}x
-                </span>{" "}
-                in API credits from your purchase! Buyers will be heavily rewarded for participating
-                in the pre-sale but credits are fully refundable before the API launches.
+                <span className="font-bold text-green-400">{promotion.data}x</span> in API credits
+                from your purchase! Buyers will be heavily rewarded for participating in the
+                pre-sale but credits are fully refundable before the API launches.
               </div>
               <div className="text-yellow-400 my-2">
                 * API credits enable integration into your app and access to premium services and
                 features *
               </div>
-              <BalanceBox
-                curBalance={certaiBalance}
-                curCredit={creditBalance}
-                isLoading={isLoading}
-              />
+              <BalanceBox />
             </div>
-            <BuyBar
-              curBalance={certaiBalance}
-              curCredit={creditBalance}
-              curPromotion={curPromotion}
-              isLoading={isLoading}
-            />
+            <BuyBar />
           </div>
         </div>
       </div>

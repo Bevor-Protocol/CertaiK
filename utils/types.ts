@@ -30,3 +30,8 @@ export interface SessionData {
   nonce?: string;
   user_id?: string;
 }
+
+export interface DropdownOption {
+  name: string;
+  value: string;
+}

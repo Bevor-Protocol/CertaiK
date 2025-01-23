@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 import { authAction } from "@/actions";
-import RequestAccountChange from "@/components/siwe/account-change";
-import SignIn from "@/components/siwe/signin";
+import RequestAccountChange from "@/components/Modal/account-change";
+import SignIn from "@/components/Modal/signin";
 import * as Modal from "@/components/ui/modal";
 import { createSiweMessage } from "@/utils/helpers";
 import { SiweStateI } from "@/utils/types";

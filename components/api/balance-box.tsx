@@ -1,33 +1,34 @@
 "use client";
 
-export default function BalanceBox({
-  curBalance,
-  curCredit,
-  isLoading,
-}: {
-  curBalance?: string | undefined;
-  curCredit?: string | undefined;
-  isLoading: boolean;
-}): JSX.Element {
+import { useCertaiBalance } from "@/hooks/useBalances";
+import { roundToDecimals } from "@/lib/utils";
+
+const BalanceBox = (): JSX.Element => {
   // Create dynamic padding based on the maximum length
-  const certaiPadding = "\u00A0".repeat(
-    19 - (isLoading ? "loading...".length : (curBalance || "0")?.length),
+  const { token, credit } = useCertaiBalance();
+
+  const tokenBalance = roundToDecimals(token.data);
+  const creditBalance = roundToDecimals(credit.data);
+
+  const tokenPadding = "\u00A0".repeat(
+    19 - (token.isLoading ? "loading...".length : String(tokenBalance).length),
   );
   const creditPadding = "\u00A0".repeat(
-    23 - (isLoading ? "loading...".length : (curCredit || "0")?.length),
+    23 - (credit.isLoading ? "loading...".length : String(creditBalance)?.length),
   );
+
+  console.log(token.data, credit.data);
 
   return (
     <div className="text-green-400 font-mono">
       <div className="sm:inline-block hidden">
         <div>+-------------------------------------------+</div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
-          | Your $CERTAI Balance:{" "}
-          {(isLoading ? "loading..." : parseFloat(curBalance || "0")).toString()}
-          {certaiPadding} |
+          | Your $CERTAI Balance: {(token.isLoading ? "loading..." : tokenBalance).toString()}
+          {tokenPadding} |
         </div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
-          | Your API Credits: {(isLoading ? "loading..." : parseFloat(curCredit || "0")).toString()}
+          | Your API Credits: {(credit.isLoading ? "loading..." : creditBalance).toString()}
           {creditPadding} |
         </div>
         <div>+-------------------------------------------+</div>
@@ -35,12 +36,14 @@ export default function BalanceBox({
       <div className="sm:hidden inline-block">
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
           Your $CERTAI Balance:
-          {(isLoading ? "loading..." : parseFloat(curBalance || "0")).toString()}
+          {(token.isLoading ? "loading..." : tokenBalance).toString()}
         </div>
         <div className="w-full whitespace-nowrap overflow-hidden text-ellipsis">
-          Your API Credits: {(isLoading ? "loading..." : parseFloat(curCredit || "0")).toString()}
+          Your API Credits: {(credit.isLoading ? "loading..." : creditBalance).toString()}
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default BalanceBox;

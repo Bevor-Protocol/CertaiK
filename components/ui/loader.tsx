@@ -15,7 +15,7 @@ export const LoaderFull = ({ className }: { className: string }): JSX.Element =>
   );
 };
 
-export const LoadWaifu = () => {
+export const LoadWaifu = (): JSX.Element => {
   return (
     <div className="w-full h-full flex items-center justify-center animate-pulse-more">
       <pre className="text-blue-100 whitespace-pre-wrap text-[0.2rem] leading-tight">
