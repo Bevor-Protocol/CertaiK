@@ -128,7 +128,9 @@ class CertaikApiService {
     }
   }
 
-  async getAudits(filters: { [key: string]: string }): Promise<{ results: any[]; more: boolean }> {
+  async getAudits(filters: {
+    [key: string]: string;
+  }): Promise<{ results: any[]; more: boolean; total_pages: number }> {
     const address = await this.authService.currentUser();
     if (!address) {
       throw new Error("user is not signed in with ethereum");

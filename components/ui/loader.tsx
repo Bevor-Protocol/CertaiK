@@ -25,6 +25,6 @@ export const LoadWaifu = (): JSX.Element => {
   );
 };
 
-export const Skeleton = ({ className }: { className: string }): JSX.Element => {
-  return <div className={cn("bg-muted animate-pulse rounded-md", className)} />;
+export const Skeleton: React.FC<{ className: string }> = ({ className }) => {
+  return <div className={cn("bg-gray-800/50 animate-pulse rounded-md", className)} />;
 };

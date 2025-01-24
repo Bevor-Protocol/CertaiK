@@ -18,19 +18,8 @@ export default async ({
           )}
         >
           <div className="flex gap-4 h-full">
-            <AuditsSearch className="mt-8" query={queryParams} />
-            <div className="flex-grow flex flex-col">
-              <div className="border-gray-800 flex *:text-center *:pb-2">
-                <div className="basis-[5%]">#</div>
-                <div className="basis-[25%]">User</div>
-                <div className="basis-[10%]">Type</div>
-                <div className="basis-[10%]">Method</div>
-                <div className="basis-[25%]">Address</div>
-                <div className="basis-[10%]">Network</div>
-                <div className="basis-[15%]">Created</div>
-              </div>
-              <Content query={queryParams} />
-            </div>
+            <AuditsSearch query={queryParams} />
+            <Content query={queryParams} />
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LoadWaifu } from "@/components/ui/loader";
+import { LoaderFull } from "@/components/ui/loader";
 import { Select } from "@/components/ui/select";
 import { cn, prettyDate } from "@/lib/utils";
 import { constructSearchQuery, trimAddress } from "@/utils/helpers";
@@ -11,7 +11,7 @@ import { DropdownOption } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const auditTypeOptions: DropdownOption[] = [
   {
@@ -78,13 +78,7 @@ const getInitialState = (query: { [key: string]: string }, key: string) => {
   }
 };
 
-export const AuditsSearch = ({
-  query,
-  className,
-}: {
-  query?: { [key: string]: string };
-  className?: string;
-}) => {
+export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }) => {
   const router = useRouter();
 
   const [auditTypesSelected, setAuditTypesSelected] = useState<DropdownOption[]>(
@@ -118,7 +112,7 @@ export const AuditsSearch = ({
   };
 
   return (
-    <div className={cn("flex flex-col gap-4 basis-1", className)}>
+    <div className="flex-col gap-4 basis-1 mt-8 hidden md:flex">
       <Input
         type="text"
         placeholder="User address..."
@@ -162,19 +156,12 @@ export const AuditsSearch = ({
 };
 
 export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.Element => {
-  const page = Number(query?.page || "0");
-
-  const router = useRouter();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["audit-data", query],
     queryFn: () => certaikApiAction.getAudits(query || {}),
   });
 
-  if (isLoading) {
-    return <LoadWaifu />;
-  }
-
-  if (isError || !data) {
+  if (isError) {
     return (
       <div className="flex flex-grow justify-center items-center">
         <p className="text-red-600">something went wrong...</p>
@@ -190,6 +177,105 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
     );
   }
 
+  return (
+    <div className="flex flex-col flex-grow justify-between overflow-x-hidden">
+      <Table results={data?.results ?? []} isLoading={isLoading} isError={isError} />
+      <Pagination query={query} data={data} more={data?.more ?? false} isLoading={isLoading} />
+    </div>
+  );
+};
+
+const Table = ({
+  results,
+  isError,
+  isLoading,
+}: {
+  results: any[];
+  isError: boolean;
+  isLoading: boolean;
+}) => {
+  return (
+    <div className="flex flex-col flex-grow overflow-x-scroll w-full">
+      <div className="grid grid-cols-9 border-gray-800 min-w-[600px] *:text-center *:pb-2 *:text-sm *:md:text-md">
+        <div className="col-span-1">#</div>
+        <div className="col-span-2">User</div>
+        <div className="col-span-1">Type</div>
+        <div className="col-span-1">Method</div>
+        <div className="col-span-2">Address</div>
+        <div className="col-span-1">Network</div>
+        <div className="col-span-1">Created</div>
+      </div>
+      <div className="flex flex-col flex-grow justify-between min-w-[600px]">
+        <div className="flex-grow">
+          {isLoading && <LoaderFull className="h-12 w-12" />}
+          {isError && <p className="text-red-600">something went wrong...</p>}
+          {results && !results.length && <p className="">no audits matched this criteria...</p>}
+          {results.map((audit) => (
+            <Link
+              key={audit.id}
+              href={`/audit/${audit.id}`}
+              className={cn(
+                "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-none",
+                "appearance-none focus:bg-gray-900 focus-within:bg-gray-900",
+              )}
+            >
+              <div className="w-full grid grid-cols-9 text-xs *:p-2 *:text-center *:whitespace-nowrap">
+                <div className="col-span-1">{audit.n + 1}</div>
+                <div className="col-span-2">{trimAddress(audit.user_id)}</div>
+                <div className="col-span-1">{audit.audit_type}</div>
+                <div className="col-span-1">{audit.contract.method}</div>
+                <div className="col-span-2">
+                  {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
+                </div>
+                <div className="col-span-1">{audit.contract.network || "N/A"}</div>
+                <div className="col-span-1">{prettyDate(audit.created_at)}</div>
+              </div>
+            </Link>
+          ))}
+          {results.slice(1, 5).map((audit) => (
+            <Link
+              key={audit.id}
+              href={`/audit/${audit.id}`}
+              className={cn(
+                "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-none",
+                "appearance-none focus:bg-gray-900 focus-within:bg-gray-900",
+              )}
+            >
+              <div className="w-full grid grid-cols-9 text-xs *:p-2 *:text-center *:whitespace-nowrap">
+                <div className="col-span-1">{audit.n + 1}</div>
+                <div className="col-span-2">{trimAddress(audit.user_id)}</div>
+                <div className="col-span-1">{audit.audit_type}</div>
+                <div className="col-span-1">{audit.contract.method}</div>
+                <div className="col-span-2">
+                  {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
+                </div>
+                <div className="col-span-1">{audit.contract.network || "N/A"}</div>
+                <div className="col-span-1">{prettyDate(audit.created_at)}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Pagination = ({
+  query,
+  data,
+  more,
+  isLoading,
+}: {
+  query: any;
+  data: any;
+  more: boolean;
+  isLoading: boolean;
+}) => {
+  const page = Number(query?.page || "0");
+
+  const router = useRouter();
+  const [totalPages, setTotalPages] = useState(1);
+
   const handlePaginate = (type: "prev" | "next") => {
     const curQuery = constructSearchQuery({
       audits: getInitialState(query || {}, "audit_type"),
@@ -202,51 +288,30 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
     router.push(`/analytics/history?${curQuery.toString()}`);
   };
 
+  useEffect(() => {
+    if (!data) return;
+    setTotalPages(data.total_pages);
+  }, [data]);
   return (
-    <div className="flex flex-col flex-grow justify-between">
-      <div>
-        {data.results.map((audit) => (
-          <Link
-            key={audit.id}
-            href={`/audit/${audit.id}`}
-            className={cn(
-              "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-none",
-              "appearance-none focus:bg-gray-900 focus-within:bg-gray-900",
-            )}
-          >
-            <div className="w-full flex *:p-2 *:text-center">
-              <div className="basis-[5%]">{audit.n + 1}</div>
-              <div className="basis-[25%]">{trimAddress(audit.user_id)}</div>
-              <div className="basis-[10%]">{audit.audit_type}</div>
-              <div className="basis-[10%]">{audit.contract.method}</div>
-              <div className="basis-[25%]">
-                {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
-              </div>
-              <div className="basis-[10%]">{audit.contract.network || "N/A"}</div>
-              <div className="basis-[15%]">{prettyDate(audit.created_at)}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-center pt-4 mt-4">
-        <div className="flex items-center gap-4">
-          <Button
-            disabled={page === 0}
-            variant="transparent"
-            onClick={() => handlePaginate("prev")}
-          >
-            ←
-          </Button>
-          <span className="text-sm text-gray-400">Page {page + 1}</span>
-          <Button
-            disabled={!data.more}
-            variant="transparent"
-            onClick={() => handlePaginate("next")}
-          >
-            →
-          </Button>
-        </div>
+    <div className="flex items-center justify-center">
+      <div className="flex items-center gap-4">
+        <Button
+          disabled={page === 0 || isLoading}
+          variant="transparent"
+          onClick={() => handlePaginate("prev")}
+        >
+          ←
+        </Button>
+        <span className="text-sm text-gray-400">
+          Page {page + 1} of {totalPages}
+        </span>
+        <Button
+          disabled={!more || isLoading}
+          variant="transparent"
+          onClick={() => handlePaginate("next")}
+        >
+          →
+        </Button>
       </div>
     </div>
   );

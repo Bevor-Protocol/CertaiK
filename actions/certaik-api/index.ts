@@ -30,7 +30,7 @@ const getCurrentGas = async (): Promise<number> => {
 
 const getAudits = async (filters: {
   [key: string]: string;
-}): Promise<{ results: any[]; more: boolean }> => {
+}): Promise<{ results: any[]; more: boolean; total_pages: number }> => {
   return certaikApiController.getAudits(filters);
 };
 
