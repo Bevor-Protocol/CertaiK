@@ -64,7 +64,7 @@ export const Profile = ({
       </Card.Content>
       <Card.Footer className="p-1">
         <div className="flex flex-col w-full">
-          <Link href={`/users/${address}`} className="w-full" onClick={close}>
+          <Link href="/dashboard" className="w-full" onClick={close}>
             <div
               className={cn(
                 "flex items-center relative rounded-lg transition-colors",

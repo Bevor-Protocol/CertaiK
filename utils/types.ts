@@ -35,3 +35,71 @@ export interface DropdownOption {
   name: string;
   value: string;
 }
+
+export interface StatsResponseI {
+  n_audits: number;
+  n_auths: number;
+  n_contracts: number;
+  n_users: number;
+  n_apps: number;
+  findings: { [key: string]: { [key: string]: string[] } };
+}
+
+interface AuditObservationI {
+  n: number;
+  id: string;
+  created_at: string;
+  app_id?: string;
+  user_id?: string;
+  audit_type: string;
+  results_status: string;
+  contract: {
+    method: string;
+    address?: string;
+    network?: string;
+  };
+}
+
+export interface AuditTableReponseI {
+  more: boolean;
+  total_pages: number;
+  results: AuditObservationI[];
+}
+
+export interface AuditResponseI {
+  contract: {
+    address: string;
+    network: string;
+    code: string;
+  };
+  user: {
+    id: string;
+    address: string;
+  };
+  audit: {
+    model: string;
+    prompt_version: string;
+    audit_type: string;
+    result: string;
+  };
+}
+
+export interface UserInfoResponseI {
+  user: {
+    id: string;
+    address: string;
+    created_at: string;
+    total_credits: number;
+    remaining_credits: number;
+  };
+  auth: {
+    exists: boolean;
+    is_active: boolean;
+  };
+  app: {
+    exists: boolean;
+    name?: string;
+  };
+  audits: AuditObservationI[];
+  n_contracts: number;
+}

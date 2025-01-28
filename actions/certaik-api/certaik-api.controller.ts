@@ -1,3 +1,9 @@
+import {
+  AuditResponseI,
+  AuditTableReponseI,
+  StatsResponseI,
+  UserInfoResponseI,
+} from "@/utils/types";
 import CertaikApiService from "./certaik-api.service";
 
 class AiController {
@@ -27,14 +33,20 @@ class AiController {
     return this.certaikApiService.getCurrentGas();
   }
 
-  async getAudits(filters: {
-    [key: string]: string;
-  }): Promise<{ results: any[]; more: boolean; total_pages: number }> {
+  async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
     return this.certaikApiService.getAudits(filters);
   }
 
-  async getStats(): Promise<any> {
+  async getStats(): Promise<StatsResponseI> {
     return this.certaikApiService.getStats();
+  }
+
+  async getAudit(id: string): Promise<AuditResponseI> {
+    return this.certaikApiService.getAudit(id);
+  }
+
+  async getUserInfo(): Promise<UserInfoResponseI> {
+    return this.certaikApiService.getUserInfo();
   }
 }
 

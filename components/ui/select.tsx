@@ -23,9 +23,8 @@ export const Select: React.FC<Props> = ({
   options,
   selectedOptions,
   setSelectedOptions,
-  ...rest
 }): JSX.Element => {
-  const toggleOption = (option: DropdownOption) => {
+  const toggleOption = (option: DropdownOption): void => {
     setSelectedOptions((prev) =>
       prev.some((item) => item.value === option.value)
         ? prev.filter((item) => item.value !== option.value)
@@ -33,7 +32,7 @@ export const Select: React.FC<Props> = ({
     );
   };
 
-  const removeOption = (option: DropdownOption) => {
+  const removeOption = (option: DropdownOption): void => {
     setSelectedOptions((prev) => prev.filter((item) => item.value !== option.value));
   };
 
@@ -41,7 +40,10 @@ export const Select: React.FC<Props> = ({
     <div className="w-full">
       <Dropdown.Main>
         <Dropdown.Trigger>
-          <Button variant="transparent" className="flex justify-between w-full py-1">
+          <Button
+            variant="transparent"
+            className={cn("flex justify-between w-full py-1", className)}
+          >
             {title}
             <ChevronDown height="14px" />
           </Button>

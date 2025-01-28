@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Circle } from "lucide-react";
 
-export default (): JSX.Element => {
+const Roadmap = (): JSX.Element => {
   return (
     <div
       className={cn(
@@ -69,3 +69,5 @@ export default (): JSX.Element => {
     </div>
   );
 };
+
+export default Roadmap;

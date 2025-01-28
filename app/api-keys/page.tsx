@@ -6,7 +6,7 @@ import BuyBar from "@/components/api/buy-bar";
 import { useCertaiBalance } from "@/hooks/useBalances";
 import { cn } from "@/lib/utils";
 
-export default function SimplePage(): JSX.Element {
+const ApiPage = (): JSX.Element => {
   const { promotion } = useCertaiBalance();
 
   return (
@@ -39,4 +39,6 @@ export default function SimplePage(): JSX.Element {
       </div>
     </main>
   );
-}
+};
+
+export default ApiPage;

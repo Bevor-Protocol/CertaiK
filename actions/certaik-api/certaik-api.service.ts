@@ -1,4 +1,10 @@
 import api from "@/lib/api";
+import {
+  AuditResponseI,
+  AuditTableReponseI,
+  StatsResponseI,
+  UserInfoResponseI,
+} from "@/utils/types";
 import AuthService from "../auth/auth.service";
 
 class CertaikApiService {
@@ -128,9 +134,7 @@ class CertaikApiService {
     }
   }
 
-  async getAudits(filters: {
-    [key: string]: string;
-  }): Promise<{ results: any[]; more: boolean; total_pages: number }> {
+  async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
     const address = await this.authService.currentUser();
     if (!address) {
       throw new Error("user is not signed in with ethereum");
@@ -154,7 +158,7 @@ class CertaikApiService {
     }
   }
 
-  async getStats(): Promise<{ results: any[]; more: boolean }> {
+  async getStats(): Promise<StatsResponseI> {
     const address = await this.authService.currentUser();
     if (!address) {
       throw new Error("user is not signed in with ethereum");
@@ -169,6 +173,49 @@ class CertaikApiService {
       return response.data;
     } catch (error) {
       console.log("Error fetching audits: ", error);
+      throw error;
+    }
+  }
+
+  async getAudit(id: string): Promise<AuditResponseI> {
+    const address = await this.authService.currentUser();
+    if (!address) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    try {
+      const response = await api.get(`/analytics/audit/${id}`);
+
+      if (!response.data) {
+        throw new Error("Issue retrying this job");
+      }
+
+      return response.data.result;
+    } catch (error) {
+      console.log("Error fetching audit: ", error);
+      throw error;
+    }
+  }
+
+  async getUserInfo(): Promise<UserInfoResponseI> {
+    console.log("CALLED");
+    const address = await this.authService.currentUser();
+    if (!address) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    try {
+      const response = await api.get("/analytics/user", {
+        headers: {
+          "X-User-Identifier": address,
+        },
+      });
+
+      if (!response.data) {
+        throw new Error("Issue retrying this job");
+      }
+
+      return response.data;
+    } catch (error) {
+      console.log("Error fetching audit: ", error);
       throw error;
     }
   }

@@ -7,7 +7,7 @@ import { LoaderFull } from "@/components/ui/loader";
 import { Select } from "@/components/ui/select";
 import { cn, prettyDate } from "@/lib/utils";
 import { constructSearchQuery, trimAddress } from "@/utils/helpers";
-import { DropdownOption } from "@/utils/types";
+import { AuditTableReponseI, DropdownOption } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -59,8 +59,7 @@ const networkOptions: DropdownOption[] = [
   },
 ];
 
-const getInitialState = (query: { [key: string]: string }, key: string) => {
-  console.log(query, key);
+const getInitialState = (query: { [key: string]: string }, key: string): DropdownOption[] => {
   if (!(key in query)) {
     return [];
   }
@@ -78,7 +77,7 @@ const getInitialState = (query: { [key: string]: string }, key: string) => {
   }
 };
 
-export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }) => {
+export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): JSX.Element => {
   const router = useRouter();
 
   const [auditTypesSelected, setAuditTypesSelected] = useState<DropdownOption[]>(
@@ -90,7 +89,7 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }) =
   const [address, setAddresss] = useState(query?.user_id ?? "");
   const [contract, setContract] = useState(query?.contract_address ?? "");
 
-  const submitHandler = () => {
+  const submitHandler = (): void => {
     const search = constructSearchQuery({
       audits: auditTypesSelected,
       networks: networkTypesSelected,
@@ -101,7 +100,7 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }) =
     router.push(`/analytics/history?${search.toString()}`);
   };
 
-  const resetHandler = () => {
+  const resetHandler = (): void => {
     setAuditTypesSelected([]);
     setNetworkTypesSelected([]);
     setAddresss("");
@@ -169,7 +168,7 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
     );
   }
 
-  if (data && !data.results.length) {
+  if (data?.results && !data.results.length) {
     return (
       <div className="flex flex-grow justify-center items-center">
         <p className="">no audits matched this criteria...</p>
@@ -179,82 +178,61 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
 
   return (
     <div className="flex flex-col flex-grow justify-between overflow-x-hidden">
-      <Table results={data?.results ?? []} isLoading={isLoading} isError={isError} />
+      <div className="flex flex-col flex-grow overflow-x-scroll w-full">
+        <div
+          className={cn(
+            "grid grid-cols-9 border-gray-800 min-w-[600px]",
+            " *:text-center *:pb-2 *:text-sm *:md:text-md",
+          )}
+        >
+          <div className="col-span-1">#</div>
+          <div className="col-span-2">User</div>
+          <div className="col-span-1">Type</div>
+          <div className="col-span-1">Method</div>
+          <div className="col-span-2">Address</div>
+          <div className="col-span-1">Network</div>
+          <div className="col-span-1">Created</div>
+        </div>
+        {isLoading && <LoaderFull className="h-12 w-12" />}
+        {isError && <p className="text-red-600">something went wrong...</p>}
+        <Table results={data?.results ?? []} />
+      </div>
       <Pagination query={query} data={data} more={data?.more ?? false} isLoading={isLoading} />
     </div>
   );
 };
 
-const Table = ({
-  results,
-  isError,
-  isLoading,
-}: {
-  results: any[];
-  isError: boolean;
-  isLoading: boolean;
-}) => {
+export const Table = ({ results }: { results: AuditTableReponseI["results"] }): JSX.Element => {
   return (
-    <div className="flex flex-col flex-grow overflow-x-scroll w-full">
-      <div className="grid grid-cols-9 border-gray-800 min-w-[600px] *:text-center *:pb-2 *:text-sm *:md:text-md">
-        <div className="col-span-1">#</div>
-        <div className="col-span-2">User</div>
-        <div className="col-span-1">Type</div>
-        <div className="col-span-1">Method</div>
-        <div className="col-span-2">Address</div>
-        <div className="col-span-1">Network</div>
-        <div className="col-span-1">Created</div>
-      </div>
-      <div className="flex flex-col flex-grow justify-between min-w-[600px]">
-        <div className="flex-grow">
-          {isLoading && <LoaderFull className="h-12 w-12" />}
-          {isError && <p className="text-red-600">something went wrong...</p>}
-          {results && !results.length && <p className="">no audits matched this criteria...</p>}
-          {results.map((audit) => (
-            <Link
-              key={audit.id}
-              href={`/audit/${audit.id}`}
+    <div className="flex flex-col flex-grow justify-between min-w-[600px]">
+      <div className="flex-grow">
+        {results.map((audit) => (
+          <Link
+            key={audit.id}
+            href={`/analytics/audit/${audit.id}`}
+            className={cn(
+              "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-none",
+              "appearance-none focus:bg-gray-900 focus-within:bg-gray-900",
+            )}
+          >
+            <div
               className={cn(
-                "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-none",
-                "appearance-none focus:bg-gray-900 focus-within:bg-gray-900",
+                "w-full grid grid-cols-9 text-xs",
+                " *:p-2 *:text-center *:whitespace-nowrap",
               )}
             >
-              <div className="w-full grid grid-cols-9 text-xs *:p-2 *:text-center *:whitespace-nowrap">
-                <div className="col-span-1">{audit.n + 1}</div>
-                <div className="col-span-2">{trimAddress(audit.user_id)}</div>
-                <div className="col-span-1">{audit.audit_type}</div>
-                <div className="col-span-1">{audit.contract.method}</div>
-                <div className="col-span-2">
-                  {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
-                </div>
-                <div className="col-span-1">{audit.contract.network || "N/A"}</div>
-                <div className="col-span-1">{prettyDate(audit.created_at)}</div>
+              <div className="col-span-1">{audit.n + 1}</div>
+              <div className="col-span-2">{trimAddress(audit.user_id)}</div>
+              <div className="col-span-1">{audit.audit_type}</div>
+              <div className="col-span-1">{audit.contract.method}</div>
+              <div className="col-span-2">
+                {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
               </div>
-            </Link>
-          ))}
-          {results.slice(1, 5).map((audit) => (
-            <Link
-              key={audit.id}
-              href={`/audit/${audit.id}`}
-              className={cn(
-                "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-none",
-                "appearance-none focus:bg-gray-900 focus-within:bg-gray-900",
-              )}
-            >
-              <div className="w-full grid grid-cols-9 text-xs *:p-2 *:text-center *:whitespace-nowrap">
-                <div className="col-span-1">{audit.n + 1}</div>
-                <div className="col-span-2">{trimAddress(audit.user_id)}</div>
-                <div className="col-span-1">{audit.audit_type}</div>
-                <div className="col-span-1">{audit.contract.method}</div>
-                <div className="col-span-2">
-                  {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
-                </div>
-                <div className="col-span-1">{audit.contract.network || "N/A"}</div>
-                <div className="col-span-1">{prettyDate(audit.created_at)}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              <div className="col-span-1">{audit.contract.network || "N/A"}</div>
+              <div className="col-span-1">{prettyDate(audit.created_at)}</div>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );
@@ -266,17 +244,17 @@ const Pagination = ({
   more,
   isLoading,
 }: {
-  query: any;
-  data: any;
+  query?: { [key: string]: string };
+  data?: AuditTableReponseI;
   more: boolean;
   isLoading: boolean;
-}) => {
+}): JSX.Element => {
   const page = Number(query?.page || "0");
 
   const router = useRouter();
   const [totalPages, setTotalPages] = useState(1);
 
-  const handlePaginate = (type: "prev" | "next") => {
+  const handlePaginate = (type: "prev" | "next"): void => {
     const curQuery = constructSearchQuery({
       audits: getInitialState(query || {}, "audit_type"),
       networks: getInitialState(query || {}, "network"),

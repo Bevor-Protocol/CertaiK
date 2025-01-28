@@ -1,7 +1,7 @@
 import { AuditsSearch, Content } from "@/components/screens/history";
 import { cn } from "@/lib/utils";
 
-export default async ({
+const HistoryPage = async ({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string }>;
@@ -26,3 +26,5 @@ export default async ({
     </main>
   );
 };
+
+export default HistoryPage;

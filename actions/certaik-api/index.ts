@@ -1,5 +1,11 @@
 "use server";
 
+import {
+  AuditResponseI,
+  AuditTableReponseI,
+  StatsResponseI,
+  UserInfoResponseI,
+} from "@/utils/types";
 import certaikApiController from "./certaik-api.controller";
 
 const runEval = async (
@@ -28,14 +34,29 @@ const getCurrentGas = async (): Promise<number> => {
   return certaikApiController.getCurrentGas();
 };
 
-const getAudits = async (filters: {
-  [key: string]: string;
-}): Promise<{ results: any[]; more: boolean; total_pages: number }> => {
+const getAudits = async (filters: { [key: string]: string }): Promise<AuditTableReponseI> => {
   return certaikApiController.getAudits(filters);
 };
 
-const getStats = async (): Promise<any> => {
+const getStats = async (): Promise<StatsResponseI> => {
   return certaikApiController.getStats();
 };
 
-export { getAudits, getCurrentGas, getSourceCode, getStats, retryFailedEval, runEval };
+const getAudit = async (id: string): Promise<AuditResponseI> => {
+  return certaikApiController.getAudit(id);
+};
+
+const getUserInfo = async (): Promise<UserInfoResponseI> => {
+  return certaikApiController.getUserInfo();
+};
+
+export {
+  getAudit,
+  getAudits,
+  getCurrentGas,
+  getSourceCode,
+  getStats,
+  getUserInfo,
+  retryFailedEval,
+  runEval,
+};

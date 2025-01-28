@@ -97,13 +97,8 @@ const Header: React.FC<Props> = ({ address }) => {
   };
 
   return (
-    <header
-      className={cn(
-        "w-full flex justify-center items-center",
-        "text-white absolute top-0 px-4 left-0 z-[100]",
-      )}
-    >
-      <div className="w-full max-w-[1200px] p-4 flex justify-between">
+    <header className="w-full text-white absolute top-0 px-4 left-0 z-[100]">
+      <div className="w-full max-w-[1200px] p-4 flex justify-between items-center m-auto">
         <Link
           className="cursor-pointer max-w-fit block"
           href="https://www.certaik.xyz"
