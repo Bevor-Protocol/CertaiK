@@ -3,6 +3,7 @@
 import {
   AuditResponseI,
   AuditTableReponseI,
+  ContractResponseI,
   StatsResponseI,
   UserInfoResponseI,
 } from "@/utils/types";
@@ -17,12 +18,7 @@ const runEval = async (
   return certaikApiController.eval(text, promptType);
 };
 
-const getSourceCode = async (
-  contractAddress: string,
-): Promise<{
-  source_code: string;
-  network: string;
-}> => {
+const getSourceCode = async (contractAddress: string): Promise<ContractResponseI> => {
   return certaikApiController.getSourceCode(contractAddress);
 };
 

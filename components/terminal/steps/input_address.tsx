@@ -58,20 +58,31 @@ const AddressStep = ({
         if (!result) {
           throw new Error("bad response");
         }
-        const { source_code } = result;
-        setContractContent(source_code);
-        setHistory((prev) => [
-          ...prev,
-          {
-            type: Message.ASSISTANT,
-            content: source_code,
-          },
-          {
-            type: Message.SYSTEM,
-            content: "Does this look right? (y/n)",
-          },
-        ]);
-        setStep(1);
+        const { source_code, is_available } = result;
+        if (!is_available || !source_code) {
+          setHistory((prev) => [
+            ...prev,
+            {
+              type: Message.ERROR,
+              content:
+                "Address was found, but it appears to not be validated. Try uploading the source code directly.",
+            },
+          ]);
+        } else {
+          setContractContent(source_code);
+          setHistory((prev) => [
+            ...prev,
+            {
+              type: Message.ASSISTANT,
+              content: source_code,
+            },
+            {
+              type: Message.SYSTEM,
+              content: "Does this look right? (y/n)",
+            },
+          ]);
+          setStep(1);
+        }
       })
       .catch((error) => {
         console.log(error);

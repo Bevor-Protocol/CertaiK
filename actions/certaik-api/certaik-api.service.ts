@@ -2,27 +2,26 @@ import api from "@/lib/api";
 import {
   AuditResponseI,
   AuditTableReponseI,
+  ContractResponseI,
   StatsResponseI,
   UserInfoResponseI,
 } from "@/utils/types";
-import AuthService from "../auth/auth.service";
 
 class CertaikApiService {
-  constructor(private readonly authService: typeof AuthService) {}
-
   async runEval(
     text: string,
     promptType: string,
+    address: string,
   ): Promise<{
     job_id: string;
   }> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-
-    try {
-      const response = await api.post(
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api
+      .post(
         "/ai/eval",
         {
           contract_code: text,
@@ -33,193 +32,108 @@ class CertaikApiService {
           webhook_url: "https://webhook.site/5eec6efd-1fda-486a-aac5-e95a19a0ea5a",
           // webhook_url: "https://i-dont-exist.com",
         },
-        {
-          headers: {
-            "X-User-Identifier": address,
-          },
-        },
-      );
-
-      if (!response.data) {
-        throw new Error("Response body is not readable");
-      }
-
-      return response.data;
-    } catch (error) {
-      console.error("Error during model call: ", error);
-      throw error;
-    }
-  }
-
-  async getSourceCode(contractAddress: string): Promise<{
-    source_code: string;
-    network: string;
-  }> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-
-    try {
-      const response = await api.get(`/blockchain/scan/${contractAddress}`, {
-        headers: {
-          "X-User-Identifier": address,
-        },
+        headers,
+      )
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data;
       });
+  }
 
+  async getSourceCode(contractAddress: string, address: string): Promise<ContractResponseI> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api.get(`/blockchain/scan/${contractAddress}`, headers).then((response) => {
       if (!response.data) {
-        throw new Error("Issue reading the data");
+        throw new Error(response.statusText);
       }
-
       return response.data;
-    } catch (error) {
-      console.error("Error getting the source code: ", error);
-      throw error;
-    }
+    });
   }
 
-  async retryFailedEval(jobId: string): Promise<boolean> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-
-    try {
-      const response = await api.post(
-        `/status/job/retry/${jobId}`,
-        {},
-        {
-          headers: {
-            "X-User-Identifier": address,
-          },
-        },
-      );
-
+  async retryFailedEval(jobId: string, address: string): Promise<boolean> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api.post(`/status/job/retry/${jobId}`, {}, headers).then((response) => {
       if (!response.data) {
-        throw new Error("Issue retrying this job");
+        throw new Error(response.statusText);
       }
-
-      return response.data.success;
-    } catch (error) {
-      console.log("Error making the retry request: ", error);
-      throw error;
-    }
-  }
-
-  async getCurrentGas(): Promise<number> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-
-    try {
-      const response = await api.post(
-        "/blockchain/gas",
-        {},
-        {
-          headers: {
-            "X-User-Identifier": address,
-          },
-        },
-      );
-
-      if (!response.data) {
-        throw new Error("Issue retrying this job");
-      }
-
       return response.data;
-    } catch (error) {
-      console.log("Error making the retry request: ", error);
-      throw error;
-    }
+    });
   }
 
-  async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
+  async getCurrentGas(address: string): Promise<number> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api.post("/blockchain/gas", {}, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async getAudits(
+    filters: { [key: string]: string },
+    address: string,
+  ): Promise<AuditTableReponseI> {
     const searchParams = new URLSearchParams(filters);
-    try {
-      const response = await api.get(`/analytics/audits?${searchParams.toString()}`, {
-        headers: {
-          "X-User-Identifier": address,
-        },
-      });
-
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api.get(`/analytics/audits?${searchParams.toString()}`, headers).then((response) => {
       if (!response.data) {
-        throw new Error("Issue retrying this job");
+        throw new Error(response.statusText);
       }
-
       return response.data;
-    } catch (error) {
-      console.log("Error fetching audits: ", error);
-      throw error;
-    }
+    });
   }
 
   async getStats(): Promise<StatsResponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    try {
-      const response = await api.get("/analytics/stats");
-
+    return api.get("/analytics/stats").then((response) => {
       if (!response.data) {
-        throw new Error("Issue retrying this job");
+        throw new Error(response.statusText);
       }
-
       return response.data;
-    } catch (error) {
-      console.log("Error fetching audits: ", error);
-      throw error;
-    }
+    });
   }
 
-  async getAudit(id: string): Promise<AuditResponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    try {
-      const response = await api.get(`/analytics/audit/${id}`);
-
+  async getAudit(id: string, address: string): Promise<AuditResponseI> {
+    return api.get(`/analytics/audit/${id}`).then((response) => {
       if (!response.data) {
-        throw new Error("Issue retrying this job");
+        throw new Error(response.statusText);
       }
-
       return response.data.result;
-    } catch (error) {
-      console.log("Error fetching audit: ", error);
-      throw error;
-    }
+    });
   }
 
-  async getUserInfo(): Promise<UserInfoResponseI> {
-    console.log("CALLED");
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    try {
-      const response = await api.get("/analytics/user", {
-        headers: {
-          "X-User-Identifier": address,
-        },
-      });
-
+  async getUserInfo(address: string): Promise<UserInfoResponseI> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api.get("/analytics/user", headers).then((response) => {
       if (!response.data) {
-        throw new Error("Issue retrying this job");
+        throw new Error(response.statusText);
       }
-
       return response.data;
-    } catch (error) {
-      console.log("Error fetching audit: ", error);
-      throw error;
-    }
+    });
   }
 }
 
-const certaikApiService = new CertaikApiService(AuthService);
+const certaikApiService = new CertaikApiService();
 export default certaikApiService;

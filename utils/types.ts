@@ -103,3 +103,9 @@ export interface UserInfoResponseI {
   audits: AuditObservationI[];
   n_contracts: number;
 }
+
+export interface ContractResponseI {
+  source_code?: string;
+  network?: string;
+  is_available: boolean;
+}

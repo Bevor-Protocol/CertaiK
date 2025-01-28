@@ -59,7 +59,7 @@ const Dashboard = async (): Promise<JSX.Element> => {
             {user.audits && !user.audits.length ? (
               <>
                 <h3 className="my-4">no recent audits</h3>
-                <Link href="/terminal" className="fit-content">
+                <Link href="/" className="fit-content">
                   <Button variant="bright">Get Started</Button>
                 </Link>
               </>
