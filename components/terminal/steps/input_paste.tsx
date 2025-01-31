@@ -1,3 +1,4 @@
+import { certaikApiAction } from "@/actions";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
 import { MessageType } from "@/utils/types";
@@ -9,6 +10,7 @@ type TerminalProps = {
   setTerminalStep: (step: TerminalStep) => void;
   setContractContent: Dispatch<SetStateAction<string>>;
   handleGlobalState: (step: TerminalStep, history: MessageType[]) => void;
+  setContractId: Dispatch<SetStateAction<string>>;
   state: MessageType[];
 };
 
@@ -16,6 +18,7 @@ const PasteStep = ({
   setTerminalStep,
   handleGlobalState,
   setContractContent,
+  setContractId,
   state,
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
@@ -50,10 +53,30 @@ const PasteStep = ({
     const l = input[0].toLowerCase();
     switch (l) {
       case "y": {
-        setInput("");
-        setContractContent(tempInput);
-        handleGlobalState(TerminalStep.INPUT_PASTE, history);
-        setTerminalStep(TerminalStep.AUDIT_TYPE);
+        certaikApiAction
+          .uploadSourceCode(tempInput)
+          .then((result) => {
+            if (!result) {
+              throw new Error("bad response");
+            }
+            const { candidates } = result;
+            const candidate = candidates[0];
+            setContractId(candidate.id);
+            setContractContent(candidate.source_code);
+            handleGlobalState(TerminalStep.INPUT_PASTE, history);
+            setTerminalStep(TerminalStep.AUDIT_TYPE);
+            setInput("");
+          })
+          .catch((error) => {
+            console.log(error);
+            setHistory((prev) => [
+              ...prev,
+              {
+                type: Message.ERROR,
+                content: "Something went wrong",
+              },
+            ]);
+          });
         break;
       }
       case "n": {

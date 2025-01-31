@@ -1,4 +1,5 @@
 import { certaikApiAction } from "@/actions";
+import authService from "@/actions/auth/auth.service";
 import { Content } from "@/components/screens/audit";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +9,7 @@ const AuditPage = async ({
   params: Promise<{ slug: string }>;
 }): Promise<JSX.Element> => {
   const audit = await certaikApiAction.getAudit((await params).slug);
+  const address = await authService.currentUser();
 
   return (
     <main className="h-svh w-screen bg-black text-white z-1">
@@ -15,10 +17,10 @@ const AuditPage = async ({
         <div
           className={cn(
             "bg-black/90 border border-gray-800 rounded-lg p-4",
-            "flex flex-row w-full h-full max-w-[1200px] max-h-[600px] gap-4",
+            "w-full h-full max-w-[1200px] max-h-[600px]",
           )}
         >
-          <Content audit={audit} />
+          <Content audit={audit} address={address} />
         </div>
       </div>
     </main>

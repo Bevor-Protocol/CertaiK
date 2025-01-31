@@ -100,20 +100,16 @@ const Header: React.FC<Props> = ({ address }) => {
     <header className="w-full text-white absolute top-0 px-4 left-0 z-[100]">
       <div className="w-full max-w-[1200px] p-4 flex justify-between items-center m-auto">
         <Link
-          className="cursor-pointer max-w-fit block"
+          className="cursor-pointer block relative"
           href="https://www.certaik.xyz"
           target="_blank"
           referrerPolicy="no-referrer"
         >
-          <Image
-            src="/logo.svg"
-            alt="Logo"
-            width={0}
-            height={0}
-            style={{ height: "4rem", width: "auto" }}
-          />
+          <div className="block w-[150px] h-[50px] md:w-[176px] md:h-[64px] relative">
+            <Image src="/logo.svg" alt="Logo" fill />
+          </div>
         </Link>
-        <NavBar className="md:flex hidden absolute left-1/2 -translate-x-1/2" />
+        <NavBar className="md:flex hidden" />
         <div className="gap-2 items-center relative flex">
           {!!address && (
             <>

@@ -9,10 +9,11 @@ import {
 
 class CertaikApiService {
   async runEval(
-    text: string,
+    contractId: string,
     promptType: string,
     address: string,
   ): Promise<{
+    id: string;
     job_id: string;
   }> {
     const headers = {
@@ -20,11 +21,12 @@ class CertaikApiService {
         "X-User-Identifier": address,
       },
     };
+
     return api
       .post(
         "/ai/eval",
         {
-          contract_code: text,
+          contract_id: contractId,
           audit_type: promptType,
           encode_code: true,
           response_type: "markdown",
@@ -35,6 +37,7 @@ class CertaikApiService {
         headers,
       )
       .then((response) => {
+        console.log(response);
         if (!response.data) {
           throw new Error(response.statusText);
         }
@@ -49,6 +52,34 @@ class CertaikApiService {
       },
     };
     return api.get(`/blockchain/scan/${contractAddress}`, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async uploadSourceCode(code: string, address: string): Promise<ContractResponseI> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api.post("/blockchain/contract/upload", { code }, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async submitFeedback(id: string, address: string, feedback?: string, verified?: boolean) {
+    const headers = {
+      headers: {
+        "X-User-Identifier": address,
+      },
+    };
+    return api.post("/analytics/feedback", { id, feedback, verified }, headers).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }
@@ -95,6 +126,7 @@ class CertaikApiService {
       },
     };
     return api.get(`/analytics/audits?${searchParams.toString()}`, headers).then((response) => {
+      console.log(response.data);
       if (!response.data) {
         throw new Error(response.statusText);
       }

@@ -15,16 +15,17 @@ class AiController {
   ) {}
 
   async eval(
-    text: string,
+    contractId: string,
     promptType: string,
   ): Promise<{
+    id: string;
     job_id: string;
   }> {
     const address = await this.authService.currentUser();
     if (!address) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.runEval(text, promptType, address);
+    return this.certaikApiService.runEval(contractId, promptType, address);
   }
 
   async getSourceCode(contractAddress: string): Promise<ContractResponseI> {
@@ -33,6 +34,26 @@ class AiController {
       throw new Error("user is not signed in with ethereum");
     }
     return this.certaikApiService.getSourceCode(contractAddress, address);
+  }
+
+  async uploadSourceCode(code: string): Promise<ContractResponseI> {
+    const address = await this.authService.currentUser();
+    if (!address) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.uploadSourceCode(code, address);
+  }
+
+  async submitFeedback(
+    id: string,
+    feedback?: string,
+    verified?: boolean,
+  ): Promise<{ success: boolean }> {
+    const address = await this.authService.currentUser();
+    if (!address) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.submitFeedback(id, address, feedback, verified);
   }
 
   async retryFailedEval(jobId: string): Promise<boolean> {

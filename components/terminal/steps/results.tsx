@@ -1,69 +1,83 @@
 import { certaikApiAction } from "@/actions";
-import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import { useWs } from "@/hooks/useContexts";
 import { MessageType } from "@/utils/types";
+import { Check, X } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
   setAuditContent: Dispatch<SetStateAction<string>>;
-  contractContent: string;
   promptType: string;
   auditContent: string;
   state: MessageType[];
+  contractId: string;
 };
+
+type ValidWsSteps =
+  | "generating_candidates"
+  | "generating_judgements"
+  | "generating_report"
+  | "done"
+  | "error";
 
 const ResultsStep = ({
   setAuditContent,
-  contractContent,
   promptType,
   auditContent,
   state,
+  contractId,
 }: TerminalProps): JSX.Element => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [jobId, setJobId] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isRetry, setIsRetry] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [allowRetry, setAllowRetry] = useState(true);
+  const [steps, setSteps] = useState<ValidWsSteps[]>([]);
   const { setOnMessageHandler, sendMessage } = useWs();
 
   useEffect(() => {
+    if (!jobId) return;
+    if (steps.includes("done")) {
+      certaikApiAction
+        .getAudit(jobId)
+        .then((result) => {
+          if (result.audit.status === "success") {
+            setAuditContent(result.audit.result);
+          } else {
+            setIsError(true);
+          }
+        })
+        .catch(() => setIsError(true))
+        .finally(() => setIsLoading(false));
+    }
+  }, [steps, jobId]);
+
+  useEffect(() => {
     setOnMessageHandler((data: any): void => {
-      if (data.result) {
-        setAuditContent(data.result);
-        setLoading(false);
+      setSteps((prev) => [...prev, data.step]);
+      if (data.step === "done") {
+        setAuditContent(JSON.stringify(data.result));
+        setIsLoading(false);
+      }
+      if (data.step === "error") {
+        setIsError(true);
+        setIsLoading(false);
       }
     });
   }, [setOnMessageHandler, setAuditContent]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const removeComments = (report: string): string => {
-    report = report.replace(/\/\/.*$/gm, "");
-    report = report.replace(/\/\*[\s\S]*?\*\//g, "");
-    report = report
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line !== "")
-      .join("\n");
-    return report;
-  };
-
   useEffect(() => {
-    if (state.length || loading) return;
-    setLoading(true);
-    const cleanedFileContent = removeComments(contractContent || "");
+    if (state.length || isLoading) return;
+    setIsLoading(true);
     certaikApiAction
-      .runEval(cleanedFileContent, promptType)
+      .runEval(contractId, promptType)
       .then((result) => {
-        const { job_id } = result;
+        const { id } = result;
         // websocket subscribes to job result
-        setJobId(job_id);
-        console.log("Sending ws message", job_id);
-        sendMessage(`subscribe:${job_id}`);
+        setJobId(id);
+        sendMessage(`subscribe:${id}`);
       })
       .catch((error) => {
         console.log(error);
@@ -71,24 +85,25 @@ const ResultsStep = ({
       });
   }, [state]);
 
-  const handleRetry = async (): Promise<void> => {
-    try {
-      const success = await certaikApiAction.retryFailedEval(jobId);
-
-      if (success) {
-        setIsRetry(true);
-        setIsError(false);
-        setLoading(true);
-      }
-    } catch (error) {
-      console.log(error);
-      setIsError(false);
-    }
-  };
-
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
+        {(isLoading || !auditContent || isError) && (
+          <>
+            {steps.map((step, i) => (
+              <div key={i} className="flex gap-4 items-center">
+                <p>{step}</p>
+                {isError ? (
+                  <X />
+                ) : i === steps.length - 1 ? (
+                  <Loader className="h-4 w-4" />
+                ) : (
+                  <Check />
+                )}
+              </div>
+            ))}
+          </>
+        )}
         {auditContent && (
           <ReactMarkdown className="overflow-scroll no-scrollbar markdown">
             {auditContent}
@@ -96,12 +111,7 @@ const ResultsStep = ({
         )}
         {isError && (
           <div className="mb-2 leading-relaxed whitespace-pre-wrap text-red-400">
-            Something went wrong
-            {allowRetry && (
-              <Button variant="dark" onClick={handleRetry}>
-                Retry
-              </Button>
-            )}
+            Something went wrong, try again or please reach out
           </div>
         )}
       </div>
@@ -110,7 +120,7 @@ const ResultsStep = ({
         onChange={() => {}}
         disabled={true}
         value={""}
-        overrideLoading={loading}
+        overrideLoading={isLoading}
         placeholder="Chat feature coming soon..."
       />
     </>

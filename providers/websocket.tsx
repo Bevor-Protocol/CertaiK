@@ -53,8 +53,10 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
         const data = JSON.parse(event.data);
         if (data.type === "heartbeat") {
           ws.send("PONG");
-        } else if (onMessageHandler.current) {
-          onMessageHandler.current(data);
+        } else if (data.type === "eval") {
+          if (onMessageHandler.current) {
+            onMessageHandler.current(data);
+          }
         }
       };
 

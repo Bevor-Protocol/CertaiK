@@ -9,6 +9,7 @@ type TerminalProps = {
   setTerminalStep: (step: TerminalStep) => void;
   setContractContent: Dispatch<SetStateAction<string>>;
   handleGlobalState: (step: TerminalStep, history: MessageType[]) => void;
+  setContractId: Dispatch<SetStateAction<string>>;
   state: MessageType[];
 };
 
@@ -16,6 +17,7 @@ const UploadStep = ({
   setTerminalStep,
   handleGlobalState,
   setContractContent,
+  setContractId,
   state,
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");

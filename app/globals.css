@@ -75,18 +75,15 @@ body {
 
     /* Lists */
     ul {
-      @apply list-disc pl-5 inline-block -mt-4;
+      @apply list-disc pl-5 inline-block;
     }
     ol {
       @apply list-decimal list-inside pl-2 m-0 inline-block;
     }
 
-    li {
-      @apply float-left my-1;
-
-      p {
-        @apply float-left -mt-5;
-      }
+    li,
+    li p {
+      @apply -mt-5;
     }
 
     /* Code blocks */

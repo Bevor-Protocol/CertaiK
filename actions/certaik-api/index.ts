@@ -10,16 +10,29 @@ import {
 import certaikApiController from "./certaik-api.controller";
 
 const runEval = async (
-  text: string,
+  contractId: string,
   promptType: string,
 ): Promise<{
+  id: string;
   job_id: string;
 }> => {
-  return certaikApiController.eval(text, promptType);
+  return certaikApiController.eval(contractId, promptType);
 };
 
 const getSourceCode = async (contractAddress: string): Promise<ContractResponseI> => {
   return certaikApiController.getSourceCode(contractAddress);
+};
+
+const uploadSourceCode = async (code: string): Promise<ContractResponseI> => {
+  return certaikApiController.uploadSourceCode(code);
+};
+
+const submitFeedback = async (
+  id: string,
+  feedback?: string,
+  verified?: boolean,
+): Promise<{ success: boolean }> => {
+  return certaikApiController.submitFeedback(id, feedback, verified);
 };
 
 const retryFailedEval = async (jobId: string): Promise<boolean> => {
@@ -55,4 +68,6 @@ export {
   getUserInfo,
   retryFailedEval,
   runEval,
+  submitFeedback,
+  uploadSourceCode,
 };

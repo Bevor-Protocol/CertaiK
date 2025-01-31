@@ -13,7 +13,7 @@ const HistoryPage = async ({
         <div
           className={cn(
             "bg-black/90 border border-gray-800 rounded-lg",
-            "p-4 flex-col max-w-[1200px] max-h-[600px]",
+            "p-4 max-w-[1200px] max-h-[600px]",
             "w-full h-full font-mono",
           )}
         >

@@ -48,3 +48,25 @@ export const ChainPresets: Record<number, string> = {
   // Default
   99999: "/unknown.svg",
 };
+
+export const NetworkToNameMapper = {
+  eth: "ETH Mainnet",
+  bsc: "Binance Smart Chain",
+  polygon: "Polygon",
+  base: "Base",
+  eth_sepolia: "ETH Sepolia testnet",
+  bsc_test: "Binance testnet",
+  polygon_amoy: "Polygon testnet",
+  base_sepolia: "Base Sepolia testnet",
+};
+
+export const BlockExplorerMapper = {
+  eth: "https://etherscan.io",
+  bsc: "https://bscscan.com",
+  polygon: "https://polygonscan.com",
+  base: "https://basescan.org",
+  eth_sepolia: "https://sepolia.etherscan.io",
+  bsc_test: "https://testnet.bscscan.com",
+  polygon_amoy: "https://amoy.polygonscan.com",
+  base_sepolia: "https://sepolia.basescan.org",
+};

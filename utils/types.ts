@@ -77,11 +77,23 @@ export interface AuditResponseI {
     address: string;
   };
   audit: {
+    status: "waiting" | "processing" | "success" | "failed";
     model: string;
     prompt_version: string;
     audit_type: string;
     result: string;
   };
+  findings: {
+    id: string;
+    level: string;
+    name: string;
+    explanation: string;
+    recommendation: string;
+    reference?: string;
+    is_attested: boolean;
+    is_verified: boolean;
+    feedback?: string;
+  }[];
 }
 
 export interface UserInfoResponseI {
@@ -105,7 +117,12 @@ export interface UserInfoResponseI {
 }
 
 export interface ContractResponseI {
-  source_code?: string;
-  network?: string;
-  is_available: boolean;
+  exact_match: boolean;
+  exists: boolean;
+  candidates: {
+    id: string;
+    source_code: string;
+    network: string;
+    is_available: boolean;
+  }[];
 }

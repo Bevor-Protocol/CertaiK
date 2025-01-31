@@ -9,7 +9,7 @@ type Props = {
 
 const MetricCard: React.FC<Props> = ({ title, Icon, stat, children }) => {
   return (
-    <div className="border border-gray-800 rounded-md">
+    <div className="border border-gray-800 rounded-md p-4">
       <div className="flex justify-between text-sm">
         <p className="mb-2">{title}</p>
         <Icon opacity={0.8} size={16} />

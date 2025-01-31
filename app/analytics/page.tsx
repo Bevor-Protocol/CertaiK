@@ -1,7 +1,9 @@
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { LoadWaifu } from "@/components/ui/loader";
+import MetricCard from "@/components/ui/metric-card";
 import { cn } from "@/lib/utils";
+import { BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -11,74 +13,65 @@ const Stats = async (): Promise<JSX.Element> => {
   return (
     <div
       className={cn(
-        "flex w-full justify-between gap-8 p-6 bg-black/90",
-        "border border-gray-800 rounded-lg mb-8",
+        "bg-black/90 border border-gray-800 rounded-lg p-4",
+        "w-full h-full max-w-[1200px] max-h-[600px] gap-4",
+        "grid grid-cols-4 grid-rows-[min-content,min-content,1fr]",
       )}
     >
+      <MetricCard title="Total Users" Icon={BarChart3} stat={data.n_users} />
+      <MetricCard title="Registered Apps" Icon={BarChart3} stat={data.n_apps} />
+      <MetricCard title="Audits Requested" Icon={BarChart3} stat={data.n_audits} />
+      <MetricCard title="Unique Contracts Observed" Icon={BarChart3} stat={data.n_contracts} />
+      <div className="border border-gray-800 rounded-md p-4 col-span-2">
+        <div className="flex justify-between text-sm">
+          <p className="mb-2">Gas Optimizations</p>
+        </div>
+        <div className="grid grid-cols-4 gap-4 *:text-center">
+          <div>
+            <p className="text-red-500 text-sm my-2">Critical</p>
+            <p className="text-lg font-bold">{data.findings.gas.critical ?? 0}</p>
+          </div>
+          <div>
+            <p className="text-orange-500 text-sm my-2">High</p>
+            <p className="text-lg font-bold">{data.findings.gas.high ?? 0}</p>
+          </div>
+          <div>
+            <p className="text-yellow-500 text-sm my-2">Medium</p>
+            <p className="text-lg font-bold">{data.findings.gas.medium || 0}</p>
+          </div>
+          <div>
+            <p className="text-green-500 text-sm my-2">Low</p>
+            <p className="text-lg font-bold">{data.findings.gas.low ?? 0}</p>
+          </div>
+        </div>
+      </div>
+      <div className="border border-gray-800 rounded-md p-4 col-span-2">
+        <div className="flex justify-between text-sm">
+          <p className="mb-2">Security Vulnerabilities</p>
+        </div>
+        <div className="grid grid-cols-4 gap-4 *:text-center">
+          <div>
+            <p className="text-red-500 text-sm my-2">Critical</p>
+            <p className="text-lg font-bold">{data.findings.security.critical || 0}</p>
+          </div>
+          <div>
+            <p className="text-orange-500 text-sm my-2">High</p>
+            <p className="text-lg font-bold">{data.findings.security.high || 0}</p>
+          </div>
+          <div>
+            <p className="text-yellow-500 text-sm my-2">Medium</p>
+            <p className="text-lg font-bold">{data.findings.security.medium || 0}</p>
+          </div>
+          <div>
+            <p className="text-green-500 text-sm my-2">Low</p>
+            <p className="text-lg font-bold">{data.findings.security.low || 0}</p>
+          </div>
+        </div>
+      </div>
       <div>
         <Link href="/analytics/history">
           <Button variant="dark">See Requests</Button>
         </Link>
-      </div>
-      <div className="flex divide-x-2 *:px-4 divide-gray-400">
-        <div className="grid grid-cols-2 gap-2 text-center">
-          <div className="flex flex-col gap-2">
-            <p className="text-gray-400 text-sm">Total Users</p>
-            <p className="text-2xl font-bold">{data.n_users}</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-gray-400 text-sm">Registered Apps</p>
-            <p className="text-2xl font-bold">{data.n_apps}</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-gray-400 text-sm">Audit Requests</p>
-            <p className="text-2xl font-bold">{data.n_audits}</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-gray-400 text-sm">Unique Contracts Observed</p>
-            <p className="text-2xl font-bold">{data.n_contracts}</p>
-          </div>
-        </div>
-
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold border-b border-gray-800 pb-2">
-              Gas Optimizations
-            </h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-red-500 text-sm">Critical</p>
-                <p className="text-2xl font-bold">{data.findings.gas.critical}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-orange-500 text-sm">High</p>
-                <p className="text-2xl font-bold">{data.findings.gas.high}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-yellow-500 text-sm">Low</p>
-                <p className="text-2xl font-bold">{data.findings.gas.low}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold border-b border-gray-800 pb-2">Security</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-red-500 text-sm">Critical</p>
-                <p className="text-2xl font-bold">{data.findings.security.critical || 0}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-orange-500 text-sm">High</p>
-                <p className="text-2xl font-bold">{data.findings.security.high || 0}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-yellow-500 text-sm">Low</p>
-                <p className="text-2xl font-bold">{data.findings.security.low || 0}</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
