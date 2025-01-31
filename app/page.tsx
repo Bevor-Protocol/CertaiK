@@ -17,7 +17,6 @@ import { useState } from "react";
 const TerminalAuditPage: React.FC = () => {
   const [terminalStep, setTerminalStep] = useState<TerminalStep>(TerminalStep.INITIAL);
   const [contractId, setContractId] = useState("");
-  const [contractContent, setContractContent] = useState<string>("");
   const [promptType, setPromptType] = useState<string>("");
   const [auditContent, setAuditContent] = useState<string>("");
   const [terminalState, setTerminalState] =
@@ -73,7 +72,7 @@ const TerminalAuditPage: React.FC = () => {
       setAuditContent("");
     }
     if (shouldResetContract) {
-      setContractContent("");
+      setContractId("");
     }
   };
 
@@ -99,7 +98,6 @@ const TerminalAuditPage: React.FC = () => {
                 setTerminalStep={handleGlobalStep}
                 handleGlobalState={handleGlobalState}
                 state={terminalState[TerminalStep.INPUT_ADDRESS]}
-                setContractContent={setContractContent}
                 setContractId={setContractId}
               />
             )}
@@ -108,7 +106,6 @@ const TerminalAuditPage: React.FC = () => {
                 setTerminalStep={handleGlobalStep}
                 handleGlobalState={handleGlobalState}
                 state={terminalState[TerminalStep.INPUT_UPLOAD]}
-                setContractContent={setContractContent}
                 setContractId={setContractId}
               />
             )}
@@ -117,7 +114,6 @@ const TerminalAuditPage: React.FC = () => {
                 setTerminalStep={handleGlobalStep}
                 handleGlobalState={handleGlobalState}
                 state={terminalState[TerminalStep.INPUT_PASTE]}
-                setContractContent={setContractContent}
                 setContractId={setContractId}
               />
             )}

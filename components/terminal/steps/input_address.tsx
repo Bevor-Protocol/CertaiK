@@ -7,7 +7,6 @@ import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
   setTerminalStep: (step: TerminalStep) => void;
-  setContractContent: Dispatch<SetStateAction<string>>;
   handleGlobalState: (step: TerminalStep, history: MessageType[]) => void;
   setContractId: Dispatch<SetStateAction<string>>;
   state: MessageType[];
@@ -16,7 +15,6 @@ type TerminalProps = {
 const AddressStep = ({
   setTerminalStep,
   handleGlobalState,
-  setContractContent,
   setContractId,
   state,
 }: TerminalProps): JSX.Element => {
@@ -68,7 +66,8 @@ const AddressStep = ({
             {
               type: Message.ERROR,
               content:
-                "Address was found, but it appears to not be validated. Try uploading the source code directly.",
+                "Address was found, but it appears to not be validated.\
+ Try uploading the source code directly.",
             },
           ]);
         } else if (!exact_match) {
@@ -78,7 +77,8 @@ const AddressStep = ({
             ...prev,
             {
               type: Message.SYSTEM,
-              content: `Found contract on multiple networks. Please select one by entering its number:
+              content: `Found contract on multiple networks. \
+Please select one by entering its number:
 ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
             },
           ]);
@@ -86,7 +86,6 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
         } else {
           const candidate = candidates[0];
           setContractId(candidate.id);
-          setContractContent(candidate.source_code);
           setHistory((prev) => [
             ...prev,
             {
@@ -160,7 +159,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
     }
   };
 
-  const handleNetwork = () => {
+  const handleNetwork = (): void => {
     if (!input) return;
 
     const inputNum = Number(input);

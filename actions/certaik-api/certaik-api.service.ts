@@ -37,7 +37,6 @@ class CertaikApiService {
         headers,
       )
       .then((response) => {
-        console.log(response);
         if (!response.data) {
           throw new Error(response.statusText);
         }
@@ -126,7 +125,6 @@ class CertaikApiService {
       },
     };
     return api.get(`/analytics/audits?${searchParams.toString()}`, headers).then((response) => {
-      console.log(response.data);
       if (!response.data) {
         throw new Error(response.statusText);
       }

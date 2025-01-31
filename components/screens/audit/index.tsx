@@ -216,7 +216,7 @@ const Findings: React.FC<FindingsProps> = ({
     );
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!isOwner) return;
     if (!selectedFindingDetails) return;
     if (!input && attestation === 0) return;

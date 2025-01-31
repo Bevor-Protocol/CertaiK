@@ -50,6 +50,7 @@ const ResultsStep = ({
         .catch(() => setIsError(true))
         .finally(() => setIsLoading(false));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [steps, jobId]);
 
   useEffect(() => {
@@ -83,6 +84,7 @@ const ResultsStep = ({
         console.log(error);
         setIsError(true);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (

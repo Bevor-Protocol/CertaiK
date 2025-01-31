@@ -8,7 +8,6 @@ import TerminalTextArea from "../textarea-bar";
 
 type TerminalProps = {
   setTerminalStep: (step: TerminalStep) => void;
-  setContractContent: Dispatch<SetStateAction<string>>;
   handleGlobalState: (step: TerminalStep, history: MessageType[]) => void;
   setContractId: Dispatch<SetStateAction<string>>;
   state: MessageType[];
@@ -17,7 +16,6 @@ type TerminalProps = {
 const PasteStep = ({
   setTerminalStep,
   handleGlobalState,
-  setContractContent,
   setContractId,
   state,
 }: TerminalProps): JSX.Element => {
@@ -62,7 +60,6 @@ const PasteStep = ({
             const { candidates } = result;
             const candidate = candidates[0];
             setContractId(candidate.id);
-            setContractContent(candidate.source_code);
             handleGlobalState(TerminalStep.INPUT_PASTE, history);
             setTerminalStep(TerminalStep.AUDIT_TYPE);
             setInput("");

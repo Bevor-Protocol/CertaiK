@@ -15,7 +15,8 @@ const Stats = async (): Promise<JSX.Element> => {
       className={cn(
         "bg-black/90 border border-gray-800 rounded-lg p-4",
         "w-full h-full max-w-[1200px] max-h-[600px] gap-4",
-        "grid grid-cols-4 grid-rows-[min-content,min-content,1fr]",
+        "grid md:grid-cols-4 md:grid-rows-[min-content,min-content,1fr]",
+        "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
       )}
     >
       <MetricCard title="Total Users" Icon={BarChart3} stat={data.n_users} />
@@ -68,9 +69,11 @@ const Stats = async (): Promise<JSX.Element> => {
           </div>
         </div>
       </div>
-      <div>
-        <Link href="/analytics/history">
-          <Button variant="dark">See Requests</Button>
+      <div className="col-span-full">
+        <Link href="/analytics/history" className="w-fit">
+          <Button variant="bright" className="w-full md:w-fit">
+            See All Audits
+          </Button>
         </Link>
       </div>
     </div>
