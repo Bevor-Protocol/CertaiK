@@ -3,11 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 // Protected routes that require authentication
-const protectedRoutes = [
-  "/",
-  "/dashboard",
-  // Add other protected routes here
-];
+const protectedRoutes = ["/", "/dashboard", "/api-keys"];
 
 const middleware = async (request: NextRequest): Promise<NextResponse> => {
   const response = NextResponse.next();
@@ -17,14 +13,14 @@ const middleware = async (request: NextRequest): Promise<NextResponse> => {
     return response;
   }
   // Check if current route is protected
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isProtectedRoute = protectedRoutes.some((route) => pathname === route);
 
-  let requireSign = false;
   if (isProtectedRoute) {
     const address = await authAction.getCurrentUser();
-    requireSign = !address;
+    if (!address) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
   }
-  response.headers.set("x-require-sign", requireSign.toString());
 
   return response;
 };

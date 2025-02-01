@@ -320,8 +320,9 @@ const Findings: React.FC<FindingsProps> = ({
                 onChange={(e) => setInput(e.target.value)}
                 disabled={!isOwner}
                 className={cn(
-                  isOwner && "border border-gray-600 rounded-md p-1",
-                  "flex-1 bg-transparent outline-none min-h-16 resize-y w-full",
+                  isOwner && "border border-gray-600 rounded-md p-1 resize-y",
+                  !isOwner && "min-h-fit resize-none",
+                  "flex-1 bg-transparent outline-none min-h-16 w-full",
                   "text-white font-mono text-sm",
                   "placeholder:text-gray-500",
                   "caret-green-400",

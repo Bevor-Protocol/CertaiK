@@ -73,11 +73,11 @@ class AiController {
   }
 
   async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    return this.certaikApiService.getAudits(filters, address);
+    // const address = await this.authService.currentUser();
+    // if (!address) {
+    //   throw new Error("user is not signed in with ethereum");
+    // }
+    return this.certaikApiService.getAudits(filters);
   }
 
   async getStats(): Promise<StatsResponseI> {
@@ -85,11 +85,11 @@ class AiController {
   }
 
   async getAudit(id: string): Promise<AuditResponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    return this.certaikApiService.getAudit(id, address);
+    // const address = await this.authService.currentUser();
+    // if (!address) {
+    //   throw new Error("user is not signed in with ethereum");
+    // }
+    return this.certaikApiService.getAudit(id);
   }
 
   async getUserInfo(): Promise<UserInfoResponseI> {

@@ -65,7 +65,7 @@ const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.Element 
       .then(() => {
         setIsAuthenticated(true);
         setIsSuccess(true);
-        router.refresh();
+        router.push("/");
       })
       .catch((error) => {
         console.log(error);

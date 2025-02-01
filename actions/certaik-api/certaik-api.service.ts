@@ -119,17 +119,9 @@ class CertaikApiService {
     });
   }
 
-  async getAudits(
-    filters: { [key: string]: string },
-    address: string,
-  ): Promise<AuditTableReponseI> {
+  async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
     const searchParams = new URLSearchParams(filters);
-    const headers = {
-      headers: {
-        "X-User-Identifier": address,
-      },
-    };
-    return api.get(`/analytics/audits?${searchParams.toString()}`, headers).then((response) => {
+    return api.get(`/analytics/audits?${searchParams.toString()}`).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }
@@ -146,7 +138,7 @@ class CertaikApiService {
     });
   }
 
-  async getAudit(id: string, address: string): Promise<AuditResponseI> {
+  async getAudit(id: string): Promise<AuditResponseI> {
     return api.get(`/analytics/audit/${id}`).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);

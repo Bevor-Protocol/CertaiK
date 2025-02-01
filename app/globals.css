@@ -33,7 +33,7 @@ body {
 
 @layer components {
   .background-container {
-    @apply relative bg-black text-white z-[1] h-svh w-screen flex flex-col px-4 gap-16 items-center justify-center;
+    @apply relative bg-black text-white z-[1] h-svh w-screen flex flex-col px-4 gap-10 sm:gap-12 md:gap-16 items-center justify-center;
   }
 
   .background-container::before {

@@ -1,4 +1,3 @@
-import Content from "@/components/content";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { sessionOptions, walletConfig } from "@/lib/config";
@@ -53,7 +52,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
               <ModalProvider>
                 <div className="background-container">
                   <Header address={address} />
-                  <Content>{children}</Content>
+                  {children}
                   <Footer />
                 </div>
               </ModalProvider>
