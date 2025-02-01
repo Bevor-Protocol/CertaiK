@@ -5,8 +5,6 @@ import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 import { fallback, http } from "viem";
 import { anvil, base, sepolia, type Chain } from "wagmi/chains";
 
-import { type SessionOptions } from "iron-session";
-
 let chains: readonly [Chain, ...Chain[]];
 const alchemyTransports = {
   /// base
@@ -53,13 +51,4 @@ declare module "wagmi" {
   }
 }
 
-const sessionOptions: SessionOptions = {
-  password: process.env.COOKIE_PSWD as string,
-  cookieName: "siwe",
-  cookieOptions: {
-    secure: process.env.NODE_ENV === "production",
-  },
-};
-
-// export { config, projectId };
-export { sessionOptions, walletConfig };
+export default walletConfig;

@@ -2,7 +2,7 @@
 
 import { CoinbaseWallet, WalletConnect } from "@/assets/wallet";
 import { useModal } from "@/hooks/useContexts";
-import { walletConfig } from "@/lib/config";
+import walletConfig from "@/lib/config/wallet";
 import { sortWallets } from "@/utils/helpers";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";

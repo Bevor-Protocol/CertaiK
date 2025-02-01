@@ -1,6 +1,7 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import { sessionOptions, walletConfig } from "@/lib/config";
+import sessionOptions from "@/lib/config/session";
+import walletConfig from "@/lib/config/wallet";
 import ModalProvider from "@/providers/modal";
 import SiweProvider from "@/providers/siwe";
 import WalletProvider from "@/providers/wallet";

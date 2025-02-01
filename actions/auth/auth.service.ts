@@ -1,5 +1,5 @@
 import api from "@/lib/api";
-import { sessionOptions } from "@/lib/config";
+import sessionOptions from "@/lib/config/session";
 import { type SessionData } from "@/utils/types";
 import { getIronSession, type IronSession } from "iron-session";
 import { cookies } from "next/headers";
