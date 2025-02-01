@@ -78,7 +78,7 @@ export const Content = ({
               href={explorerUrl}
               target="_blank"
               referrerPolicy="no-referrer"
-              className="ml-auto"
+              className="w-fit my-0 md:my-2 ml-auto md:ml-0 text-sm md:text-base relative"
             >
               <Button variant="bright" className="w-fit my-2 md:my-0">
                 view onchain
@@ -89,7 +89,7 @@ export const Content = ({
           {audit.findings.length && view === "audit" && (
             <Button
               variant="bright"
-              className="w-fit my-0 md:my-2 ml-auto md:ml-0 text-sm md:text-md relative"
+              className="w-fit my-0 md:my-2 ml-auto md:ml-0 text-sm md:text-base relative"
               onClick={() => setShowFindings(!showFindings)}
             >
               {showFindings ? "view report" : "view breakdown"}
@@ -102,7 +102,7 @@ export const Content = ({
             "md:order-2 md:border-none md:flex-col md:pb-0",
           )}
         >
-          <div className="text-sm md:text-md">
+          <div className="text-sm md:text-base">
             <h3 className="text-gray-400 mb-2 hidden md:block">Contract Details</h3>
             <div className="space-y-1 *:whitespace-nowrap">
               <p>
@@ -112,7 +112,7 @@ export const Content = ({
               <p>Network: {audit.contract.network ?? "Not Provided"}</p>
             </div>
           </div>
-          <div className="text-sm md:text-md">
+          <div className="text-sm md:text-base">
             <h3 className="text-gray-400 mb-2 hidden md:block">Audit Details</h3>
             <div className="space-y-1 *:whitespace-nowrap">
               <p>Audit Type: {audit.audit.audit_type}</p>

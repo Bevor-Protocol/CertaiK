@@ -182,7 +182,7 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
         <div
           className={cn(
             "grid grid-cols-9 border-gray-800 min-w-[600px]",
-            " *:text-center *:pb-2 *:text-sm *:md:text-md",
+            " *:text-center *:pb-2 *:text-sm *:md:text-base",
           )}
         >
           <div className="col-span-1">#</div>

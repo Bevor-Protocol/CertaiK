@@ -1,3 +1,4 @@
+import Content from "@/components/content";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { sessionOptions, walletConfig } from "@/lib/config";
@@ -10,6 +11,7 @@ import { getIronSession } from "iron-session";
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import { cookies, headers } from "next/headers";
+import React from "react";
 import { cookieToInitialState } from "wagmi";
 import "./globals.css";
 
@@ -49,9 +51,11 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
           <SiweProvider>
             <WebSocketProvider>
               <ModalProvider>
-                <Header address={address} />
-                {children}
-                <Footer />
+                <div className="background-container">
+                  <Header address={address} />
+                  <Content>{children}</Content>
+                  <Footer />
+                </div>
               </ModalProvider>
             </WebSocketProvider>
           </SiweProvider>

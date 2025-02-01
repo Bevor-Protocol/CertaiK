@@ -21,7 +21,9 @@ const PasteStep = ({
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [textAvailable, setTextAvailable] = useState(state.length === 1);
-  const [tempInput, setTempInput] = useState("");
+  const [tempInput, setTempInput] = useState(
+    state.find((s) => s.type === Message.ASSISTANT)?.content ?? "",
+  );
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);

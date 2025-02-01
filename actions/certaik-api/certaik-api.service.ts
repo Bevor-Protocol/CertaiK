@@ -72,7 +72,12 @@ class CertaikApiService {
     });
   }
 
-  async submitFeedback(id: string, address: string, feedback?: string, verified?: boolean) {
+  async submitFeedback(
+    id: string,
+    address: string,
+    feedback?: string,
+    verified?: boolean,
+  ): Promise<{ success: boolean }> {
     const headers = {
       headers: {
         "X-User-Identifier": address,

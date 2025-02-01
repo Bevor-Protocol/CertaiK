@@ -32,19 +32,6 @@ const TerminalAuditPage: React.FC = () => {
     setTerminalState((prev) => ({ ...prev, [step]: history }));
   };
 
-  const handleDownload = (): void => {
-    if (!(terminalStep === TerminalStep.RESULTS && auditContent)) return;
-    const blob = new Blob([auditContent], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "audit-report.md";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   const handleRewind = (s: TerminalStep): void => {
     // if going back, need to reset state for proceeding steps
     const interStack = stack;
@@ -77,119 +64,170 @@ const TerminalAuditPage: React.FC = () => {
   };
 
   return (
-    <main className="h-svh w-screen bg-black text-white z-1">
-      <div className="relative px-4 py-24 z-20 size-full flex flex-col items-center justify-center">
-        <div
-          className={cn(
-            "bg-black/90 border border-gray-800 rounded-lg p-4",
-            "flex flex-row w-full h-full max-w-[1200px] max-h-[600px]",
-          )}
-        >
-          <div className="flex flex-col w-full h-full flex-1 no-scrollbar">
-            {terminalStep == TerminalStep.INITIAL && (
-              <InitialStep
-                setTerminalStep={handleGlobalStep}
-                handleGlobalState={handleGlobalState}
-                state={terminalState[TerminalStep.INITIAL]}
-              />
-            )}
-            {terminalStep == TerminalStep.INPUT_ADDRESS && (
-              <AddressStep
-                setTerminalStep={handleGlobalStep}
-                handleGlobalState={handleGlobalState}
-                state={terminalState[TerminalStep.INPUT_ADDRESS]}
-                setContractId={setContractId}
-              />
-            )}
-            {terminalStep == TerminalStep.INPUT_UPLOAD && (
-              <UploadStep
-                setTerminalStep={handleGlobalStep}
-                handleGlobalState={handleGlobalState}
-                state={terminalState[TerminalStep.INPUT_UPLOAD]}
-                setContractId={setContractId}
-              />
-            )}
-            {terminalStep == TerminalStep.INPUT_PASTE && (
-              <PasteStep
-                setTerminalStep={handleGlobalStep}
-                handleGlobalState={handleGlobalState}
-                state={terminalState[TerminalStep.INPUT_PASTE]}
-                setContractId={setContractId}
-              />
-            )}
-            {terminalStep == TerminalStep.AUDIT_TYPE && (
-              <AuditTypeStep
-                setTerminalStep={handleGlobalStep}
-                handleGlobalState={handleGlobalState}
-                state={terminalState[TerminalStep.AUDIT_TYPE]}
-                setPromptType={setPromptType}
-              />
-            )}
-            {terminalStep == TerminalStep.RESULTS && (
-              <ResultsStep
-                state={terminalState[TerminalStep.RESULTS]}
-                setAuditContent={setAuditContent}
-                auditContent={auditContent}
-                promptType={promptType}
-                contractId={contractId}
-              />
-            )}
-          </div>
-          <div
-            className={cn(
-              "hidden flex-col z-1 justify-between gap-1 border-l-[1px]",
-              "border-l-gray-500 pl-2 ml-2 md:flex",
-            )}
-          >
-            <div className="z-10">
-              <div className="text-gray-500 z-1">Go back to:</div>
-              {stack.map((s) => (
-                <div
-                  key={s}
-                  className={cn(
-                    "relative w-fit z-1",
-                    s !== terminalStep && "cursor-pointer hover:opacity-80 transition-opacity z-0",
-                    s === terminalStep && "cursor-default pointer-events-none opacity-80 z-0",
-                  )}
-                  onClick={() => handleRewind(s)}
-                >
-                  {stepText[s]}
-                  {s === terminalStep && (
-                    <div
-                      className={cn(
-                        "absolute -right-4 top-1/2 -translate-y-1/2 bg-green-500",
-                        "w-1 h-1 z-1 rounded-full",
-                      )}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-            <div
-              className={cn(
-                "flex justify-start cursor-pointer w-full max-w-[900px]",
-                terminalStep === TerminalStep.RESULTS && auditContent ? "visible" : "invisible",
-              )}
-            >
-              <Button onClick={handleDownload} variant="bright" className="w-fit" type="submit">
-                Download Report
-              </Button>
-            </div>
-          </div>
-        </div>
-        <div
-          className={cn(
-            "flex justify-start cursor-pointer w-full max-w-[900px] mt-2",
-            terminalStep === TerminalStep.RESULTS && auditContent ? "visible" : "invisible",
-            "md:hidden",
-          )}
-        >
-          <Button onClick={handleDownload} variant="bright" className="w-fit" type="submit">
-            Download Report
-          </Button>
-        </div>
+    <>
+      <div
+        className={cn(
+          "block md:hidden absolute bottom-full left-0 right-0 bg-black/90",
+          "border border-gray-800 rounded-lg py-2 px-4",
+          "max-w-full overflow-x-scroll",
+        )}
+      >
+        <StepsRewind stack={stack} terminalStep={terminalStep} handleRewind={handleRewind} />
       </div>
-    </main>
+      <div className="flex flex-col md:flex-row w-full h-full">
+        <div className="flex flex-col w-full h-full flex-1 no-scrollbar">
+          {terminalStep == TerminalStep.INITIAL && (
+            <InitialStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.INITIAL]}
+            />
+          )}
+          {terminalStep == TerminalStep.INPUT_ADDRESS && (
+            <AddressStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.INPUT_ADDRESS]}
+              setContractId={setContractId}
+            />
+          )}
+          {terminalStep == TerminalStep.INPUT_UPLOAD && (
+            <UploadStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.INPUT_UPLOAD]}
+              setContractId={setContractId}
+            />
+          )}
+          {terminalStep == TerminalStep.INPUT_PASTE && (
+            <PasteStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.INPUT_PASTE]}
+              setContractId={setContractId}
+            />
+          )}
+          {terminalStep == TerminalStep.AUDIT_TYPE && (
+            <AuditTypeStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.AUDIT_TYPE]}
+              setPromptType={setPromptType}
+            />
+          )}
+          {terminalStep == TerminalStep.RESULTS && (
+            <ResultsStep
+              state={terminalState[TerminalStep.RESULTS]}
+              setAuditContent={setAuditContent}
+              auditContent={auditContent}
+              promptType={promptType}
+              contractId={contractId}
+            />
+          )}
+        </div>
+        <StepsRewind
+          stack={stack}
+          terminalStep={terminalStep}
+          handleRewind={handleRewind}
+          className="hidden md:flex flex-col"
+        >
+          <Download terminalStep={terminalStep} auditContent={auditContent} />
+        </StepsRewind>
+      </div>
+      <Download
+        terminalStep={terminalStep}
+        auditContent={auditContent}
+        className="mt-2 md:hidden"
+      />
+    </>
+  );
+};
+
+type DownloadProps = {
+  terminalStep: TerminalStep;
+  auditContent?: string;
+  className?: string;
+};
+
+const Download: React.FC<DownloadProps> = ({ terminalStep, auditContent, className }) => {
+  const handleDownload = (): void => {
+    if (!(terminalStep === TerminalStep.RESULTS && auditContent)) return;
+    const blob = new Blob([auditContent], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "audit-report.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  return (
+    <div
+      className={cn(
+        "flex justify-start cursor-pointer absolute left-0 right-0 top-full md:static",
+        className,
+        terminalStep === TerminalStep.RESULTS && auditContent ? "visible" : "invisible",
+      )}
+    >
+      <Button onClick={handleDownload} variant="bright" className="w-full" type="submit">
+        Download Report
+      </Button>
+    </div>
+  );
+};
+
+type StepsProps = {
+  children?: React.ReactNode;
+  stack: TerminalStep[];
+  terminalStep: TerminalStep;
+  handleRewind: (step: TerminalStep) => void;
+  className?: string;
+};
+
+const StepsRewind: React.FC<StepsProps> = ({
+  stack,
+  terminalStep,
+  handleRewind,
+  children,
+  className,
+}) => {
+  return (
+    <div
+      className={cn(
+        "z-1 justify-between gap-2 md:gap-1",
+        "md:border-l-gray-500 md:border-l-[1px] md:ml-2 md:pl-2",
+        "border-l-0, ml-0, pl-0",
+        className,
+      )}
+    >
+      <div className="z-10 flex md:block flex-row gap-2">
+        <div className="text-gray-500 z-1 hidden md:block">Go back to:</div>
+        {stack.map((s) => (
+          <div
+            key={s}
+            className={cn(
+              "relative w-fit z-1 whitespace-nowrap text-sm md:text-base",
+              s !== terminalStep &&
+                "cursor-pointer hover:opacity-90 opacity-70 transition-opacity z-0",
+              s === terminalStep && "cursor-default pointer-events-none z-0",
+            )}
+            onClick={() => handleRewind(s)}
+          >
+            {stepText[s]}
+            {s === terminalStep && (
+              <div
+                className={cn(
+                  "absolute -right-4 top-1/2 -translate-y-1/2 bg-green-500",
+                  "w-1 h-1 z-1 rounded-full hidden md:block",
+                )}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      {children}
+    </div>
   );
 };
 

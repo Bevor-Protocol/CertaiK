@@ -32,11 +32,11 @@ body {
 }
 
 @layer components {
-  main {
-    position: relative;
+  .background-container {
+    @apply relative bg-black text-white z-[1] h-svh w-screen flex flex-col px-4 gap-16 items-center justify-center;
   }
 
-  main::before {
+  .background-container::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -45,7 +45,7 @@ body {
     background-image: url("/bg-pattern.webp");
   }
 
-  main::after {
+  .background-container::after {
     content: "";
     position: absolute;
     top: 100px;

@@ -97,7 +97,7 @@ const Header: React.FC<Props> = ({ address }) => {
   };
 
   return (
-    <header className="w-full text-white absolute top-0 px-4 left-0 z-[100]">
+    <header className="w-full text-white z-[100] relative">
       <div className="w-full max-w-[1200px] p-4 flex justify-between items-center m-auto">
         <Link
           className="cursor-pointer block relative"
@@ -118,7 +118,7 @@ const Header: React.FC<Props> = ({ address }) => {
             </>
           )}
           {!address && (
-            <Button onClick={handleWalletModal} variant="dark">
+            <Button onClick={handleWalletModal} variant="bright">
               connect
             </Button>
           )}
