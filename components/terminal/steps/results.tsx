@@ -94,7 +94,7 @@ const ResultsStep = ({
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
-        {!isConnected && <p className="">we're having issues connecting to the server</p>}
+        {!isConnected && <p className="">we&apos;re having issues connecting to the server</p>}
         {(isLoading || !auditContent || isError) && (
           <>
             {steps.map((step, i) => (

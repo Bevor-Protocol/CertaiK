@@ -60,7 +60,11 @@ const Dashboard = async (): Promise<JSX.Element> => {
           ) : (
             <>
               <h3 className="my-4 hidden md:block">my recent audits</h3>
-              <div className="hidden md:flex gap-4 w-full justify-start max-w-full overflow-x-scroll pb-2">
+              <div
+                className={cn(
+                  "hidden md:flex gap-4 w-full justify-start max-w-full overflow-x-scroll pb-2",
+                )}
+              >
                 {user.audits.slice(0, 5).map((audit) => (
                   <Link
                     key={audit.id}
