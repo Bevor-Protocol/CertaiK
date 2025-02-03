@@ -19,20 +19,16 @@ const logout = async (): Promise<boolean> => {
   return authController.logout();
 };
 
-const getSecureSigning = async (): Promise<{
-  signature: string;
-  timestamp: string;
-}> => {
+const getSecureSigning = async (): Promise<string> => {
   const secret = process.env.SHARED_SECRET!;
 
   const timestamp = Date.now().toString();
   const payload = `${timestamp}:/ws`;
   const signature = crypto.createHmac("sha256", secret).update(payload).digest("hex");
 
-  return {
-    signature,
-    timestamp,
-  };
+  const url = `${process.env.API_URL}/ws?signature=${signature}&timestamp=${timestamp}`;
+
+  return url;
 };
 
 export { getCurrentUser, getSecureSigning, logout, nonce, verify };

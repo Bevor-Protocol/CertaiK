@@ -33,7 +33,7 @@ const ResultsStep = ({
   const [isError, setIsError] = useState(false);
   const [jobId, setJobId] = useState("");
   const [steps, setSteps] = useState<ValidWsSteps[]>([]);
-  const { setOnMessageHandler, sendMessage } = useWs();
+  const { setOnMessageHandler, sendMessage, isConnected, reconnect } = useWs();
 
   useEffect(() => {
     if (!jobId) return;
@@ -71,6 +71,10 @@ const ResultsStep = ({
 
   useEffect(() => {
     if (state.length || isLoading) return;
+    if (!isConnected) {
+      reconnect();
+      return;
+    }
     setIsLoading(true);
     certaikApiAction
       .runEval(contractId, promptType)
@@ -85,22 +89,23 @@ const ResultsStep = ({
         setIsError(true);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [state, isConnected]);
 
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
+        {!isConnected && <p className="">we're having issues connecting to the server</p>}
         {(isLoading || !auditContent || isError) && (
           <>
             {steps.map((step, i) => (
               <div key={i} className="flex gap-4 items-center">
                 <p>{step}</p>
-                {isError ? (
-                  <X />
-                ) : i === steps.length - 1 ? (
-                  <Loader className="h-4 w-4" />
-                ) : (
+                {i < steps.length - 1 ? (
                   <Check />
+                ) : isError ? (
+                  <X />
+                ) : (
+                  <Loader className="h-4 w-4" />
                 )}
               </div>
             ))}

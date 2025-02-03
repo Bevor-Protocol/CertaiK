@@ -26,10 +26,8 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
 
   const fetchSigningSecretAndConnect = async (): Promise<void> => {
     try {
-      const { signature, timestamp } = await authAction.getSecureSigning();
-      const ws = new WebSocket(
-        `http://localhost:8000/ws?signature=${signature}&timestamp=${timestamp}`,
-      );
+      const url = await authAction.getSecureSigning();
+      const ws = new WebSocket(url);
 
       ws.onopen = (): void => {
         console.log("WebSocket Connected");
