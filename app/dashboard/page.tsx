@@ -7,7 +7,7 @@ import { trimAddress } from "@/utils/helpers";
 import { ArrowUpRight, BarChart3, DollarSign } from "lucide-react";
 import Link from "next/link";
 
-const Dashboard = async (): Promise<JSX.Element> => {
+const Dashboard = async () => {
   const user = await certaikApiAction.getUserInfo();
 
   return (
