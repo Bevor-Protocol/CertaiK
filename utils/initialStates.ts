@@ -7,7 +7,7 @@ export const initialState = {
       content:
         "How would like you get started? Choose an option (Type just \
 the number such as '1'):\n\n1. Input contract address\n2. \
-Upload file\n3. Paste code",
+Upload file\n3. Paste code\n4. Input agent from Cookie DAO",
     },
   ],
   [TerminalStep.INPUT_ADDRESS]: [
