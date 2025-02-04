@@ -163,6 +163,7 @@ const Findings: React.FC<FindingsProps> = ({
   const [input, setInput] = useState("");
   const [attestation, setAttestation] = useState(0);
   const [isOpen, setIsOpen] = useState(true);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     if (!selectedFindingDetails) return;
@@ -178,8 +179,20 @@ const Findings: React.FC<FindingsProps> = ({
   const { isPending, mutateAsync } = useMutation({
     mutationFn: (variables: { id: string; feedback?: string; verified?: boolean }) =>
       certaikApiAction.submitFeedback(variables.id, variables.feedback, variables.verified),
-    onSuccess: () => router.refresh(),
+    onSuccess: () => {
+      setShowSuccess(true);
+      router.refresh();
+    },
   });
+
+  useEffect(() => {
+    if (!isPending && showSuccess) {
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+      }, 1000);
+      return (): void => clearTimeout(timer);
+    }
+  }, [isPending, showSuccess]);
 
   // Group findings by level
   const findingsByLevel = useMemo(() => {
@@ -363,8 +376,8 @@ const Findings: React.FC<FindingsProps> = ({
                 </div>
               </div>
               {isOwner && (
-                <Button variant="bright" onClick={handleSubmit} disabled={isPending}>
-                  Submit Feedback
+                <Button variant="bright" onClick={handleSubmit} disabled={isPending || showSuccess}>
+                  {showSuccess ? "Success" : "Submit Feedback"}
                 </Button>
               )}
             </div>
