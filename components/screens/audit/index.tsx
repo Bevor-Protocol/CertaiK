@@ -211,19 +211,38 @@ const Findings: React.FC<FindingsProps> = ({
   }, [findings]);
 
   const formatter = (text: string): JSX.Element => {
-    const parts = text.split(/(`.*?`)/);
+    // First split by multi-line code blocks
+    const multiLineParts = text.split(/(```[\s\S]*?```)/);
+
     return (
       <>
-        {parts.map((part, index) => {
-          if (part.startsWith("`") && part.endsWith("`")) {
-            // Remove backticks and wrap in code tag
+        {multiLineParts.map((part, idx) => {
+          // Handle multi-line code blocks
+          if (part.startsWith("```")) {
+            const code = part.slice(3, -3).replace(/^solidity\n/, ""); // Remove language identifier
             return (
-              <code key={index} className="!text-[0.875em]">
-                {part.slice(1, -1)}
-              </code>
+              <pre key={idx} className="!text-[0.875em] bg-gray-800/50 p-2 rounded-md my-2">
+                {code}
+              </pre>
             );
           }
-          return part;
+
+          // Handle inline code blocks
+          const inlineParts = part.split(/(`.*?`)/);
+          return (
+            <span key={idx}>
+              {inlineParts.map((inlinePart, inlineIdx) => {
+                if (inlinePart.startsWith("`") && inlinePart.endsWith("`")) {
+                  return (
+                    <code key={inlineIdx} className="!text-[0.875em]">
+                      {inlinePart.slice(1, -1)}
+                    </code>
+                  );
+                }
+                return inlinePart;
+              })}
+            </span>
+          );
         })}
       </>
     );
@@ -293,24 +312,28 @@ const Findings: React.FC<FindingsProps> = ({
       <div className="flex-1 p-4 overflow-y-auto">
         {selectedFindingDetails ? (
           <div className="space-y-4 markdown">
-            <p className="text-xl break-words">{formatter(selectedFindingDetails.name)}</p>
+            <div className="text-xl break-words">{formatter(selectedFindingDetails.name)}</div>
 
             <div>
               <h3 className="text-gray-400 mb-2">Explanation</h3>
-              <p className="text-sm break-words">{formatter(selectedFindingDetails.explanation)}</p>
+              <div className="text-sm break-words">
+                {formatter(selectedFindingDetails.explanation)}
+              </div>
             </div>
 
             <div>
               <h3 className="text-gray-400 mb-2">Recommendation</h3>
-              <p className="text-sm break-words">
+              <div className="text-sm break-words">
                 {formatter(selectedFindingDetails.recommendation)}
-              </p>
+              </div>
             </div>
 
             {selectedFindingDetails.reference && (
               <div>
                 <h3 className="text-gray-400 mb-2">Reference</h3>
-                <p className="text-sm break-words">{formatter(selectedFindingDetails.reference)}</p>
+                <div className="text-sm break-words">
+                  {formatter(selectedFindingDetails.reference)}
+                </div>
               </div>
             )}
 
