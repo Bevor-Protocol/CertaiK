@@ -2,7 +2,7 @@
 import Script from "next/script";
 import { SVGProps } from "react";
 
-export default (props: SVGProps<SVGSVGElement>): JSX.Element => {
+const Coinbase = (props: SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -43,3 +43,5 @@ export default (props: SVGProps<SVGSVGElement>): JSX.Element => {
     </svg>
   );
 };
+
+export default Coinbase;

@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { SVGProps } from "react";
 
-export default (props: SVGProps<SVGSVGElement>): JSX.Element => {
+const Twitter = (props: SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg viewBox="0 0 24 24" width="auto" height="24" stroke="white" {...props}>
       <g>
@@ -10,3 +10,5 @@ export default (props: SVGProps<SVGSVGElement>): JSX.Element => {
     </svg>
   );
 };
+
+export default Twitter;

@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { SVGProps } from "react";
 
-export default (props: SVGProps<SVGSVGElement>): JSX.Element => {
+const Telegram = (props: SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -33,3 +33,5 @@ export default (props: SVGProps<SVGSVGElement>): JSX.Element => {
     </svg>
   );
 };
+
+export default Telegram;
