@@ -106,7 +106,7 @@ const Header: React.FC<Props> = ({ address }) => {
           referrerPolicy="no-referrer"
         >
           <div className="block w-[175px] md:w-[200px] lg:w-[220px] aspect-[1430/498] relative">
-            <Image src="/BevorAI-logo.png" alt="Logo" fill />
+            <Image src="/BevorAI-Logo.png" alt="Logo" fill />
           </div>
         </Link>
         <NavBar className="md:flex hidden" />
