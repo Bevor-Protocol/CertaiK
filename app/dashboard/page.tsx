@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import MetricCard from "@/components/ui/metric-card";
 import { cn, prettyDate } from "@/lib/utils";
 import { trimAddress } from "@/utils/helpers";
-import { ArrowUpRight, BarChart3, DollarSign } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import Link from "next/link";
+import CreditsCard from "../components/CreditsCard";
 
 const Dashboard = async (): Promise<JSX.Element> => {
   const user = await certaikApiAction.getUserInfo();
@@ -20,12 +21,7 @@ const Dashboard = async (): Promise<JSX.Element> => {
       >
         <MetricCard title="Total Audits" Icon={BarChart3} stat={user.audits.length} />
         <MetricCard title="Unique Contracts" Icon={BarChart3} stat={user.n_contracts} />
-        <MetricCard title="Total Credits" Icon={DollarSign} stat={user.audits.length} />
-        <MetricCard title="Remaining Credits" Icon={DollarSign} stat={user.audits.length}>
-          <Link href="/api-keys" className="text-sm">
-            Get More <ArrowUpRight size={16} className="inline-block align-baseline" color="gray" />
-          </Link>
-        </MetricCard>
+        <CreditsCard />
         <div className="border border-gray-800 rounded-md p-4 col-span-2">
           <div className="flex flex-col gap-2">
             <p className="text-lg font-medium">API Key Management</p>
