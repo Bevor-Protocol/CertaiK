@@ -6,7 +6,7 @@ interface FileDropZoneProps {
   className?: string;
 }
 
-export const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JSX.Element => {
+const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JSX.Element => {
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
 
@@ -91,7 +91,7 @@ export const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JS
 
         <label
           className={cn(
-            "flex items-center justify-center text-md py-2 px-5",
+            "flex items-center justify-center text-base py-2 px-5",
             "bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-md cursor-pointer",
             "hover:opacity-80 transition-opacity",
           )}
@@ -103,3 +103,5 @@ export const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JS
     </div>
   );
 };
+
+export default FileDropZone;

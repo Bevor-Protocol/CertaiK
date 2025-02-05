@@ -11,6 +11,24 @@ body {
   :root {
     --radius: 0.5rem;
   }
+
+  h1 {
+    @apply text-3xl;
+  }
+  h2 {
+    @apply text-2xl;
+  }
+  h3 {
+    @apply text-xl;
+  }
+}
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }
 
 @layer base {
@@ -22,11 +40,11 @@ body {
 }
 
 @layer components {
-  main {
-    position: relative;
+  .background-container {
+    @apply relative bg-black text-white z-[1] h-svh w-screen flex flex-col px-4 gap-10 sm:gap-12 md:gap-16 items-center justify-center;
   }
 
-  main::before {
+  .background-container::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -35,7 +53,7 @@ body {
     background-image: url("/bg-pattern.webp");
   }
 
-  main::after {
+  .background-container::after {
     content: "";
     position: absolute;
     top: 100px;
@@ -44,7 +62,7 @@ body {
     width: 100%;
     max-width: 900px;
     height: 16rem;
-    background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(0, 0, 255, 0.4) 120%);
+    background: radial-gradient(circle, black 0%, rgba(0, 0, 255, 0.4) 120%);
     filter: blur(60px) opacity(0.8);
     z-index: 0;
   }
@@ -65,18 +83,15 @@ body {
 
     /* Lists */
     ul {
-      @apply list-disc pl-5 inline-block -mt-4;
+      @apply list-disc pl-5 inline-block;
     }
     ol {
       @apply list-decimal list-inside pl-2 m-0 inline-block;
     }
 
-    li {
-      @apply float-left my-1;
-
-      p {
-        @apply float-left -mt-5;
-      }
+    li,
+    li p {
+      @apply -mt-5;
     }
 
     /* Code blocks */

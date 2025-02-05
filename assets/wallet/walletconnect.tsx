@@ -2,7 +2,7 @@
 import Script from "next/script";
 import { SVGProps } from "react";
 
-const WalletConnect: React.FC<SVGProps<SVGSVGElement>> = (props): JSX.Element => {
+const WalletConnect = (props: SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -11,14 +11,14 @@ interface InputBarProps {
   placeholder?: string;
 }
 
-const TerminalInputBar: React.FC<InputBarProps> = ({
+const TerminalInputBar = ({
   value,
   onChange,
   onSubmit,
   disabled,
   overrideLoading,
   placeholder,
-}) => {
+}: InputBarProps): JSX.Element => {
   const isMobile = useIsMobile();
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {

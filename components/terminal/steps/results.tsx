@@ -1,117 +1,137 @@
+import { certaikApiAction } from "@/actions";
+import { Loader } from "@/components/ui/loader";
+import { useWs } from "@/hooks/useContexts";
 import { MessageType } from "@/utils/types";
+import { Check, X } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
   setAuditContent: Dispatch<SetStateAction<string>>;
-  contractContent: string;
-  promptContent: string;
+  promptType: string;
+  auditContent: string;
   state: MessageType[];
+  contractId: string;
 };
 
-export const ResultsStep = ({
+type ValidWsSteps =
+  | "generating_candidates"
+  | "generating_judgements"
+  | "generating_report"
+  | "done"
+  | "error";
+
+const ResultsStep = ({
   setAuditContent,
-  contractContent,
-  promptContent,
+  promptType,
+  auditContent,
   state,
+  contractId,
 }: TerminalProps): JSX.Element => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [streamedAudit, setStreamedAudit] = useState("");
+  const [jobId, setJobId] = useState("");
+  const [steps, setSteps] = useState<ValidWsSteps[]>([]);
+  const { setOnMessageHandler, sendMessage, isConnected, reconnect } = useWs();
+
+  useEffect(() => {
+    if (!jobId) return;
+    if (steps.includes("done")) {
+      certaikApiAction
+        .getAudit(jobId)
+        .then((result) => {
+          if (result.audit.status === "success") {
+            setAuditContent(result.audit.result);
+          } else {
+            setIsError(true);
+          }
+        })
+        .catch(() => setIsError(true))
+        .finally(() => setIsLoading(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [steps, jobId]);
+
+  useEffect(() => {
+    setOnMessageHandler((data: any): void => {
+      setSteps((prev) => [...prev, data.step]);
+      if (data.step === "done") {
+        setAuditContent(JSON.stringify(data.result));
+        setIsLoading(false);
+      }
+      if (data.step === "error") {
+        setIsError(true);
+        setIsLoading(false);
+      }
+    });
+  }, [setOnMessageHandler, setAuditContent]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = (): void => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-    }
-  };
-
-  const removeComments = (report: string): string => {
-    report = report.replace(/\/\/.*$/gm, "");
-    report = report.replace(/\/\*[\s\S]*?\*\//g, "");
-    report = report
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line !== "")
-      .join("\n");
-    return report;
-  };
-
   useEffect(() => {
-    if (state.length || loading) return;
-    setLoading(true);
-    const cleanedFileContent = removeComments(contractContent || "");
-
-    let streamedChunks = "";
-    const fetchStream = async (): Promise<void> => {
-      const response = await fetch("/api/ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: cleanedFileContent, prompt: promptContent }),
-        signal: AbortSignal.timeout(600000),
+    if (state.length || isLoading) return;
+    if (!isConnected) {
+      reconnect();
+      return;
+    }
+    setIsLoading(true);
+    certaikApiAction
+      .runEval(contractId, promptType)
+      .then((result) => {
+        const { id } = result;
+        // websocket subscribes to job result
+        setJobId(id);
+        sendMessage(`subscribe:${id}`);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsError(true);
       });
-
-      if (!response.ok) {
-        console.log("ERROR", response.statusText);
-      }
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      while (reader) {
-        const { value, done } = await reader.read();
-        if (done) {
-          break;
-        }
-        const chunk = decoder.decode(value, { stream: true });
-        streamedChunks += chunk;
-        setStreamedAudit(streamedChunks);
-      }
-      setLoading(false);
-      // store this in a separate variable so we can access it outside of state.
-      setAuditContent(streamedChunks);
-    };
-    try {
-      fetchStream();
-    } catch (error) {
-      console.log(error);
-      setIsError(true);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [streamedAudit]);
-
-  const handleSubmit = (): void => {};
+  }, [state, isConnected]);
 
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
-        {streamedAudit && (
+        {!isConnected && <p className="">we&apos;re having issues connecting to the server</p>}
+        {(isLoading || !auditContent || isError) && (
+          <>
+            {steps.map((step, i) => (
+              <div key={i} className="flex gap-4 items-center">
+                <p>{step}</p>
+                {i < steps.length - 1 ? (
+                  <Check />
+                ) : isError ? (
+                  <X />
+                ) : (
+                  <Loader className="h-4 w-4" />
+                )}
+              </div>
+            ))}
+          </>
+        )}
+        {auditContent && (
           <ReactMarkdown className="overflow-scroll no-scrollbar markdown">
-            {streamedAudit}
+            {auditContent}
           </ReactMarkdown>
         )}
         {isError && (
           <div className="mb-2 leading-relaxed whitespace-pre-wrap text-red-400">
-            Something went wrong, try again
+            Something went wrong, try again or please reach out
           </div>
         )}
       </div>
       <TerminalInputBar
-        onSubmit={handleSubmit}
+        onSubmit={() => {}}
         onChange={() => {}}
         disabled={true}
         value={""}
-        overrideLoading={loading}
+        overrideLoading={isLoading}
         placeholder="Chat feature coming soon..."
       />
     </>
   );
 };
+
+export default ResultsStep;

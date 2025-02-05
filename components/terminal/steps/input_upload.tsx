@@ -1,21 +1,22 @@
+import { certaikApiAction } from "@/actions";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
 import { MessageType } from "@/utils/types";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
-import { FileDropZone } from "../file-drop-zone";
+import FileDropZone from "../file-drop-zone";
 import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
   setTerminalStep: (step: TerminalStep) => void;
-  setContractContent: Dispatch<SetStateAction<string>>;
   handleGlobalState: (step: TerminalStep, history: MessageType[]) => void;
+  setContractId: Dispatch<SetStateAction<string>>;
   state: MessageType[];
 };
 
-export const UploadStep = ({
+const UploadStep = ({
   setTerminalStep,
   handleGlobalState,
-  setContractContent,
+  setContractId,
   state,
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
@@ -35,19 +36,38 @@ export const UploadStep = ({
   }, [history]);
 
   const handleUpload = (content: string): void => {
-    setContractContent(content);
-    setUploadAvailable(false);
-    setHistory((prev) => [
-      ...prev,
-      {
-        type: Message.ASSISTANT,
-        content: content,
-      },
-      {
-        type: Message.SYSTEM,
-        content: "Does this look right? (y/n)",
-      },
-    ]);
+    certaikApiAction
+      .uploadSourceCode(content)
+      .then((result) => {
+        if (!result) {
+          throw new Error("bad response");
+        }
+        const { candidates } = result;
+        const candidate = candidates[0];
+        setContractId(candidate.id);
+        setUploadAvailable(false);
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: Message.ASSISTANT,
+            content: content,
+          },
+          {
+            type: Message.SYSTEM,
+            content: "Does this look right? (y/n)",
+          },
+        ]);
+      })
+      .catch((error) => {
+        console.log(error);
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: Message.ERROR,
+            content: "Something went wrong",
+          },
+        ]);
+      });
   };
 
   const handleValidate = (): void => {
@@ -135,3 +155,5 @@ export const UploadStep = ({
     </>
   );
 };
+
+export default UploadStep;

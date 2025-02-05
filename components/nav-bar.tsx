@@ -3,19 +3,9 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
 
 const NavBar: React.FC<{ className: string }> = ({ className }) => {
-  const [selected, setSelected] = useState<"terminal" | "api">("terminal");
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (pathname === "/api-keys") {
-      setSelected("api");
-    } else {
-      setSelected("terminal");
-    }
-  }, [pathname]);
 
   return (
     <div
@@ -26,23 +16,32 @@ const NavBar: React.FC<{ className: string }> = ({ className }) => {
       )}
     >
       <Link href="/" passHref>
-        <div
-          className={cn("cursor-pointer relative", selected === "terminal" && " text-green-400")}
-          onClick={() => setSelected("terminal")}
-        >
-          {selected === "terminal" && (
-            <span className="absolute left-0 -translate-x-full">{">"}</span>
-          )}
-          Terminal
+        <div className={cn("cursor-pointer relative", pathname === "/" && " text-green-400")}>
+          {pathname === "/" && <span className="absolute left-0 -translate-x-full">{">"}</span>}
+          terminal
         </div>
       </Link>
       <Link href="/api-keys" passHref>
         <div
-          className={cn("cursor-pointer relative", selected === "api" && " text-green-400")}
-          onClick={() => setSelected("api")}
+          className={cn("cursor-pointer relative", pathname === "/api-keys" && " text-green-400")}
         >
-          {selected === "api" && <span className="absolute left-0 -translate-x-full">{">"}</span>}
-          API
+          {pathname === "/api-keys" && (
+            <span className="absolute left-0 -translate-x-full">{">"}</span>
+          )}
+          api
+        </div>
+      </Link>
+      <Link href="/analytics" passHref>
+        <div
+          className={cn(
+            "cursor-pointer relative",
+            pathname.includes("/analytics") && " text-green-400",
+          )}
+        >
+          {pathname.includes("/analytics") && (
+            <span className="absolute left-0 -translate-x-full">{">"}</span>
+          )}
+          analytics
         </div>
       </Link>
     </div>
