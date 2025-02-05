@@ -15,7 +15,7 @@ const MetricCard: React.FC<Props> = ({ title, Icon, stat, children }) => {
         <Icon opacity={0.8} size={16} />
       </div>
       <div className="flex justify-between">
-        <p className="text-lg font-bold">{stat}</p>
+        <p className="text-lg font-bold">{stat.toLocaleString()}</p>
         {children}
       </div>
     </div>

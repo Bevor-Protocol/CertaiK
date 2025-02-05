@@ -70,9 +70,9 @@ const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.Element 
       .catch((error) => {
         console.log(error);
         setIsAuthenticated(false);
-        setIsPending(false);
         logout();
-      });
+      })
+      .finally(() => setIsPending(false));
   };
 
   useEffect(() => {

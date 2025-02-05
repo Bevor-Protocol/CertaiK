@@ -63,12 +63,12 @@ const InitialStep = ({ setTerminalStep, handleGlobalState, state }: TerminalProp
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
         <div className="sm:inline-block hidden text-white mb-4">
           <div>+--------------------------------------------------+</div>
-          <div className="w-full">| Welcome to CertaiK {"\u00A0".repeat(30)}|</div>
+          <div className="w-full">| Welcome to BevorAI {"\u00A0".repeat(30)}|</div>
           <div>| I&apos;m an AI agent for smart contract auditing {"\u00A0".repeat(4)} |</div>
           <div>+--------------------------------------------------+</div>
         </div>
         <div className="sm:hidden inline-block text-white mb-4">
-          <div className="w-full">Welcome to CertaiK</div>
+          <div className="w-full">Welcome to BevorAI</div>
           <div className="w-full">I&apos;m an AI agent for smart contract auditing</div>
         </div>
         {history.map((message, i) => (
