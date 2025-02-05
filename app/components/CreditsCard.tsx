@@ -5,7 +5,7 @@ import { useCertaiBalance } from "@/hooks/useBalances";
 import { ArrowUpRight, DollarSign } from "lucide-react";
 import Link from "next/link";
 
-const CreditsCard = () => {
+const CreditsCard = (): JSX.Element => {
   const { credit } = useCertaiBalance();
 
   return (
@@ -20,4 +20,4 @@ const CreditsCard = () => {
   );
 };
 
-export default CreditsCard; 
+export default CreditsCard;
