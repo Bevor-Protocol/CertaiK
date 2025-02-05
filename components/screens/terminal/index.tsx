@@ -3,6 +3,7 @@
 import AuditTypeStep from "@/components/terminal/steps/audit_type";
 import InitialStep from "@/components/terminal/steps/initial";
 import AddressStep from "@/components/terminal/steps/input_address";
+import AgentStep from "@/components/terminal/steps/input_agent";
 import PasteStep from "@/components/terminal/steps/input_paste";
 import UploadStep from "@/components/terminal/steps/input_upload";
 import ResultsStep from "@/components/terminal/steps/results";
@@ -104,6 +105,14 @@ const TerminalContainer: React.FC = () => {
               setTerminalStep={handleGlobalStep}
               handleGlobalState={handleGlobalState}
               state={terminalState[TerminalStep.INPUT_PASTE]}
+              setContractId={setContractId}
+            />
+          )}
+          {terminalStep == TerminalStep.INPUT_AGENT && (
+            <AgentStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.INPUT_AGENT]}
               setContractId={setContractId}
             />
           )}

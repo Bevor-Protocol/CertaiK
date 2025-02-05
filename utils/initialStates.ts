@@ -7,7 +7,7 @@ export const initialState = {
       content:
         "How would like you get started? Choose an option (Type just \
 the number such as '1'):\n\n1. Input contract address\n2. \
-Upload file\n3. Paste code\n4. Input agent from Cookie DAO",
+Upload file\n3. Paste code\n4. Input agent powered by Cookie DAO",
     },
   ],
   [TerminalStep.INPUT_ADDRESS]: [
@@ -26,6 +26,12 @@ Upload file\n3. Paste code\n4. Input agent from Cookie DAO",
     {
       type: Message.SYSTEM,
       content: "Drag + Drop, or press below, to upload a .sol or .rs file",
+    },
+  ],
+  [TerminalStep.INPUT_AGENT]: [
+    {
+      type: Message.SYSTEM,
+      content: "Input an agent twitter handle or Cookie DAO Link",
     },
   ],
   [TerminalStep.AUDIT_TYPE]: [
