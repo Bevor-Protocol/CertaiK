@@ -105,8 +105,8 @@ const Header: React.FC<Props> = ({ address }) => {
           target="_blank"
           referrerPolicy="no-referrer"
         >
-          <div className="block w-[150px] h-[50px] md:w-[176px] md:h-[64px] relative">
-            <Image src="/logo.svg" alt="Logo" fill />
+          <div className="block w-[200px] h-[75px] md:w-[176px] md:h-[64px] relative">
+            <Image src="/BevorAI-logo.png" alt="Logo" fill />
           </div>
         </Link>
         <NavBar className="md:flex hidden" />

@@ -11,7 +11,7 @@ const ApiContent = (): JSX.Element => {
   return (
     <div className="flex flex-col w-full h-full flex-1 no-scrollbar">
       <div className="flex flex-col items-start w-full font-mono text-sm flex-1">
-        <div className="text-blue-400">Welcome to the CertaiK API!</div>
+        <div className="text-blue-400">Welcome to the BevorAI API!</div>
         <div className="text-blue-400 my-2">
           The presale is live and you can receive{" "}
           <span className="font-bold text-green-400">{promotion.data}x</span> in API credits from
