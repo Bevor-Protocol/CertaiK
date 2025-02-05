@@ -31,6 +31,14 @@ body {
   }
 }
 
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
 @layer components {
   .background-container {
     @apply relative bg-black text-white z-[1] h-svh w-screen flex flex-col px-4 gap-10 sm:gap-12 md:gap-16 items-center justify-center;

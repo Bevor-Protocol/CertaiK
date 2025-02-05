@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 "use client";
 
 import { Telegram, Twitter, Virtuals } from "@/assets/icons";
@@ -91,6 +92,19 @@ const Footer: React.FC = () => {
             </p>
           )}
         </div>
+        {/* <div className="text-sm flex items-center">
+          {isConnected ? (
+            <p>
+              <span className="h-1 w-1 rounded-full bg-green-400 inline-block align-middle mr-1 animate-pulse" />
+              connected
+            </p>
+          ) : (
+            <p>
+              <span className="h-1 w-1 rounded-full bg-red-400 inline-block align-middle mr-1" />
+              disconnected
+            </p>
+          )}
+        </div> */}
       </div>
     </footer>
   );

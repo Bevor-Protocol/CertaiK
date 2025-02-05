@@ -26,7 +26,7 @@ export default async function Image(): Promise<ImageResponse> {
         }}
       >
         <img
-          src={`${process.env.VERCEL_URL}/logo.svg`}
+          src="https://app.certaik.xyz/logo.svg"
           alt="Logo"
           style={{ height: "300px", width: "812px" }}
         />
