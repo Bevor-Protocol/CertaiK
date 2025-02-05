@@ -22,6 +22,7 @@ export const WebSocketContext = createContext<WebSocketContextType>({
 const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [nAttempts, setNAttempts] = useState(0);
   const onMessageHandler = useRef<(data: any) => void>(() => {});
 
   const fetchSigningSecretAndConnect = async (): Promise<void> => {
@@ -32,6 +33,7 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
       ws.onopen = (): void => {
         console.log("WebSocket Connected");
         setIsConnected(true);
+        setNAttempts(0);
       };
 
       ws.onclose = (): void => {
@@ -71,7 +73,9 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
   };
 
   useEffect(() => {
-    fetchSigningSecretAndConnect();
+    if (!isConnected && nAttempts < 3) {
+      fetchSigningSecretAndConnect();
+    }
 
     return (): void => {
       if (socket) {
@@ -79,7 +83,7 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isConnected, nAttempts]);
 
   const sendMessage = (message: string): void => {
     if (socket && isConnected) {
