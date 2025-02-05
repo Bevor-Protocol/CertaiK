@@ -18,3 +18,7 @@ export const filterChildren = (children: ReactNode, name: string): ReactElement 
 export const roundToDecimals = (value: number, decimals: number = 4): number => {
   return Math.round(value * 10 ** decimals) / 10 ** decimals;
 };
+
+export const prettyDate = (date: string | Date): string => {
+  return new Date(date).toISOString().split("T")[0];
+};

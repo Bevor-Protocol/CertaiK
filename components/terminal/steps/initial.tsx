@@ -10,11 +10,7 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-export const InitialStep = ({
-  setTerminalStep,
-  handleGlobalState,
-  state,
-}: TerminalProps): JSX.Element => {
+const InitialStep = ({ setTerminalStep, handleGlobalState, state }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<MessageType[]>(state);
 
@@ -99,3 +95,5 @@ export const InitialStep = ({
     </>
   );
 };
+
+export default InitialStep;

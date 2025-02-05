@@ -17,8 +17,6 @@ const BalanceBox = (): JSX.Element => {
     23 - (credit.isLoading ? "loading...".length : String(creditBalance)?.length),
   );
 
-  console.log(token.data, credit.data);
-
   return (
     <div className="text-green-400 font-mono">
       <div className="sm:inline-block hidden">

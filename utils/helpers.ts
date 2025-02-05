@@ -1,7 +1,22 @@
-import { walletConfig } from "@/lib/config";
+import { DropdownOption } from "@/utils/types";
+import { SiweMessage } from "siwe";
 import { Address, Chain } from "viem";
 import { Connector } from "wagmi";
 import { ChainPresets } from "./constants";
+
+export const createSiweMessage = (address: string, chainId: number, nonce: string): string => {
+  const message = new SiweMessage({
+    domain: window.location.host,
+    address,
+    statement: "Sign in with Ethereum.",
+    uri: window.location.origin,
+    version: "1",
+    chainId,
+    nonce,
+    // expirationTime
+  });
+  return message.prepareMessage();
+};
 
 export const trimAddress = (address: Address | string | undefined): string => {
   return address?.substring(0, 6) + "..." + address?.substring(address.length - 3, address.length);
@@ -10,10 +25,8 @@ export const trimAddress = (address: Address | string | undefined): string => {
 export const getNetworkImage = (
   chain: Chain | undefined,
 ): { supported: boolean; networkImg: string } => {
-  const { chains } = walletConfig;
-  const availableChains = chains.map((c) => c.id);
   const result = { supported: false, networkImg: ChainPresets[99999] };
-  if (chain && chain.id in ChainPresets && availableChains.includes(chain.id)) {
+  if (chain && chain.id in ChainPresets) {
     result.supported = true;
     result.networkImg = ChainPresets[chain.id];
   }
@@ -38,4 +51,39 @@ export const sortWallets = (
   }
 
   return arraySorted;
+};
+
+export const constructSearchQuery = ({
+  audits,
+  networks,
+  address,
+  contract,
+  page,
+}: {
+  audits: DropdownOption[];
+  networks: DropdownOption[];
+  address: string;
+  contract: string;
+  page?: string;
+}): URLSearchParams => {
+  const search = new URLSearchParams();
+  if (audits.length) {
+    const params = audits.map((audit) => audit.value);
+    search.append("audit_type", params.join(","));
+  }
+  if (networks.length) {
+    const params = networks.map((audit) => audit.value);
+    search.append("network", params.join(","));
+  }
+  if (address) {
+    search.append("user_id", address);
+  }
+  if (contract) {
+    search.append("contract_address", contract);
+  }
+  if (page) {
+    search.append("page", page);
+  }
+
+  return search;
 };

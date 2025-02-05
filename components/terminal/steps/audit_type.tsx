@@ -1,9 +1,6 @@
-import AdvancedOptionsModal from "@/components/advanced-options";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
 import { initialState } from "@/utils/initialStates";
-import gasPrompt from "@/utils/prompts/gas";
-import securityPrompt from "@/utils/prompts/security";
 import { MessageType } from "@/utils/types";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import TerminalInputBar from "../input-bar";
@@ -11,21 +8,18 @@ import TerminalInputBar from "../input-bar";
 type TerminalProps = {
   setTerminalStep: (step: TerminalStep) => void;
   handleGlobalState: (step: TerminalStep, history: MessageType[]) => void;
-  setPromptContent: Dispatch<SetStateAction<string>>;
-  promptContent: string;
+  setPromptType: Dispatch<SetStateAction<string>>;
   state: MessageType[];
 };
 
-export const AuditTypeStep = ({
+const AuditTypeStep = ({
   setTerminalStep,
   handleGlobalState,
-  promptContent,
-  setPromptContent,
+  setPromptType,
   state,
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
-  const [step, setStep] = useState(state.length === 1 ? 0 : 2);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [step, setStep] = useState(state.length === 1 ? 0 : 1);
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -47,11 +41,11 @@ export const AuditTypeStep = ({
           },
           {
             type: Message.SYSTEM,
-            content: "Do you want to modify the prompt? (y/n)",
+            content: "Ready for your audit? (y/n)",
           },
         ]);
         setStep(1);
-        setPromptContent(securityPrompt);
+        setPromptType("security");
         break;
       }
       case "2": {
@@ -63,11 +57,11 @@ export const AuditTypeStep = ({
           },
           {
             type: Message.SYSTEM,
-            content: "Do you want to modify the prompt? (y/n)",
+            content: "Ready for your audit? (y/n)",
           },
         ]);
         setStep(1);
-        setPromptContent(gasPrompt);
+        setPromptType("gas");
         break;
       }
       default: {
@@ -79,56 +73,6 @@ export const AuditTypeStep = ({
           },
         ]);
         break;
-      }
-    }
-    setInput("");
-  };
-
-  const handleModification = (): void => {
-    if (!input) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.ERROR,
-          content: "Not a valid input, try again...",
-        },
-      ]);
-      setInput("");
-      return;
-    }
-    const l = input[0].toLowerCase();
-    switch (l) {
-      case "y": {
-        setModalOpen(true);
-        setStep(2);
-        setHistory((prev) => [
-          ...prev,
-          {
-            type: Message.SYSTEM,
-            content: "Ready? (y/n)",
-          },
-        ]);
-        break;
-      }
-      case "n": {
-        setStep(2);
-        setHistory((prev) => [
-          ...prev,
-          {
-            type: Message.SYSTEM,
-            content: "Ready? (y/n)",
-          },
-        ]);
-        break;
-      }
-      default: {
-        setHistory((prev) => [
-          ...prev,
-          {
-            type: Message.SYSTEM,
-            content: "Not a valid input, try again...",
-          },
-        ]);
       }
     }
     setInput("");
@@ -181,9 +125,6 @@ export const AuditTypeStep = ({
       handlePrompt();
     }
     if (step === 1) {
-      handleModification();
-    }
-    if (step === 2) {
       handleReady();
     }
   };
@@ -210,16 +151,10 @@ export const AuditTypeStep = ({
       <TerminalInputBar
         onSubmit={handleSubmit}
         onChange={(value: string) => setInput(value)}
-        disabled={modalOpen}
         value={input}
       />
-      {modalOpen && (
-        <AdvancedOptionsModal
-          setPromptText={setPromptContent}
-          promptText={promptContent}
-          onClose={() => setModalOpen(false)}
-        />
-      )}
     </>
   );
 };
+
+export default AuditTypeStep;

@@ -1,21 +1,33 @@
+import { authAction } from "@/actions";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import type { NextRequest } from "next/server";
+// Protected routes that require authentication
+const protectedRoutes = ["/", "/dashboard", "/api-keys"];
 
-export function middleware(req: NextRequest) {
-  // Only expose the api to requests from the app.
-  const url = req.nextUrl;
-  const { pathname } = url;
-  return NextResponse.next();
-  if (pathname.startsWith(`/api/`)) {
-    if (!req.headers.get("referer")?.includes(process.env.VERCEL_URL as string)) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+const middleware = async (request: NextRequest): Promise<NextResponse> => {
+  const response = NextResponse.next();
+  const pathname = request.nextUrl.pathname;
+  // somehow can't get the matcher to exclude _next/static or files
+  if (pathname.includes(".")) {
+    return response;
+  }
+  // Check if current route is protected
+  const isProtectedRoute = protectedRoutes.some((route) => pathname === route);
+
+  if (isProtectedRoute) {
+    const address = await authAction.getCurrentUser();
+    if (!address) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
     }
   }
 
-  return NextResponse.next();
-}
-
-export const config = {
-  matcher: "/api/:path*",
+  return response;
 };
+
+// Configure which routes the middleware should run on
+const config = {
+  matcher: "/((?!\\..*|api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+};
+
+export { config, middleware };

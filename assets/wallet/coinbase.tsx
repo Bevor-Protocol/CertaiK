@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 import Script from "next/script";
-import React, { SVGProps } from "react";
+import { SVGProps } from "react";
 
-const Coinbase: React.FC<SVGProps<SVGSVGElement>> = (props): JSX.Element => {
+const Coinbase = (props: SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

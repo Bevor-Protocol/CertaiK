@@ -14,7 +14,6 @@ module.exports = {
   ],
   plugins: ["@typescript-eslint", "prettier", "@next/eslint-plugin-next"],
   rules: {
-    // Max Line Length
     "@typescript-eslint/no-explicit-any": "warn",
     quotes: ["error", "double"],
     "max-len": [

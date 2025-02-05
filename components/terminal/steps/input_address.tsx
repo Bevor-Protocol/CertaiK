@@ -1,26 +1,28 @@
+import { certaikApiAction } from "@/actions";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
-import { MessageType } from "@/utils/types";
+import { ContractResponseI, MessageType } from "@/utils/types";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
   setTerminalStep: (step: TerminalStep) => void;
-  setContractContent: Dispatch<SetStateAction<string>>;
   handleGlobalState: (step: TerminalStep, history: MessageType[]) => void;
+  setContractId: Dispatch<SetStateAction<string>>;
   state: MessageType[];
 };
 
-export const AddressStep = ({
+const AddressStep = ({
   setTerminalStep,
   handleGlobalState,
-  setContractContent,
+  setContractId,
   state,
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [history, setHistory] = useState<MessageType[]>(state);
+  const [candidates, setCandidates] = useState<ContractResponseI["candidates"]>([]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -51,30 +53,52 @@ export const AddressStep = ({
     setLoading(true);
     const address = encodeURIComponent(input);
 
-    fetch(`/api/scan/${address}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Bad request");
-        }
-        return response.json();
-      })
+    certaikApiAction
+      .getSourceCode(address)
       .then((result) => {
-        if (result.error) {
-          throw new Error("Bad response");
+        if (!result) {
+          throw new Error("bad response");
         }
-        setContractContent(result.sourceCode);
-        setHistory((prev) => [
-          ...prev,
-          {
-            type: Message.ASSISTANT,
-            content: result.sourceCode,
-          },
-          {
-            type: Message.SYSTEM,
-            content: "Does this look right? (y/n)",
-          },
-        ]);
-        setStep(1);
+        const { candidates, exists, exact_match } = result;
+        if (!exists) {
+          setHistory((prev) => [
+            ...prev,
+            {
+              type: Message.ERROR,
+              content:
+                "Address was found, but it appears to not be validated.\
+ Try uploading the source code directly.",
+            },
+          ]);
+        } else if (!exact_match) {
+          setCandidates(candidates);
+          const networks = candidates.map((candidate) => candidate.network);
+          setHistory((prev) => [
+            ...prev,
+            {
+              type: Message.SYSTEM,
+              content: `Found contract on multiple networks. \
+Please select one by entering its number:
+${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
+            },
+          ]);
+          setStep(1);
+        } else {
+          const candidate = candidates[0];
+          setContractId(candidate.id);
+          setHistory((prev) => [
+            ...prev,
+            {
+              type: Message.ASSISTANT,
+              content: candidate.source_code,
+            },
+            {
+              type: Message.SYSTEM,
+              content: "Does this look right? (y/n)",
+            },
+          ]);
+          setStep(2);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -135,17 +159,66 @@ export const AddressStep = ({
     }
   };
 
+  const handleNetwork = (): void => {
+    if (!input) return;
+
+    const inputNum = Number(input);
+    if (isNaN(inputNum) || !Number.isInteger(inputNum)) {
+      setHistory((prev) => [
+        ...prev,
+        {
+          type: Message.SYSTEM,
+          content: "Please enter a valid number",
+        },
+      ]);
+      return;
+    }
+
+    if (inputNum > candidates.length) {
+      setHistory((prev) => [
+        ...prev,
+        {
+          type: Message.SYSTEM,
+          content: "Not a valid input, try again...",
+        },
+      ]);
+    } else {
+      setHistory((prev) => [
+        ...prev,
+        {
+          type: Message.USER,
+          content: candidates[inputNum - 1].network,
+        },
+        {
+          type: Message.ASSISTANT,
+          content: candidates[inputNum - 1].source_code,
+        },
+        {
+          type: Message.SYSTEM,
+          content: "Does this look right? (y/n)",
+        },
+      ]);
+      setContractId(candidates[inputNum - 1].id);
+      setInput("");
+      setStep(2);
+    }
+  };
+
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
-    setHistory((prev) => [
-      ...prev,
-      {
-        type: Message.USER,
-        content: input,
-      },
-    ]);
-    if (!step) {
+    if (step === 0 || step === 2) {
+      setHistory((prev) => [
+        ...prev,
+        {
+          type: Message.USER,
+          content: input,
+        },
+      ]);
+    }
+    if (step === 0) {
       handleScan();
+    } else if (step === 1) {
+      handleNetwork();
     } else {
       handleValidate();
     }
@@ -180,3 +253,5 @@ export const AddressStep = ({
     </>
   );
 };
+
+export default AddressStep;

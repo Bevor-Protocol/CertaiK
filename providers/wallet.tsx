@@ -1,6 +1,6 @@
 "use client";
 
-import { walletConfig } from "@/lib/config";
+import walletConfig from "@/lib/config/wallet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type State, WagmiProvider } from "wagmi";
 
