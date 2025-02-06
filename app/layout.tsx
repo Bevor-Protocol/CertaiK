@@ -17,24 +17,31 @@ import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"] });
 
+const baseURL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://app.certaik.xyz"),
-  title: "CertaiK",
+  metadataBase: new URL(baseURL),
+  title: "BevorAI",
   description: "AI Agent Smart Contract Auditor",
+  keywords: ["AI Agent", "Auditor", "Smart Contract", "web3", "Ethereum", "Solana"],
   openGraph: {
-    title: "CertaiK",
+    title: "BevorAI",
     description: "AI Agent Smart Contract Auditor",
     type: "website",
-    url: "https://app.certaik.xyz",
-    siteName: "CertaiK",
+    url: baseURL,
+    siteName: "BevorAI",
     locale: "en_US",
+    images: [`${baseURL}/opengraph.png`],
   },
   twitter: {
-    title: "CertaiK",
+    title: "BevorAI",
     description: "AI Agent Smart Contract Auditor",
     card: "summary_large_image",
     site: "@CertaiK_Agent",
     creator: "@CertaiK_Agent",
+    images: [`${baseURL}/opengraph.png`],
   },
 };
 
