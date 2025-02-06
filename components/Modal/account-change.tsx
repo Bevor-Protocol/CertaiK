@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useAccount } from "wagmi";
 
 import { CoinbaseWallet, WalletConnect } from "@/assets/wallet";
@@ -28,9 +27,6 @@ const RequestAccountChange = ({ verifiedAddress }: Props): JSX.Element => {
 
   return (
     <div className="items-center justify-center flex flex-col">
-      <div className="aspect-[1091/1685] relative h-20">
-        <Image src="/logo.svg" alt="brand logo" fill={true} sizes="any" />
-      </div>
       <p className="font-bold text-xl my-4">Switch Wallet</p>
       <div className="relative h-14 w-14">
         {activeConnector.icon ? (
