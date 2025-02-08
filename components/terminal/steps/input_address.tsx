@@ -23,7 +23,7 @@ const AddressStep = ({
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [history, setHistory] = useState<MessageType[]>(state);
-  
+
   const [candidates, setCandidates] = useState<ContractResponseI["candidates"]>([]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -55,12 +55,12 @@ const AddressStep = ({
 
     try {
       let address = input;
-      
+
       if (agent) {
         console.log("Fetching agent address for handle:", input);
         const response = await fetch(`/api/agent?handle=${input}`);
         const result = await response.json();
-        
+
         if (result.error) {
           throw new Error(result.error);
         }
@@ -76,17 +76,17 @@ const AddressStep = ({
         //   }
         //   throw new Error("Unknown error occurred while fetching security score");
         // }
-        
+
         address = result.address;
       }
 
       // Check if Solana address (base58 encoded, 32-44 chars)
       const isSolanaAddress = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
-      
+
       if (isSolanaAddress) {
         // For Solana addresses, only show security score
         const securityScore = {
-          score: Math.floor((Math.random() * (98.5 - 82.4) + 82.4) * 10) / 10
+          score: Math.floor((Math.random() * (98.5 - 82.4) + 82.4) * 10) / 10,
         };
 
         setHistory((prev) => [
@@ -99,7 +99,7 @@ Agent Security Score: ${securityScore.score}/100
 
 Powered by Cookie DAO 🍪
 
-========================================`
+========================================`,
           },
         ]);
         return;
@@ -113,7 +113,7 @@ Powered by Cookie DAO 🍪
       }
 
       const { candidates, exists, exact_match } = result;
-      
+
       if (!exists) {
         setHistory((prev) => [
           ...prev,
@@ -142,7 +142,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
         setContractId(candidate.id);
 
         const securityScore = {
-          score: Math.floor((Math.random() * (98.5 - 82.4) + 82.4) * 10) / 10
+          score: Math.floor((Math.random() * (98.5 - 82.4) + 82.4) * 10) / 10,
         };
 
         setHistory((prev) => [
@@ -159,7 +159,7 @@ Agent Security Score: ${securityScore.score}/100
 
 Powered by Cookie DAO 🍪
 
-========================================`
+========================================`,
           },
           {
             type: Message.SYSTEM,
@@ -168,9 +168,8 @@ Powered by Cookie DAO 🍪
         ]);
         setStep(2);
       }
-
     } catch (error) {
-      console.log(error); 
+      console.log(error);
       setHistory((prev) => [
         ...prev,
         {

@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 
-type Params = {
-  params: Promise<{
-    handle: string;
-  }>;
-};
-
 export async function GET(req: Request): Promise<Response | undefined> {
   try {
     // Get handle from URL search params
     const { searchParams } = new URL(req.url);
-    const handle = searchParams.get('handle');
+    const handle = searchParams.get("handle");
 
     console.log("Handle:", handle);
 
@@ -19,14 +13,14 @@ export async function GET(req: Request): Promise<Response | undefined> {
     }
 
     console.log("Cookie API Key:", process.env.NEXT_PUBLIC_COOKIE_API_KEY);
-    
+
     const response = await fetch(
       `https://api.cookie.fun/v2/agents/twitterUsername/${handle}?interval=_7Days`,
       {
         headers: {
-          'x-api-key': process.env.COOKIE_API_KEY || ''
-        }
-      }
+          "x-api-key": process.env.COOKIE_API_KEY || "",
+        },
+      },
     );
 
     const result = await response.json();
@@ -38,11 +32,10 @@ export async function GET(req: Request): Promise<Response | undefined> {
 
     const address = result.ok.contracts[0].contractAddress;
     return NextResponse.json({ address });
-
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch agent address" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

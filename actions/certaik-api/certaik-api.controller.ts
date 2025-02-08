@@ -29,7 +29,7 @@ class AiController {
   }
 
   async getAgentSecurityScore(twitterHandle: string): Promise<any> {
-    const address = await this.authService.currentUser(); 
+    const address = await this.authService.currentUser();
     if (!address) {
       throw new Error("user is not signed in with ethereum");
     }

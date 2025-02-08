@@ -45,16 +45,14 @@ class CertaikApiService {
   }
 
   async getAgentSecurityScore(twitterHandle: string): Promise<any> {
-    return api
-      .get(`/ai/agent-security/${twitterHandle}`)
-      .then((response) => {
-        if (!response.data) {
-          throw new Error(response.statusText);
-        }
-        return response.data;
-      });
+    return api.get(`/ai/agent-security/${twitterHandle}`).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
   }
-  
+
   async getAgentContracts(agentId: string): Promise<ContractResponseI> {
     return api
       .post("/ai/eval/agent", {

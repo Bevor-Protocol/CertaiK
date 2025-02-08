@@ -74,6 +74,5 @@ export {
   retryFailedEval,
   runEval,
   submitFeedback,
-  uploadSourceCode
+  uploadSourceCode,
 };
-

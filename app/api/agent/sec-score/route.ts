@@ -8,7 +8,7 @@ export async function GET(req: Request): Promise<Response | undefined> {
   try {
     // Get handle from URL search params
     const { searchParams } = new URL(req.url);
-    const handle = searchParams.get('handle');
+    const handle = searchParams.get("handle");
 
     if (!handle) {
       throw new Error("Handle is undefined");
@@ -21,12 +21,11 @@ export async function GET(req: Request): Promise<Response | undefined> {
     }
 
     return NextResponse.json(response.data);
-
   } catch (error) {
     console.error("Error fetching security score:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch security score" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
