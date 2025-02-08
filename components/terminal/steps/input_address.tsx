@@ -37,7 +37,32 @@ const AddressStep = ({
   useEffect(() => {
     scrollToBottom();
   }, [history]);
-  const handleScan = async (): Promise<void> => {
+
+  const handleFetchSecurityScore = async (input: string): Promise<void> => {
+    if (agent) {
+      // Get agent security score
+      try {
+        const secScoreResponse = await fetch(`/api/agent/sec-score?handle=${input}`);
+        const secScoreResult = await secScoreResponse.json();
+
+        if (secScoreResult.error) {
+          throw new Error(secScoreResult.error);
+        }
+
+        console.log(`Agent Security Score: ${secScoreResult.score.toFixed(1)}/100`);
+
+        await handleScan(secScoreResult.score);
+      } catch (error: unknown) {
+        console.error("Error fetching security score:", error);
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
+        throw new Error("Unknown error occurred while fetching security score");
+      }
+    }
+  };
+
+  const handleScan = async (securityScore: number): Promise<void> => {
     if (!input) {
       setHistory((prev) => [
         ...prev,
@@ -65,18 +90,6 @@ const AddressStep = ({
           throw new Error(result.error);
         }
 
-        // // Get agent security score
-        // try {
-        //   const securityScore = await certaikApiAction.getAgentSecurityScore(input);
-        //   console.log("Security score:", securityScore);
-        // } catch (error: unknown) {
-        //   console.error("Error fetching security score:", error);
-        //   if (error instanceof Error) {
-        //     throw new Error(error.message);
-        //   }
-        //   throw new Error("Unknown error occurred while fetching security score");
-        // }
-
         address = result.address;
       }
 
@@ -85,9 +98,6 @@ const AddressStep = ({
 
       if (isSolanaAddress) {
         // For Solana addresses, only show security score
-        const securityScore = {
-          score: Math.floor((Math.random() * (98.5 - 82.4) + 82.4) * 10) / 10,
-        };
 
         setHistory((prev) => [
           ...prev,
@@ -95,7 +105,7 @@ const AddressStep = ({
             type: Message.ASSISTANT,
             content: `\n========================================
 
-Agent Security Score: ${securityScore.score}/100
+Agent Security Score: ${securityScore}/100
 
 Powered by Cookie DAO 🍪
 
@@ -141,10 +151,6 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
         const candidate = candidates[0];
         setContractId(candidate.id);
 
-        const securityScore = {
-          score: Math.floor((Math.random() * (98.5 - 82.4) + 82.4) * 10) / 10,
-        };
-
         setHistory((prev) => [
           ...prev,
           {
@@ -156,7 +162,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
                 {
                   type: Message.ASSISTANT,
                   content: `\n========================================
-Agent Security Score: ${securityScore.score}/100
+Agent Security Score: ${securityScore}/100
 Powered by Cookie DAO 🍪
 ========================================`,
                 },
@@ -272,7 +278,7 @@ Powered by Cookie DAO 🍪
     }
   };
 
-  const handleSubmit = (e: FormEvent): void => {
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (step === 0 || step === 2) {
       setHistory((prev) => [
@@ -284,7 +290,7 @@ Powered by Cookie DAO 🍪
       ]);
     }
     if (step === 0) {
-      handleScan();
+      await handleFetchSecurityScore(input);
     } else if (step === 1) {
       handleNetwork();
     } else {
@@ -297,7 +303,7 @@ Powered by Cookie DAO 🍪
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
         {history.map((message, i) => (
           <div
-            key={i}
+            key={`${i}`}
             className={cn(
               "mb-2 leading-relaxed whitespace-pre-wrap",
               message.type === Message.SYSTEM && "text-blue-400",
