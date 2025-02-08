@@ -10,6 +10,7 @@ import { AuditResponseI } from "@/utils/types";
 import { useMutation } from "@tanstack/react-query";
 import {
   ArrowUpRightFromSquareIcon,
+  DownloadIcon,
   Info,
   MenuIcon,
   ThumbsDownIcon,
@@ -27,11 +28,10 @@ export const Content = ({
   audit: AuditResponseI;
   address: string | null;
 }): JSX.Element => {
-  const [view, setView] = useState<"contract" | "audit">("audit");
-  const [showFindings, setShowFindings] = useState(false);
+  const [view, setView] = useState<"contract" | "report" | "breakdown">("report");
   const [selectedFinding, setSelectedFinding] = useState<string | null>(null);
 
-  const handleToggle = (type: "contract" | "audit"): void => {
+  const handleToggle = (type: "contract" | "report" | "breakdown"): void => {
     setView(type);
   };
 
@@ -42,26 +42,52 @@ export const Content = ({
     return `${explorer}/address/${address}`;
   };
 
+  const handleDownload = (): void => {
+    const blob = new Blob([audit.audit.result], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "audit-report.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const explorerUrl = getBlockExplorer(audit.contract.network, audit.contract.address);
 
   return (
     <div className="flex flex-col md:flex-row gap-0 md:gap-4 w-full h-full">
-      <div className="flex flex-col gap-2 md:mt-8 justify-between">
+      <div className="flex flex-col gap-2 md:mt-4 justify-between">
         <div
           className={cn(
             "flex flex-row order-2 items-center",
             "md:items-start md:flex-col md:order-1",
           )}
         >
-          <div>
+          <div
+            className={cn(
+              "flex flex-row gap-2 overflow-x-scroll pb-4",
+              "md:flex-col md:gap-1 md:overflow-x-auto md:pb-0",
+            )}
+          >
             <p
               className={cn(
                 "cursor-pointer whitespace-nowrap",
-                view !== "audit" && "opacity-50 hover:opacity-70",
+                view !== "report" && "opacity-50 hover:opacity-70",
               )}
-              onClick={() => handleToggle("audit")}
+              onClick={() => handleToggle("report")}
             >
-              Audit Findings
+              Report
+            </p>
+            <p
+              className={cn(
+                "cursor-pointer whitespace-nowrap",
+                view !== "breakdown" && "opacity-50 hover:opacity-70",
+              )}
+              onClick={() => handleToggle("breakdown")}
+            >
+              Breakdown
             </p>
             <p
               className={cn(
@@ -70,7 +96,7 @@ export const Content = ({
               )}
               onClick={() => handleToggle("contract")}
             >
-              Smart Contract Code
+              Contract Code
             </p>
           </div>
           {view === "contract" && explorerUrl && (
@@ -86,20 +112,11 @@ export const Content = ({
               </Button>
             </Link>
           )}
-          {audit.findings.length && view === "audit" && (
-            <Button
-              variant="bright"
-              className="w-fit my-0 md:my-2 ml-auto md:ml-0 text-sm md:text-base relative"
-              onClick={() => setShowFindings(!showFindings)}
-            >
-              {showFindings ? "view report" : "view breakdown"}
-            </Button>
-          )}
         </div>
         <div
           className={cn(
             "flex order-1 justify-between flex-row gap-4 border-b border-b-gray-600 pb-4",
-            "md:order-2 md:border-none md:flex-col md:pb-0",
+            "md:order-2 md:border-none md:flex-col md:pb-0 flex-wrap",
           )}
         >
           <div className="text-sm md:text-base">
@@ -119,14 +136,44 @@ export const Content = ({
               <p>Model: {audit.audit.model}</p>
             </div>
           </div>
+          <div className="w-full *:w-1/2 flex flex-row md:flex-col gap-2 *:md:w-full">
+            <Button
+              onClick={handleDownload}
+              variant="bright"
+              className="w-full text-sm md:text-base"
+            >
+              Download Report
+              <DownloadIcon size={14} className="ml-1" />
+            </Button>
+            <Link
+              href={explorerUrl ?? ""}
+              aria-disabled={!explorerUrl}
+              target="_blank"
+              referrerPolicy="no-referrer"
+              className={cn(
+                "text-sm relative",
+                "md:text-base",
+                !explorerUrl && "pointer-events-none",
+              )}
+            >
+              <Button
+                variant="bright"
+                className="w-full text-sm md:text-base"
+                disabled={!explorerUrl}
+              >
+                view onchain
+                <ArrowUpRightFromSquareIcon size={10} className="ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
-      {view === "audit" && !showFindings && (
+      {view === "report" && (
         <ReactMarkdown className="overflow-scroll no-scrollbar markdown flex-grow">
           {audit.audit.result}
         </ReactMarkdown>
       )}
-      {view === "audit" && showFindings && (
+      {view === "breakdown" && (
         <Findings
           findings={audit.findings}
           selectedFinding={selectedFinding}

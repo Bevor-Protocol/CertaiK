@@ -12,11 +12,14 @@ import { stepText } from "@/utils/constants";
 import { TerminalStep } from "@/utils/enums";
 import { initialState } from "@/utils/initialStates";
 import { MessageType } from "@/utils/types";
+import { DownloadIcon, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const TerminalContainer: React.FC = () => {
   const [terminalStep, setTerminalStep] = useState<TerminalStep>(TerminalStep.INITIAL);
   const [contractId, setContractId] = useState("");
+  const [auditId, setAuditId] = useState("");
   const [promptType, setPromptType] = useState<string>("");
   const [auditContent, setAuditContent] = useState<string>("");
   const [terminalState, setTerminalState] =
@@ -122,6 +125,8 @@ const TerminalContainer: React.FC = () => {
               auditContent={auditContent}
               promptType={promptType}
               contractId={contractId}
+              auditId={auditId}
+              setAuditId={setAuditId}
             />
           )}
         </div>
@@ -131,10 +136,11 @@ const TerminalContainer: React.FC = () => {
           handleRewind={handleRewind}
           className="hidden md:flex flex-col"
         >
-          <Download terminalStep={terminalStep} auditContent={auditContent} />
+          <Download auditId={auditId} terminalStep={terminalStep} auditContent={auditContent} />
         </StepsRewind>
       </div>
       <Download
+        auditId={auditId}
         terminalStep={terminalStep}
         auditContent={auditContent}
         className="mt-2 md:hidden"
@@ -147,9 +153,10 @@ type DownloadProps = {
   terminalStep: TerminalStep;
   auditContent?: string;
   className?: string;
+  auditId: string;
 };
 
-const Download: React.FC<DownloadProps> = ({ terminalStep, auditContent, className }) => {
+const Download: React.FC<DownloadProps> = ({ terminalStep, auditContent, className, auditId }) => {
   const handleDownload = (): void => {
     if (!(terminalStep === TerminalStep.RESULTS && auditContent)) return;
     const blob = new Blob([auditContent], { type: "text/markdown" });
@@ -165,13 +172,20 @@ const Download: React.FC<DownloadProps> = ({ terminalStep, auditContent, classNa
   return (
     <div
       className={cn(
-        "flex justify-start cursor-pointer absolute left-0 right-0 top-full md:static",
+        "flex flex-col gap-2 cursor-pointer absolute left-0 right-0 top-full md:static",
         className,
         terminalStep === TerminalStep.RESULTS && auditContent ? "visible" : "invisible",
       )}
     >
-      <Button onClick={handleDownload} variant="bright" className="w-full" type="submit">
+      <Link href={`/analytics/audit/${auditId}`}>
+        <Button variant="bright" className="w-full">
+          View Breakdown
+          <ExternalLink size={14} className="ml-1" />
+        </Button>
+      </Link>
+      <Button onClick={handleDownload} variant="bright" className="w-full">
         Download Report
+        <DownloadIcon size={14} className="ml-1" />
       </Button>
     </div>
   );
