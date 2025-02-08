@@ -7,6 +7,7 @@ export const stepText = {
   [TerminalStep.INPUT_UPLOAD]: "upload audit",
   [TerminalStep.AUDIT_TYPE]: "audit type",
   [TerminalStep.RESULTS]: "results",
+  [TerminalStep.INPUT_AGENT]: "Input Agent",
 };
 
 export const iconSizeMapper: Record<string, Record<string, string>> = {

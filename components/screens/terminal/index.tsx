@@ -115,6 +115,15 @@ const TerminalContainer: React.FC = () => {
               setPromptType={setPromptType}
             />
           )}
+          {terminalStep == TerminalStep.INPUT_AGENT && (
+            <AddressStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.INPUT_AGENT]}
+              agent={true}
+              setContractId={setContractId}
+            />
+          )}
           {terminalStep == TerminalStep.RESULTS && (
             <ResultsStep
               state={terminalState[TerminalStep.RESULTS]}
