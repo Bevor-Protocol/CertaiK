@@ -151,16 +151,17 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
             type: Message.ASSISTANT,
             content: candidate.source_code,
           },
-          {
-            type: Message.ASSISTANT,
-            content: `\n========================================
-
+          ...(agent
+            ? [
+                {
+                  type: Message.ASSISTANT,
+                  content: `\n========================================
 Agent Security Score: ${securityScore.score}/100
-
 Powered by Cookie DAO 🍪
-
 ========================================`,
-          },
+                },
+              ]
+            : []),
           {
             type: Message.SYSTEM,
             content: "Does this look right? (y/n)",
