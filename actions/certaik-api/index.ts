@@ -19,12 +19,20 @@ const runEval = async (
   return certaikApiController.eval(contractId, promptType);
 };
 
-const getSourceCode = async (contractAddress: string): Promise<ContractResponseI> => {
-  return certaikApiController.getSourceCode(contractAddress);
-};
-
-const uploadSourceCode = async (code: string): Promise<ContractResponseI> => {
-  return certaikApiController.uploadSourceCode(code);
+const uploadSourceCode = async ({
+  address,
+  network,
+  code,
+}: {
+  address?: string;
+  network?: string;
+  code?: string;
+}): Promise<ContractResponseI> => {
+  return certaikApiController.uploadSourceCode({
+    address,
+    network,
+    code,
+  });
 };
 
 const submitFeedback = async (
@@ -63,7 +71,6 @@ export {
   getAudit,
   getAudits,
   getCurrentGas,
-  getSourceCode,
   getStats,
   getUserInfo,
   retryFailedEval,

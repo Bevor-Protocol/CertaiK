@@ -6,15 +6,15 @@ import { cookies } from "next/headers";
 import { SiweMessage } from "siwe";
 
 class AuthService {
-  async currentUser(): Promise<string | null> {
+  async currentUser(): Promise<{ address: string; user_id: string } | null> {
     const session = await this.getSession();
-    if (!session?.siwe) {
+    if (!session?.siwe || !session.user_id) {
       return null;
     }
-    const { siwe } = session;
+    const { siwe, user_id } = session;
     const { address } = siwe;
 
-    return address;
+    return { address, user_id };
   }
 
   async getSession(): Promise<IronSession<SessionData>> {
@@ -42,20 +42,14 @@ class AuthService {
     }
     session.siwe = data;
 
-    const response = await api.post(
-      "/auth/user",
-      {},
-      {
-        headers: {
-          "X-User-Identifier": data.address,
-        },
-      },
-    );
+    const response = await api.post("/auth/user", {
+      address: data.address,
+    });
     if (!response.data) {
       console.log("something went wrong");
       session.destroy();
     }
-    session.user_id = response.data.id;
+    session.user_id = response.data.user_id;
 
     await session.save();
   }

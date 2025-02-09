@@ -54,7 +54,7 @@ const AddressStep = ({
     const address = encodeURIComponent(input);
 
     certaikApiAction
-      .getSourceCode(address)
+      .uploadSourceCode({ address })
       .then((result) => {
         if (!result) {
           throw new Error("bad response");

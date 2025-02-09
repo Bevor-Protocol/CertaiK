@@ -91,7 +91,7 @@ const Dashboard = async (): Promise<JSX.Element> => {
               ))}
             </div>
             <div className="mt-auto md:mt-8 w-full md:w-fit">
-              <Link href={`/analytics/history?user_id=${user.user.address}`} className="w-fit">
+              <Link href={`/analytics/history?user_address=${user.user.address}`} className="w-fit">
                 <Button variant="bright" className="w-full md:w-fit">
                   View My Audits
                 </Button>

@@ -86,7 +86,7 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
   const [networkTypesSelected, setNetworkTypesSelected] = useState<DropdownOption[]>(
     getInitialState(query || {}, "network"),
   );
-  const [address, setAddresss] = useState(query?.user_id ?? "");
+  const [address, setAddresss] = useState(query?.user_address ?? "");
   const [contract, setContract] = useState(query?.contract_address ?? "");
 
   const submitHandler = (): void => {
