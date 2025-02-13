@@ -28,6 +28,14 @@ class AiController {
     return this.certaikApiService.runEval(contractId, promptType, address);
   }
 
+  async getAgentSecurityScore(twitterHandle: string): Promise<any> {
+    const address = await this.authService.currentUser();
+    if (!address) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.getAgentSecurityScore(twitterHandle);
+  }
+
   async getSourceCode(contractAddress: string): Promise<ContractResponseI> {
     const address = await this.authService.currentUser();
     if (!address) {
