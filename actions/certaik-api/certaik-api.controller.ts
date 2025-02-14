@@ -104,6 +104,30 @@ class AiController {
     }
     return this.certaikApiService.getUserInfo(user.user_id);
   }
+
+  async generateApiKey(type: "user" | "app"): Promise<string> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.generateApiKey(type, user.user_id);
+  }
+
+  async generateApp(name: string): Promise<string> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.generateApp(name, user.user_id);
+  }
+
+  async updateApp(name: string): Promise<string> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.updateApp(name, user.user_id);
+  }
 }
 
 const certaikApiController = new AiController(AuthService, CertaikApiService);

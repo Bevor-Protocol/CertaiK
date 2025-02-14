@@ -67,7 +67,21 @@ const getUserInfo = async (): Promise<UserInfoResponseI> => {
   return certaikApiController.getUserInfo();
 };
 
+const generateApiKey = async (type: "user" | "app"): Promise<string> => {
+  return certaikApiController.generateApiKey(type);
+};
+
+const generateApp = async (name: string): Promise<string> => {
+  return certaikApiController.generateApp(name);
+};
+
+const updateApp = async (name: string): Promise<string> => {
+  return certaikApiController.updateApp(name);
+};
+
 export {
+  generateApiKey,
+  generateApp,
   getAudit,
   getAudits,
   getCurrentGas,
@@ -76,5 +90,6 @@ export {
   retryFailedEval,
   runEval,
   submitFeedback,
+  updateApp,
   uploadSourceCode,
 };

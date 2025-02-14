@@ -1,5 +1,6 @@
 import { certaikApiAction } from "@/actions";
 import Content from "@/components/content";
+import { ApiKeyManagement, AppManagement } from "@/components/screens/dashboard";
 import { Button } from "@/components/ui/button";
 import { LoadWaifu } from "@/components/ui/loader";
 import MetricCard from "@/components/ui/metric-card";
@@ -23,29 +24,8 @@ const Dashboard = async (): Promise<JSX.Element> => {
       <MetricCard title="Total Audits" Icon={BarChart3} stat={user.audits.length} />
       <MetricCard title="Unique Contracts" Icon={BarChart3} stat={user.n_contracts} />
       <CreditsCard />
-      <div className="border border-gray-800 rounded-md p-4 col-span-2">
-        <div className="flex flex-col gap-2">
-          <p className="text-lg font-medium">API Key Management</p>
-          <p className="text-sm text-gray-400">Manage your API key</p>
-          <Button variant="transparent" disabled className="py-1 px-5 w-fit mt-4">
-            {user.auth.exists ? "regenerate api key" : "generate api key"}
-          </Button>
-        </div>
-      </div>
-      <div className="border border-gray-800 rounded-md p-4 col-span-2">
-        <div className="flex flex-col gap-2">
-          <p className="text-lg font-medium">Registered Application</p>
-          <p className="text-sm text-gray-400">Information about your registered app</p>
-          {user.app.exists ? (
-            <p className="mt-2">
-              <span className="text-gray-400">App Name: </span>
-              <span className="font-medium">{user.app.name}</span>
-            </p>
-          ) : (
-            <p className="mt-2 text-gray-400">No registered app exists</p>
-          )}
-        </div>
-      </div>
+      <ApiKeyManagement userAuth={user.auth} />
+      <AppManagement userApp={user.app} />
       <div className="flex flex-col items-center col-span-full">
         {user.audits && !user.audits.length ? (
           <>

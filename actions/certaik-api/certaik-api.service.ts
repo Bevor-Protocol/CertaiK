@@ -119,6 +119,7 @@ class CertaikApiService {
 
   async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
     const searchParams = new URLSearchParams(filters);
+    searchParams.set("status", "success");
     return api.get(`/analytics/audits?${searchParams.toString()}`).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
@@ -152,6 +153,48 @@ class CertaikApiService {
       },
     };
     return api.get("/analytics/user", headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async generateApiKey(type: "user" | "app", userId: string): Promise<string> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": userId,
+      },
+    };
+    return api.post(`/auth/generate/${type}`, {}, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data.api_key;
+    });
+  }
+
+  async generateApp(name: string, userId: string): Promise<string> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": userId,
+      },
+    };
+    return api.post("/auth/app", { name }, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async updateApp(name: string, userId: string): Promise<string> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": userId,
+      },
+    };
+    return api.patch("/auth/app", { name }, headers).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }
