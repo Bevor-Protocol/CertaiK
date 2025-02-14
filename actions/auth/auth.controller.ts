@@ -13,7 +13,7 @@ class AuthController {
     return session.nonce;
   }
 
-  async currentUser(): Promise<string | null> {
+  async currentUser(): Promise<{ address: string; user_id: string } | null> {
     return this.authService.currentUser();
   }
 

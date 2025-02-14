@@ -44,11 +44,11 @@ const InitialStep = ({ setTerminalStep, handleGlobalState, state }: TerminalProp
         setTerminalStep(TerminalStep.INPUT_PASTE);
         break;
       }
-      case "4": {
-        handleGlobalState(TerminalStep.INITIAL, history);
-        setTerminalStep(TerminalStep.INPUT_AGENT);
-        break;
-      }
+      // case "4": {
+      //   handleGlobalState(TerminalStep.INITIAL, history);
+      //   setTerminalStep(TerminalStep.INPUT_AGENT);
+      //   break;
+      // }
       default: {
         setHistory((prev) => [
           ...prev,

@@ -7,7 +7,7 @@ const nonce = async (): Promise<string> => {
   return authController.nonce();
 };
 
-const getCurrentUser = async (): Promise<string | null> => {
+const getCurrentUser = async (): Promise<{ address: string; user_id?: string } | null> => {
   return authController.currentUser();
 };
 

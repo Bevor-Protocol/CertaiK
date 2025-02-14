@@ -76,7 +76,7 @@ export const constructSearchQuery = ({
     search.append("network", params.join(","));
   }
   if (address) {
-    search.append("user_id", address);
+    search.append("user_address", address);
   }
   if (contract) {
     search.append("contract_address", contract);

@@ -107,10 +107,14 @@ export interface UserInfoResponseI {
   auth: {
     exists: boolean;
     is_active: boolean;
+    can_create: boolean;
   };
   app: {
     exists: boolean;
     name?: string;
+    can_create: boolean;
+    exists_auth: boolean;
+    can_create_auth: boolean;
   };
   audits: AuditObservationI[];
   n_contracts: number;

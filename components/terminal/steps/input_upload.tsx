@@ -37,7 +37,7 @@ const UploadStep = ({
 
   const handleUpload = (content: string): void => {
     certaikApiAction
-      .uploadSourceCode(content)
+      .uploadSourceCode({ code: content })
       .then((result) => {
         if (!result) {
           throw new Error("bad response");

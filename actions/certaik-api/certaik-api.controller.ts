@@ -8,7 +8,7 @@ import {
 } from "@/utils/types";
 import CertaikApiService from "./certaik-api.service";
 
-class AiController {
+class CertaikApiController {
   constructor(
     private readonly authService: typeof AuthService,
     private readonly certaikApiService: typeof CertaikApiService,
@@ -21,11 +21,11 @@ class AiController {
     id: string;
     job_id: string;
   }> {
-    const address = await this.authService.currentUser();
-    if (!address) {
+    const user = await this.authService.currentUser();
+    if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.runEval(contractId, promptType, address);
+    return this.certaikApiService.runEval(contractId, promptType, user.user_id);
   }
 
   async getAgentSecurityScore(twitterHandle: string): Promise<any> {
@@ -36,20 +36,25 @@ class AiController {
     return this.certaikApiService.getAgentSecurityScore(twitterHandle);
   }
 
-  async getSourceCode(contractAddress: string): Promise<ContractResponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
+  async uploadSourceCode({
+    address,
+    network,
+    code,
+  }: {
+    address?: string;
+    network?: string;
+    code?: string;
+  }): Promise<ContractResponseI> {
+    const user = await this.authService.currentUser();
+    if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.getSourceCode(contractAddress, address);
-  }
-
-  async uploadSourceCode(code: string): Promise<ContractResponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    return this.certaikApiService.uploadSourceCode(code, address);
+    return this.certaikApiService.uploadSourceCode({
+      address,
+      network,
+      code,
+      userId: user.user_id,
+    });
   }
 
   async submitFeedback(
@@ -57,27 +62,27 @@ class AiController {
     feedback?: string,
     verified?: boolean,
   ): Promise<{ success: boolean }> {
-    const address = await this.authService.currentUser();
-    if (!address) {
+    const user = await this.authService.currentUser();
+    if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.submitFeedback(id, address, feedback, verified);
+    return this.certaikApiService.submitFeedback(id, user.user_id, feedback, verified);
   }
 
   async retryFailedEval(jobId: string): Promise<boolean> {
-    const address = await this.authService.currentUser();
-    if (!address) {
+    const user = await this.authService.currentUser();
+    if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.retryFailedEval(jobId, address);
+    return this.certaikApiService.retryFailedEval(jobId, user.user_id);
   }
 
   async getCurrentGas(): Promise<number> {
-    const address = await this.authService.currentUser();
-    if (!address) {
+    const user = await this.authService.currentUser();
+    if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.getCurrentGas(address);
+    return this.certaikApiService.getCurrentGas(user.user_id);
   }
 
   async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
@@ -101,13 +106,37 @@ class AiController {
   }
 
   async getUserInfo(): Promise<UserInfoResponseI> {
-    const address = await this.authService.currentUser();
-    if (!address) {
+    const user = await this.authService.currentUser();
+    if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.getUserInfo(address);
+    return this.certaikApiService.getUserInfo(user.user_id);
+  }
+
+  async generateApiKey(type: "user" | "app"): Promise<string> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.generateApiKey(type, user.user_id);
+  }
+
+  async generateApp(name: string): Promise<string> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.generateApp(name, user.user_id);
+  }
+
+  async updateApp(name: string): Promise<string> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.updateApp(name, user.user_id);
   }
 }
 
-const certaikApiController = new AiController(AuthService, CertaikApiService);
+const certaikApiController = new CertaikApiController(AuthService, CertaikApiService);
 export default certaikApiController;

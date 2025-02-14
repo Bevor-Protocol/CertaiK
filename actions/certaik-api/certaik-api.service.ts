@@ -11,14 +11,14 @@ class CertaikApiService {
   async runEval(
     contractId: string,
     promptType: string,
-    address: string,
+    userId: string,
   ): Promise<{
     id: string;
     job_id: string;
   }> {
     const headers = {
       headers: {
-        "X-User-Identifier": address,
+        "X-User-Identifier": userId,
       },
     };
 
@@ -69,43 +69,41 @@ class CertaikApiService {
       });
   }
 
-  async getSourceCode(contractAddress: string, address: string): Promise<ContractResponseI> {
+  async uploadSourceCode({
+    address,
+    network,
+    code,
+    userId,
+  }: {
+    address?: string;
+    network?: string;
+    code?: string;
+    userId: string;
+  }): Promise<ContractResponseI> {
     const headers = {
       headers: {
-        "X-User-Identifier": address,
+        "X-User-Identifier": userId,
       },
     };
-    return api.get(`/blockchain/scan/${contractAddress}`, headers).then((response) => {
-      if (!response.data) {
-        throw new Error(response.statusText);
-      }
-      return response.data;
-    });
-  }
-
-  async uploadSourceCode(code: string, address: string): Promise<ContractResponseI> {
-    const headers = {
-      headers: {
-        "X-User-Identifier": address,
-      },
-    };
-    return api.post("/blockchain/contract/upload", { code }, headers).then((response) => {
-      if (!response.data) {
-        throw new Error(response.statusText);
-      }
-      return response.data;
-    });
+    return api
+      .post("/blockchain/contract", { address, network, code }, headers)
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data;
+      });
   }
 
   async submitFeedback(
     id: string,
-    address: string,
+    userId: string,
     feedback?: string,
     verified?: boolean,
   ): Promise<{ success: boolean }> {
     const headers = {
       headers: {
-        "X-User-Identifier": address,
+        "X-User-Identifier": userId,
       },
     };
     return api.post("/analytics/feedback", { id, feedback, verified }, headers).then((response) => {
@@ -116,10 +114,10 @@ class CertaikApiService {
     });
   }
 
-  async retryFailedEval(jobId: string, address: string): Promise<boolean> {
+  async retryFailedEval(jobId: string, userId: string): Promise<boolean> {
     const headers = {
       headers: {
-        "X-User-Identifier": address,
+        "X-User-Identifier": userId,
       },
     };
     return api.post(`/status/job/retry/${jobId}`, {}, headers).then((response) => {
@@ -130,10 +128,10 @@ class CertaikApiService {
     });
   }
 
-  async getCurrentGas(address: string): Promise<number> {
+  async getCurrentGas(userId: string): Promise<number> {
     const headers = {
       headers: {
-        "X-User-Identifier": address,
+        "X-User-Identifier": userId,
       },
     };
     return api.post("/blockchain/gas", {}, headers).then((response) => {
@@ -146,6 +144,7 @@ class CertaikApiService {
 
   async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
     const searchParams = new URLSearchParams(filters);
+    searchParams.set("status", "success");
     return api.get(`/analytics/audits?${searchParams.toString()}`).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
@@ -172,13 +171,55 @@ class CertaikApiService {
     });
   }
 
-  async getUserInfo(address: string): Promise<UserInfoResponseI> {
+  async getUserInfo(userId: string): Promise<UserInfoResponseI> {
     const headers = {
       headers: {
-        "X-User-Identifier": address,
+        "X-User-Identifier": userId,
       },
     };
     return api.get("/analytics/user", headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async generateApiKey(type: "user" | "app", userId: string): Promise<string> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": userId,
+      },
+    };
+    return api.post(`/auth/generate/${type}`, {}, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data.api_key;
+    });
+  }
+
+  async generateApp(name: string, userId: string): Promise<string> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": userId,
+      },
+    };
+    return api.post("/auth/app", { name }, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async updateApp(name: string, userId: string): Promise<string> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": userId,
+      },
+    };
+    return api.patch("/auth/app", { name }, headers).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }
