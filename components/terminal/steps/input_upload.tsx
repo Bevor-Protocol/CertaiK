@@ -20,7 +20,7 @@ const UploadStep = ({
   state,
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
-  const [uploadAvailable, setUploadAvailable] = useState(state.length === 1);
+  const [uploadAvailable, setUploadAvailable] = useState(state.length === 1 || state.length === 3);
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);

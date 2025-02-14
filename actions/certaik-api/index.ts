@@ -19,6 +19,10 @@ const runEval = async (
   return certaikApiController.eval(contractId, promptType);
 };
 
+const getAgentSecurityScore = async (twitterHandle: string): Promise<any> => {
+  return certaikApiController.getAgentSecurityScore(twitterHandle);
+};
+
 const uploadSourceCode = async ({
   address,
   network,
@@ -82,6 +86,7 @@ const updateApp = async (name: string): Promise<string> => {
 export {
   generateApiKey,
   generateApp,
+  getAgentSecurityScore,
   getAudit,
   getAudits,
   getCurrentGas,

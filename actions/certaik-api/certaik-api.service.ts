@@ -44,6 +44,31 @@ class CertaikApiService {
       });
   }
 
+  async getAgentSecurityScore(twitterHandle: string): Promise<any> {
+    return api.get(`/ai/agent-security/${twitterHandle}`).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async getAgentContracts(agentId: string): Promise<ContractResponseI> {
+    return api
+      .post("/ai/eval/agent", {
+        agent_id: agentId,
+        encode_code: true,
+        response_type: "markdown",
+        webhook_url: "https://webhook.site/5eec6efd-1fda-486a-aac5-e95a19a0ea5a",
+      })
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data;
+      });
+  }
+
   async uploadSourceCode({
     address,
     network,

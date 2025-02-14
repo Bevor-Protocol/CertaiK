@@ -8,7 +8,7 @@ import {
 } from "@/utils/types";
 import CertaikApiService from "./certaik-api.service";
 
-class AiController {
+class CertaikApiController {
   constructor(
     private readonly authService: typeof AuthService,
     private readonly certaikApiService: typeof CertaikApiService,
@@ -26,6 +26,14 @@ class AiController {
       throw new Error("user is not signed in with ethereum");
     }
     return this.certaikApiService.runEval(contractId, promptType, user.user_id);
+  }
+
+  async getAgentSecurityScore(twitterHandle: string): Promise<any> {
+    const address = await this.authService.currentUser();
+    if (!address) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.getAgentSecurityScore(twitterHandle);
   }
 
   async uploadSourceCode({
@@ -130,5 +138,5 @@ class AiController {
   }
 }
 
-const certaikApiController = new AiController(AuthService, CertaikApiService);
+const certaikApiController = new CertaikApiController(AuthService, CertaikApiService);
 export default certaikApiController;
