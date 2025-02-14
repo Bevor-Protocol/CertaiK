@@ -7,9 +7,9 @@ import { Suspense } from "react";
 
 const Audit = async ({ params }: { params: Promise<{ slug: string }> }): Promise<JSX.Element> => {
   const audit = await certaikApiAction.getAudit((await params).slug);
-  const { address } = await authService.currentUser();
+  const user = await authService.currentUser();
 
-  return <Content audit={audit} address={address} />;
+  return <Content audit={audit} address={user?.address ?? ""} />;
 };
 
 export default function AuditPage({ params }: { params: Promise<{ slug: string }> }): JSX.Element {
