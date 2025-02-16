@@ -23,12 +23,20 @@ const getAgentSecurityScore = async (twitterHandle: string): Promise<any> => {
   return certaikApiController.getAgentSecurityScore(twitterHandle);
 };
 
-const getSourceCode = async (contractAddress: string): Promise<ContractResponseI> => {
-  return certaikApiController.getSourceCode(contractAddress);
-};
-
-const uploadSourceCode = async (code: string): Promise<ContractResponseI> => {
-  return certaikApiController.uploadSourceCode(code);
+const uploadSourceCode = async ({
+  address,
+  network,
+  code,
+}: {
+  address?: string;
+  network?: string;
+  code?: string;
+}): Promise<ContractResponseI> => {
+  return certaikApiController.uploadSourceCode({
+    address,
+    network,
+    code,
+  });
 };
 
 const submitFeedback = async (
@@ -63,16 +71,30 @@ const getUserInfo = async (): Promise<UserInfoResponseI> => {
   return certaikApiController.getUserInfo();
 };
 
+const generateApiKey = async (type: "user" | "app"): Promise<string> => {
+  return certaikApiController.generateApiKey(type);
+};
+
+const generateApp = async (name: string): Promise<string> => {
+  return certaikApiController.generateApp(name);
+};
+
+const updateApp = async (name: string): Promise<string> => {
+  return certaikApiController.updateApp(name);
+};
+
 export {
+  generateApiKey,
+  generateApp,
   getAgentSecurityScore,
   getAudit,
   getAudits,
   getCurrentGas,
-  getSourceCode,
   getStats,
   getUserInfo,
   retryFailedEval,
   runEval,
   submitFeedback,
+  updateApp,
   uploadSourceCode,
 };

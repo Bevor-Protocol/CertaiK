@@ -1,4 +1,4 @@
-import { certaikApiAction } from "@/actions";
+import { certaikApiAction, cookieDaoAction } from "@/actions";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
 import { ContractResponseI, MessageType } from "@/utils/types";
@@ -12,16 +12,18 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-const AddressStep = ({
+const AgentStep = ({
   setTerminalStep,
   handleGlobalState,
   setContractId,
   state,
-}: TerminalProps): JSX.Element => {
+  agent = false,
+}: TerminalProps & { agent?: boolean }): JSX.Element => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [history, setHistory] = useState<MessageType[]>(state);
+
   const [candidates, setCandidates] = useState<ContractResponseI["candidates"]>([]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -36,13 +38,28 @@ const AddressStep = ({
     scrollToBottom();
   }, [history]);
 
-  const handleScan = (): void => {
+  const handleFetchSecurityScore = async (input: string): Promise<void> => {
+    if (!agent) return;
+    cookieDaoAction
+      .getAgentSecurityScore(input)
+      .then((result) => {
+        if (!result) {
+          throw new Error("bad response");
+        }
+        return handleScan(result);
+      })
+      .catch((error) => {
+        console.error("Error fetching security score:", error);
+      });
+  };
+
+  const handleScan = async (securityScore: number): Promise<void> => {
     if (!input) {
       setHistory((prev) => [
         ...prev,
         {
           type: Message.ERROR,
-          content: "Not a valid address, try again...",
+          content: "Not a valid input, try again...",
         },
       ]);
       setInput("");
@@ -51,68 +68,110 @@ const AddressStep = ({
 
     setInput("");
     setLoading(true);
-    const address = encodeURIComponent(input);
 
-    certaikApiAction
-      .uploadSourceCode({ address })
-      .then((result) => {
-        if (!result) {
-          throw new Error("bad response");
-        }
-        const { candidates, exists, exact_match } = result;
-        if (!exists) {
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.ERROR,
-              content:
-                "Address was found, but it appears to not be validated.\
- Try uploading the source code directly.",
-            },
-          ]);
-        } else if (!exact_match) {
-          setCandidates(candidates);
-          const networks = candidates.map((candidate) => candidate.network);
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.SYSTEM,
-              content: `Found contract on multiple networks. \
-Please select one by entering its number:
-${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
-            },
-          ]);
-          setStep(1);
-        } else {
-          const candidate = candidates[0];
-          setContractId(candidate.id);
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.ASSISTANT,
-              content: candidate.source_code,
-            },
-            {
-              type: Message.SYSTEM,
-              content: "Does this look right? (y/n)",
-            },
-          ]);
-          setStep(2);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+    try {
+      let address = input;
+
+      if (agent) {
+        console.log("Fetching agent address for handle:", input);
+        const response = await cookieDaoAction.getAgentByTwitterHandle(input);
+        address = response.address;
+      }
+
+      // Check if Solana address (base58 encoded, 32-44 chars)
+      const isSolanaAddress = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+
+      if (isSolanaAddress) {
+        // For Solana addresses, only show security score
+
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: Message.ASSISTANT,
+            content: `\n========================================
+
+Agent Security Score: ${securityScore}/100
+
+Powered by Cookie DAO 🍪
+
+========================================`,
+          },
+        ]);
+        return;
+      }
+
+      address = encodeURIComponent(address);
+      const result = await certaikApiAction.uploadSourceCode({ address });
+
+      if (!result) {
+        throw new Error("bad response");
+      }
+
+      const { candidates, exists, exact_match } = result;
+
+      if (!exists) {
         setHistory((prev) => [
           ...prev,
           {
             type: Message.ERROR,
-            content: "Something went wrong",
+            content:
+              "Address was found, but it appears to not be validated.\
+ Try uploading the source code directly.",
           },
         ]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      } else if (!exact_match) {
+        setCandidates(candidates);
+        const networks = candidates.map((candidate) => candidate.network);
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: Message.SYSTEM,
+            content: `Found contract on multiple networks. \
+Please select one by entering its number:
+${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
+          },
+        ]);
+        setStep(1);
+      } else {
+        const candidate = candidates[0];
+        setContractId(candidate.id);
+
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: Message.ASSISTANT,
+            content: candidate.source_code,
+          },
+          ...(agent
+            ? [
+                {
+                  type: Message.ASSISTANT,
+                  content: `\n========================================
+Agent Security Score: ${securityScore}/100
+Powered by Cookie DAO 🍪
+========================================`,
+                },
+              ]
+            : []),
+          {
+            type: Message.SYSTEM,
+            content: "Does this look right? (y/n)",
+          },
+        ]);
+        setStep(2);
+      }
+    } catch (error) {
+      console.log(error);
+      setHistory((prev) => [
+        ...prev,
+        {
+          type: Message.ERROR,
+          content: "Something went wrong",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleValidate = (): void => {
@@ -204,7 +263,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
     }
   };
 
-  const handleSubmit = (e: FormEvent): void => {
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (step === 0 || step === 2) {
       setHistory((prev) => [
@@ -216,7 +275,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
       ]);
     }
     if (step === 0) {
-      handleScan();
+      await handleFetchSecurityScore(input);
     } else if (step === 1) {
       handleNetwork();
     } else {
@@ -229,7 +288,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
         {history.map((message, i) => (
           <div
-            key={i}
+            key={`${i}`}
             className={cn(
               "mb-2 leading-relaxed whitespace-pre-wrap",
               message.type === Message.SYSTEM && "text-blue-400",
@@ -254,4 +313,4 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
   );
 };
 
-export default AddressStep;
+export default AgentStep;

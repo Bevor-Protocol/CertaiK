@@ -13,6 +13,8 @@ type TerminalProps = {
   auditContent: string;
   state: MessageType[];
   contractId: string;
+  auditId: string;
+  setAuditId: Dispatch<SetStateAction<string>>;
 };
 
 type ValidWsSteps =
@@ -28,18 +30,19 @@ const ResultsStep = ({
   auditContent,
   state,
   contractId,
+  auditId,
+  setAuditId,
 }: TerminalProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [jobId, setJobId] = useState("");
   const [steps, setSteps] = useState<ValidWsSteps[]>([]);
   const { setOnMessageHandler, sendMessage, isConnected, reconnect } = useWs();
 
   useEffect(() => {
-    if (!jobId) return;
+    if (!auditId) return;
     if (steps.includes("done")) {
       certaikApiAction
-        .getAudit(jobId)
+        .getAudit(auditId)
         .then((result) => {
           if (result.audit.status === "success") {
             setAuditContent(result.audit.result);
@@ -51,7 +54,7 @@ const ResultsStep = ({
         .finally(() => setIsLoading(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [steps, jobId]);
+  }, [steps, auditId]);
 
   useEffect(() => {
     setOnMessageHandler((data: any): void => {
@@ -81,7 +84,7 @@ const ResultsStep = ({
       .then((result) => {
         const { id } = result;
         // websocket subscribes to job result
-        setJobId(id);
+        setAuditId(id);
         sendMessage(`subscribe:${id}`);
       })
       .catch((error) => {

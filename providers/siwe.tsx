@@ -92,7 +92,8 @@ const SiweProvider = ({ children }: { children: React.ReactNode }): JSX.Element 
     */
     let timer: ReturnType<typeof setTimeout>;
     const handleChange = async (): Promise<void> => {
-      await authAction.getCurrentUser().then((userAddress) => {
+      await authAction.getCurrentUser().then((user) => {
+        const userAddress = user?.address;
         const ANY_USER_AUTHED = !!userAddress; // authenticated address
         const ANY_WALLET_CONNECTED = !!address; // existing connected address
 
