@@ -17,12 +17,17 @@ type TerminalProps = {
   setAuditId: Dispatch<SetStateAction<string>>;
 };
 
-type ValidWsSteps =
-  | "generating_candidates"
-  | "generating_judgements"
-  | "generating_report"
-  | "done"
-  | "error";
+type WsStep = { name: string; status: string };
+
+const stepToTextMapper = {
+  access_control: "access control findings",
+  control_flow: "control flow findings",
+  data_handling: "data handling findings",
+  economic: "economic-related findings",
+  logic: "logic flaw findings",
+  math: "mathematical findings",
+  report: "generating report",
+};
 
 const ResultsStep = ({
   setAuditContent,
@@ -35,12 +40,13 @@ const ResultsStep = ({
 }: TerminalProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [steps, setSteps] = useState<ValidWsSteps[]>([]);
+  const [steps, setSteps] = useState<WsStep[]>([]);
   const { setOnMessageHandler, sendMessage, isConnected, reconnect } = useWs();
 
   useEffect(() => {
     if (!auditId) return;
-    if (steps.includes("done")) {
+    const reportDone = steps.find((step) => step.name === "report" && step.status === "done");
+    if (reportDone) {
       certaikApiAction
         .getAudit(auditId)
         .then((result) => {
@@ -58,15 +64,18 @@ const ResultsStep = ({
 
   useEffect(() => {
     setOnMessageHandler((data: any): void => {
-      setSteps((prev) => [...prev, data.step]);
-      if (data.step === "done") {
-        setAuditContent(JSON.stringify(data.result));
-        setIsLoading(false);
-      }
-      if (data.step === "error") {
-        setIsError(true);
-        setIsLoading(false);
-      }
+      setSteps((prev) => {
+        const existingStepIndex = prev.findIndex((step) => step.name === data.name);
+        if (existingStepIndex !== -1) {
+          // Update the status of the existing step
+          const updatedSteps = [...prev];
+          updatedSteps[existingStepIndex] = { name: data.name, status: data.status };
+          return updatedSteps;
+        } else {
+          // Append the new step
+          return [...prev, { name: data.name, status: data.status }];
+        }
+      });
     });
   }, [setOnMessageHandler, setAuditContent]);
 
@@ -100,16 +109,12 @@ const ResultsStep = ({
         {!isConnected && <p className="">we&apos;re having issues connecting to the server</p>}
         {(isLoading || !auditContent || isError) && (
           <>
-            {steps.map((step, i) => (
-              <div key={i} className="flex gap-4 items-center">
-                <p>{step}</p>
-                {i < steps.length - 1 ? (
-                  <Check />
-                ) : isError ? (
-                  <X />
-                ) : (
-                  <Loader className="h-4 w-4" />
-                )}
+            {steps.map((step) => (
+              <div key={step.name} className="flex gap-4 items-center">
+                <p>{stepToTextMapper[step.name as keyof typeof stepToTextMapper]}</p>
+                {step.status === "start" && <Loader className="h-4 w-4" />}
+                {step.status === "done" && <Check />}
+                {step.status === "error" && <X />}
               </div>
             ))}
           </>

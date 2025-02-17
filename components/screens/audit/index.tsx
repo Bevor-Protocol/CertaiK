@@ -133,7 +133,7 @@ export const Content = ({
             <h3 className="text-gray-400 mb-2 hidden md:block">Audit Details</h3>
             <div className="space-y-1 *:whitespace-nowrap">
               <p>Audit Type: {audit.audit.audit_type}</p>
-              <p>Model: {audit.audit.model}</p>
+              <p>Version: {audit.audit.version}</p>
             </div>
           </div>
           <div className="w-full *:w-1/2 flex flex-row md:flex-col gap-2 *:md:w-full">

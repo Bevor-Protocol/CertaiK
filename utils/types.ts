@@ -78,8 +78,7 @@ export interface AuditResponseI {
   };
   audit: {
     status: "waiting" | "processing" | "success" | "failed";
-    model: string;
-    prompt_version: string;
+    version: string;
     audit_type: string;
     result: string;
   };
