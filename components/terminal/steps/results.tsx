@@ -47,6 +47,7 @@ const ResultsStep = ({
     if (!auditId) return;
     const reportDone = steps.find((step) => step.name === "report" && step.status === "done");
     if (reportDone) {
+      console.log("report complete");
       certaikApiAction
         .getAudit(auditId)
         .then((result) => {
@@ -82,8 +83,10 @@ const ResultsStep = ({
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log(state, isLoading, isConnected);
     if (state.length || isLoading) return;
     if (!isConnected) {
+      console.log("not connected, reconnecting");
       reconnect();
       return;
     }
@@ -91,7 +94,9 @@ const ResultsStep = ({
     certaikApiAction
       .runEval(contractId, promptType)
       .then((result) => {
+        console.log(result);
         const { id } = result;
+        console.log("subscribing to job", id);
         // websocket subscribes to job result
         setAuditId(id);
         sendMessage(`subscribe:${id}`);
