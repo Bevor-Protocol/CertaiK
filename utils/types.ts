@@ -135,3 +135,11 @@ export interface CreditSyncResponseI {
   credits_added: number;
   credits_removed: number;
 }
+
+export interface AuditStatusResponseI {
+  status: string;
+  steps: {
+    step: string;
+    status: string;
+  }[];
+}

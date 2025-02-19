@@ -2,6 +2,7 @@
 
 import {
   AuditResponseI,
+  AuditStatusResponseI,
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
@@ -72,6 +73,10 @@ const getAudit = async (id: string): Promise<AuditResponseI> => {
   return certaikApiController.getAudit(id);
 };
 
+const getAuditStatus = async (id: string): Promise<AuditStatusResponseI> => {
+  return certaikApiController.getAuditStatus(id);
+};
+
 const getUserInfo = async (): Promise<UserInfoResponseI> => {
   return certaikApiController.getUserInfo();
 };
@@ -94,6 +99,7 @@ export {
   getAgentSecurityScore,
   getAudit,
   getAudits,
+  getAuditStatus,
   getCurrentGas,
   getStats,
   getUserInfo,
