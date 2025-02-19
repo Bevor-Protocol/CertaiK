@@ -3,6 +3,7 @@ import {
   AuditResponseI,
   AuditTableReponseI,
   ContractResponseI,
+  CreditSyncResponseI,
   StatsResponseI,
   UserInfoResponseI,
 } from "@/utils/types";
@@ -26,6 +27,14 @@ class CertaikApiController {
       throw new Error("user is not signed in with ethereum");
     }
     return this.certaikApiService.runEval(contractId, promptType, user.user_id);
+  }
+
+  async syncCredits(): Promise<CreditSyncResponseI> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.syncCredits(user.user_id);
   }
 
   async getAgentSecurityScore(twitterHandle: string): Promise<any> {

@@ -3,6 +3,7 @@ import {
   AuditResponseI,
   AuditTableReponseI,
   ContractResponseI,
+  CreditSyncResponseI,
   StatsResponseI,
   UserInfoResponseI,
 } from "@/utils/types";
@@ -42,6 +43,20 @@ class CertaikApiService {
         }
         return response.data;
       });
+  }
+
+  async syncCredits(userId: string): Promise<CreditSyncResponseI> {
+    const headers = {
+      headers: {
+        "X-User-Identifier": userId,
+      },
+    };
+    return api.post("/auth/sync/credits", {}, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
   }
 
   async getAgentSecurityScore(twitterHandle: string): Promise<any> {
