@@ -1,6 +1,7 @@
 import AuthService from "@/actions/auth/auth.service";
 import {
   AuditResponseI,
+  AuditStatusResponseI,
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
@@ -112,6 +113,14 @@ class CertaikApiController {
     //   throw new Error("user is not signed in with ethereum");
     // }
     return this.certaikApiService.getAudit(id);
+  }
+
+  async getAuditStatus(id: string): Promise<AuditStatusResponseI> {
+    // const address = await this.authService.currentUser();
+    // if (!address) {
+    //   throw new Error("user is not signed in with ethereum");
+    // }
+    return this.certaikApiService.getAuditStatus(id);
   }
 
   async getUserInfo(): Promise<UserInfoResponseI> {

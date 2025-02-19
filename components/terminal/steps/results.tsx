@@ -1,7 +1,6 @@
 import { certaikApiAction } from "@/actions";
 import { Loader } from "@/components/ui/loader";
-import { useWs } from "@/hooks/useContexts";
-import { MessageType } from "@/utils/types";
+import { AuditStatusResponseI, MessageType } from "@/utils/types";
 import { Check, X } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -16,8 +15,6 @@ type TerminalProps = {
   auditId: string;
   setAuditId: Dispatch<SetStateAction<string>>;
 };
-
-type WsStep = { name: string; status: string };
 
 const stepToTextMapper = {
   access_control: "access control findings",
@@ -43,85 +40,82 @@ const ResultsStep = ({
 }: TerminalProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [steps, setSteps] = useState<WsStep[]>([]);
-  const { setOnMessageHandler, sendMessage, isConnected, reconnect } = useWs();
+  const [isReady, setIsReady] = useState(false);
+  const [steps, setSteps] = useState<AuditStatusResponseI["steps"]>([]);
+
+  useEffect(() => {
+    if (!auditId || !isReady) return;
+    certaikApiAction
+      .getAudit(auditId)
+      .then((result) => {
+        if (result.audit.status === "success") {
+          setAuditContent(result.audit.result);
+        } else {
+          setIsError(true);
+        }
+      })
+      .catch(() => setIsError(true))
+      .finally(() => setIsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [steps, auditId, isReady]);
 
   useEffect(() => {
     if (!auditId) return;
-    const reportDone = steps.find((step) => step.name === "report" && step.status === "done");
-    if (reportDone) {
-      console.log("report complete");
-      certaikApiAction
-        .getAudit(auditId)
-        .then((result) => {
-          if (result.audit.status === "success") {
-            setAuditContent(result.audit.result);
-          } else {
-            setIsError(true);
-          }
-        })
-        .catch(() => setIsError(true))
-        .finally(() => setIsLoading(false));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [steps, auditId]);
 
-  useEffect(() => {
-    setOnMessageHandler((data: any): void => {
-      setSteps((prev) => {
-        const existingStepIndex = prev.findIndex((step) => step.name === data.name);
-        if (existingStepIndex !== -1) {
-          // Update the status of the existing step
-          const updatedSteps = [...prev];
-          updatedSteps[existingStepIndex] = { name: data.name, status: data.status };
-          return updatedSteps;
-        } else {
-          // Append the new step
-          return [...prev, { name: data.name, status: data.status }];
+    const interval = setInterval(async () => {
+      try {
+        const result = await certaikApiAction.getAuditStatus(auditId);
+        setSteps(result.steps);
+
+        if (result.status === "success") {
+          clearInterval(interval);
+          setIsReady(true);
         }
-      });
-    });
-  }, [setOnMessageHandler, setAuditContent]);
+        if (result.status === "failed") {
+          clearInterval(interval);
+          setIsError(true);
+        }
+      } catch (error) {
+        console.error(error);
+        clearInterval(interval);
+        setIsError(true);
+      }
+      // poll every second.
+    }, 1000);
+
+    return (): void => clearInterval(interval);
+  }, [auditId]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (state.length || isLoading) return;
-    if (!isConnected) {
-      console.log("not connected, reconnecting");
-      reconnect();
-      return;
-    }
     setIsLoading(true);
     certaikApiAction
       .runEval(contractId, promptType)
       .then((result) => {
-        console.log(result);
         const { id } = result;
-        console.log("subscribing to job", id);
         // websocket subscribes to job result
         setAuditId(id);
-        sendMessage(`subscribe:${id}`);
       })
       .catch((error) => {
         console.log(error);
         setIsError(true);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, isConnected]);
+  }, [state]);
 
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
-        {!isConnected && <p className="">we&apos;re having issues connecting to the server</p>}
         {(isLoading || !auditContent || isError) && (
           <>
             {steps.map((step) => (
-              <div key={step.name} className="flex gap-4 items-center">
-                <p>{stepToTextMapper[step.name as keyof typeof stepToTextMapper]}</p>
-                {step.status === "start" && <Loader className="h-4 w-4" />}
-                {step.status === "done" && <Check />}
-                {step.status === "error" && <X />}
+              <div key={step.step} className="flex gap-4 items-center">
+                <p>{stepToTextMapper[step.step as keyof typeof stepToTextMapper]}</p>
+                {step.status === "processing" && <Loader className="h-4 w-4" />}
+                {step.status === "success" && <Check />}
+                {step.status === "failed" && <X />}
               </div>
             ))}
           </>

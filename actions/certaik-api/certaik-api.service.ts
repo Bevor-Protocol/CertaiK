@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import {
   AuditResponseI,
+  AuditStatusResponseI,
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
@@ -184,6 +185,18 @@ class CertaikApiService {
       }
       return response.data.result;
     });
+  }
+
+  async getAuditStatus(id: string): Promise<AuditStatusResponseI> {
+    return api
+      .get(`/ai/eval/${id}/steps`)
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data;
+      })
+      .catch((e) => console.log(e));
   }
 
   async getUserInfo(userId: string): Promise<UserInfoResponseI> {
