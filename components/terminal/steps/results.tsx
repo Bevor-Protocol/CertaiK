@@ -26,6 +26,9 @@ const stepToTextMapper = {
   economic: "economic-related findings",
   logic: "logic flaw findings",
   math: "mathematical findings",
+  gas_optimization_1: "gas optimization 1st pass",
+  gas_optimization_2: "gas optimization 2nd pass",
+  gas_optimization_3: "gas optimization 3rd pass",
   report: "generating report",
 };
 
@@ -83,7 +86,6 @@ const ResultsStep = ({
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log(state, isLoading, isConnected);
     if (state.length || isLoading) return;
     if (!isConnected) {
       console.log("not connected, reconnecting");
