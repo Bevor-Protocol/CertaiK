@@ -26,6 +26,9 @@ const stepToTextMapper = {
   economic: "economic-related findings",
   logic: "logic flaw findings",
   math: "mathematical findings",
+  gas_optimization_1: "gas optimization 1st pass",
+  gas_optimization_2: "gas optimization 2nd pass",
+  gas_optimization_3: "gas optimization 3rd pass",
   report: "generating report",
 };
 
@@ -47,6 +50,7 @@ const ResultsStep = ({
     if (!auditId) return;
     const reportDone = steps.find((step) => step.name === "report" && step.status === "done");
     if (reportDone) {
+      console.log("report complete");
       certaikApiAction
         .getAudit(auditId)
         .then((result) => {
@@ -84,6 +88,7 @@ const ResultsStep = ({
   useEffect(() => {
     if (state.length || isLoading) return;
     if (!isConnected) {
+      console.log("not connected, reconnecting");
       reconnect();
       return;
     }
@@ -91,7 +96,9 @@ const ResultsStep = ({
     certaikApiAction
       .runEval(contractId, promptType)
       .then((result) => {
+        console.log(result);
         const { id } = result;
+        console.log("subscribing to job", id);
         // websocket subscribes to job result
         setAuditId(id);
         sendMessage(`subscribe:${id}`);
