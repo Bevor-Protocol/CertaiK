@@ -4,10 +4,14 @@ export const initialState = {
   [TerminalStep.INITIAL]: [
     {
       type: Message.SYSTEM,
+      //       content:
+      //         "How would like you get started? Choose an option (Type just \
+      // the number such as '1'):\n\n1. Input contract address\n2. \
+      // Upload file\n3. Paste code\n4. Input agent powered by Cookie DAO 🍪",
       content:
         "How would like you get started? Choose an option (Type just \
 the number such as '1'):\n\n1. Input contract address\n2. \
-Upload file\n3. Paste code\n4. Input agent powered by Cookie DAO 🍪",
+Upload file\n3. Paste code",
     },
   ],
   [TerminalStep.INPUT_ADDRESS]: [

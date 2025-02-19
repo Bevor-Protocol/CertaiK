@@ -28,7 +28,7 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
   const fetchSigningSecretAndConnect = async (): Promise<void> => {
     try {
       const url = await authAction.getSecureSigning();
-      const ws = new WebSocket(url);
+      const ws = new WebSocket(url.replace("http", "ws"));
 
       ws.onopen = (): void => {
         console.log("WebSocket Connected");
@@ -47,6 +47,9 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
       ws.onerror = (error): void => {
         console.log("Error connecting to WS", error);
         setIsConnected(false);
+        setTimeout(() => {
+          setNAttempts((prev) => prev + 1);
+        }, 200);
       };
 
       ws.onmessage = (event): void => {
@@ -73,7 +76,7 @@ const WebSocketProvider = ({ children }: { children: React.ReactNode }): JSX.Ele
   };
 
   useEffect(() => {
-    if (!isConnected && nAttempts < 3) {
+    if (!isConnected && nAttempts <= 3) {
       fetchSigningSecretAndConnect();
     }
 

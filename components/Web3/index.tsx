@@ -6,7 +6,7 @@ import * as Dropdown from "@/components/ui/dropdown";
 import * as Tooltip from "@/components/ui/tooltip";
 import { useModal } from "@/hooks/useContexts";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
-import { walletConfig } from "@/lib/config";
+import walletConfig from "@/lib/config/wallet";
 import { cn } from "@/lib/utils";
 import { getNetworkImage, sortWallets, trimAddress } from "@/utils/helpers";
 import { Check, ChevronDown, Copy, LogOut, X } from "lucide-react";

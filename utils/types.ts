@@ -78,8 +78,7 @@ export interface AuditResponseI {
   };
   audit: {
     status: "waiting" | "processing" | "success" | "failed";
-    model: string;
-    prompt_version: string;
+    version: string;
     audit_type: string;
     result: string;
   };
@@ -107,10 +106,14 @@ export interface UserInfoResponseI {
   auth: {
     exists: boolean;
     is_active: boolean;
+    can_create: boolean;
   };
   app: {
     exists: boolean;
     name?: string;
+    can_create: boolean;
+    exists_auth: boolean;
+    can_create_auth: boolean;
   };
   audits: AuditObservationI[];
   n_contracts: number;
@@ -125,4 +128,10 @@ export interface ContractResponseI {
     network: string;
     is_available: boolean;
   }[];
+}
+
+export interface CreditSyncResponseI {
+  total_credits: number;
+  credits_added: number;
+  credits_removed: number;
 }
