@@ -4,6 +4,7 @@ import {
   AuditResponseI,
   AuditTableReponseI,
   ContractResponseI,
+  CreditSyncResponseI,
   StatsResponseI,
   UserInfoResponseI,
 } from "@/utils/types";
@@ -17,6 +18,10 @@ const runEval = async (
   job_id: string;
 }> => {
   return certaikApiController.eval(contractId, promptType);
+};
+
+const syncCredits = async (): Promise<CreditSyncResponseI> => {
+  return certaikApiController.syncCredits();
 };
 
 const getAgentSecurityScore = async (twitterHandle: string): Promise<any> => {
@@ -95,6 +100,7 @@ export {
   retryFailedEval,
   runEval,
   submitFeedback,
+  syncCredits,
   updateApp,
   uploadSourceCode,
 };

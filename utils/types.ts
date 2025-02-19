@@ -129,3 +129,9 @@ export interface ContractResponseI {
     is_available: boolean;
   }[];
 }
+
+export interface CreditSyncResponseI {
+  total_credits: number;
+  credits_added: number;
+  credits_removed: number;
+}
