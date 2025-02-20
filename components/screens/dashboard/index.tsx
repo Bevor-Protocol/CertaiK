@@ -95,7 +95,7 @@ export const AppManagement: React.FC<{ userApp: UserInfoResponseI["app"] }> = ({
     mutationFn: certaikApiAction.generateApp,
   });
   const { mutateAsync: updateApp } = useMutation({
-    mutationFn: certaikApiAction.generateApp,
+    mutationFn: certaikApiAction.updateApp,
   });
 
   const handleUpsert = async (): Promise<void> => {
