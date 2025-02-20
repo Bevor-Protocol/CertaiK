@@ -183,7 +183,7 @@ class CertaikApiService {
       if (!response.data) {
         throw new Error(response.statusText);
       }
-      return response.data.result;
+      return response.data;
     });
   }
 
