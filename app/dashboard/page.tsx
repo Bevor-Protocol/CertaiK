@@ -1,5 +1,6 @@
 import { certaikApiAction } from "@/actions";
 import Content from "@/components/content";
+import ApiContent from "@/components/screens/api-keys";
 import { ApiKeyManagement, AppManagement } from "@/components/screens/dashboard";
 import { LoadWaifu } from "@/components/ui/loader";
 import MetricCard from "@/components/ui/metric-card";
@@ -17,6 +18,7 @@ const Dashboard = async (): Promise<JSX.Element> => {
       className={cn(
         "grid gap-4 size-full md:grid-cols-4 md:grid-rows-[min-content,min-content,1fr]",
         "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
+        "relative",
       )}
     >
       <MetricCard title="Total Audits" Icon={BarChart3} stat={user.n_audits}>
@@ -28,6 +30,9 @@ const Dashboard = async (): Promise<JSX.Element> => {
       <CreditsCard />
       <ApiKeyManagement userAuth={user.auth} />
       <AppManagement userApp={user.app} />
+      <div className="col-span-full h-full">
+        <ApiContent />
+      </div>
     </div>
   );
 };
