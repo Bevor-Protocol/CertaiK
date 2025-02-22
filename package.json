@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.15",
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
+    "d3": "^7.9.0",
     "ethers": "^6.13.4",
     "iron-session": "^8.0.4",
     "lucide-react": "^0.462.0",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^15.1.4",
+    "@types/d3": "^7.4.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

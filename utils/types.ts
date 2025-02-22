@@ -43,6 +43,8 @@ export interface StatsResponseI {
   n_users: number;
   n_apps: number;
   findings: { [key: string]: { [key: string]: string[] } };
+  users_timeseries: { date: string; count: number }[];
+  audits_timeseries: { date: string; count: number }[];
 }
 
 interface AuditObservationI {
@@ -115,7 +117,7 @@ export interface UserInfoResponseI {
     exists_auth: boolean;
     can_create_auth: boolean;
   };
-  audits: AuditObservationI[];
+  n_audits: number;
   n_contracts: number;
 }
 
