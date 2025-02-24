@@ -69,6 +69,11 @@ export interface AuditTableReponseI {
 }
 
 export interface AuditResponseI {
+  status: "waiting" | "processing" | "success" | "failed";
+  version: string;
+  audit_type: string;
+  processing_time_seconds: number;
+  result: string;
   contract: {
     address: string;
     network: string;
@@ -77,12 +82,6 @@ export interface AuditResponseI {
   user: {
     id: string;
     address: string;
-  };
-  audit: {
-    status: "waiting" | "processing" | "success" | "failed";
-    version: string;
-    audit_type: string;
-    result: string;
   };
   findings: {
     id: string;
@@ -98,13 +97,11 @@ export interface AuditResponseI {
 }
 
 export interface UserInfoResponseI {
-  user: {
-    id: string;
-    address: string;
-    created_at: string;
-    total_credits: number;
-    remaining_credits: number;
-  };
+  id: string;
+  address: string;
+  created_at: string;
+  total_credits: number;
+  remaining_credits: number;
   auth: {
     exists: boolean;
     is_active: boolean;

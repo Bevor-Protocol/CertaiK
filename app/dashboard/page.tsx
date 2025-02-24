@@ -22,12 +22,12 @@ const Dashboard = async (): Promise<JSX.Element> => {
       )}
     >
       <MetricCard title="Total Audits" Icon={BarChart3} stat={user.n_audits}>
-        <Link href={`/analytics/history?user_address=${user.user.address}`} className="text-sm">
+        <Link href={`/analytics/history?user_address=${user.address}`} className="text-sm">
           View <ArrowUpRight size={16} className="inline-block align-baseline" color="gray" />
         </Link>
       </MetricCard>
       <MetricCard title="Unique Contracts" Icon={BarChart3} stat={user.n_contracts} />
-      <CreditsCard />
+      <CreditsCard remainingCredits={user.remaining_credits} />
       <ApiKeyManagement userAuth={user.auth} />
       <AppManagement userApp={user.app} />
       <div className="col-span-full h-full">

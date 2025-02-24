@@ -48,8 +48,8 @@ const ResultsStep = ({
     certaikApiAction
       .getAudit(auditId)
       .then((result) => {
-        if (result.audit.status === "success") {
-          setAuditContent(result.audit.result);
+        if (result.status === "success") {
+          setAuditContent(result.result);
         } else {
           setIsError(true);
         }

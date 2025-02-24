@@ -102,9 +102,9 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
   const [auditTypesSelected, setAuditTypesSelected] = useState<DropdownOption[]>(
     getInitialState(query || {}, "audit_type"),
   );
-  const [projectTypeSelected, setProjectTypeSelected] = useState<DropdownOption[]>(
-    getInitialState(query || {}, "project_type"),
-  );
+  // const [projectTypeSelected, setProjectTypeSelected] = useState<DropdownOption[]>(
+  //   getInitialState(query || {}, "project_type"),
+  // );
   const [networkTypesSelected, setNetworkTypesSelected] = useState<DropdownOption[]>(
     getInitialState(query || {}, "network"),
   );
@@ -156,14 +156,14 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
           setSelectedOptions={setAuditTypesSelected}
         />
       </div>
-      <div className="w-full">
+      {/* <div className="w-full">
         <Select
           title="project type"
           options={projectTypeOptions}
           selectedOptions={projectTypeSelected}
           setSelectedOptions={setProjectTypeSelected}
         />
-      </div>
+      </div> */}
       <div className="w-full">
         <Select
           title="network"
