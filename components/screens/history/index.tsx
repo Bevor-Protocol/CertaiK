@@ -24,25 +24,6 @@ const auditTypeOptions: DropdownOption[] = [
   },
 ];
 
-const projectTypeOptions: DropdownOption[] = [
-  {
-    name: "AI Agent",
-    value: "agent",
-  },
-  {
-    name: "Protocol",
-    value: "protocol",
-  },
-  {
-    name: "NFT",
-    value: "nft",
-  },
-  {
-    name: "Token",
-    value: "token",
-  },
-];
-
 const networkOptions: DropdownOption[] = [
   {
     name: "eth mainnet",
