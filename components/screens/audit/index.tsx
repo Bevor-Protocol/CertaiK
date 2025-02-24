@@ -43,7 +43,7 @@ export const Content = ({
   };
 
   const handleDownload = (): void => {
-    const blob = new Blob([audit.audit.result], { type: "text/markdown" });
+    const blob = new Blob([audit.result], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -132,8 +132,8 @@ export const Content = ({
           <div className="text-sm md:text-base">
             <h3 className="text-gray-400 mb-2 hidden md:block">Audit Details</h3>
             <div className="space-y-1 *:whitespace-nowrap">
-              <p>Audit Type: {audit.audit.audit_type}</p>
-              <p>Version: {audit.audit.version}</p>
+              <p>Audit Type: {audit.audit_type}</p>
+              <p>Version: {audit.version}</p>
             </div>
           </div>
           <div className="w-full *:w-1/2 flex flex-row md:flex-col gap-2 *:md:w-full">
@@ -170,7 +170,7 @@ export const Content = ({
       </div>
       {view === "report" && (
         <ReactMarkdown className="overflow-scroll no-scrollbar markdown flex-grow">
-          {audit.audit.result}
+          {audit.result}
         </ReactMarkdown>
       )}
       {view === "breakdown" && (

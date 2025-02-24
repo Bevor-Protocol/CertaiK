@@ -3,28 +3,39 @@
 
 import BalanceBox from "@/components/api/balance-box";
 import BuyBar from "@/components/api/buy-bar";
-import { useCertaiBalance } from "@/hooks/useBalances";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const ApiContent = (): JSX.Element => {
-  const { promotion } = useCertaiBalance();
+  const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
-    <div className="flex flex-col w-full h-full flex-1 no-scrollbar">
-      <div className="flex flex-col items-start w-full font-mono text-sm flex-1">
-        <div className="text-blue-400">Welcome to the BevorAI API!</div>
-        <div className="text-blue-400 my-2">
-          The presale is live and you can receive{" "}
-          <span className="font-bold text-green-400">{promotion.data}x</span> in API credits from
-          your purchase! Buyers will be heavily rewarded for participating in the pre-sale but
-          credits are fully refundable before the API launches.
-        </div>
-        <div className="text-yellow-400 my-2">
-          * API credits enable integration into your app and access to premium services and features
-          *
-        </div>
-        <BalanceBox />
-      </div>
-      <BuyBar />
+    <div
+      className={cn(
+        "flex flex-col justify-end w-full font-mono text-sm h-full",
+        isMobile && isOpen && "absolute bg-black inset-0",
+      )}
+    >
+      {(!isMobile || isOpen) && (
+        <>
+          <div className="flex-1">
+            <BalanceBox />
+            <div className="text-yellow-400 my-2">
+              * API credits enable integration into your app and access to premium services and
+              features *
+            </div>
+          </div>
+          <BuyBar />
+        </>
+      )}
+      {isMobile && (
+        <Button variant="bright" className="w-full mt-4" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? "Back to Dashboard" : "Get Credits"}
+        </Button>
+      )}
     </div>
   );
 };

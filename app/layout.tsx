@@ -6,6 +6,7 @@ import ModalProvider from "@/providers/modal";
 import SiweProvider from "@/providers/siwe";
 import WalletProvider from "@/providers/wallet";
 import { SessionData } from "@/utils/types";
+import { Analytics } from "@vercel/analytics/react";
 import { getIronSession } from "iron-session";
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
@@ -59,6 +60,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
               <div className="background-container">
                 <Header address={address} />
                 {children}
+                <Analytics />
                 <Footer />
               </div>
             </ModalProvider>

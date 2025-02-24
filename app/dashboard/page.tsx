@@ -1,12 +1,11 @@
 import { certaikApiAction } from "@/actions";
 import Content from "@/components/content";
+import ApiContent from "@/components/screens/api-keys";
 import { ApiKeyManagement, AppManagement } from "@/components/screens/dashboard";
-import { Button } from "@/components/ui/button";
 import { LoadWaifu } from "@/components/ui/loader";
 import MetricCard from "@/components/ui/metric-card";
-import { cn, prettyDate } from "@/lib/utils";
-import { trimAddress } from "@/utils/helpers";
-import { BarChart3 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ArrowUpRight, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import CreditsCard from "../components/CreditsCard";
@@ -19,66 +18,20 @@ const Dashboard = async (): Promise<JSX.Element> => {
       className={cn(
         "grid gap-4 size-full md:grid-cols-4 md:grid-rows-[min-content,min-content,1fr]",
         "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
+        "relative",
       )}
     >
-      <MetricCard title="Total Audits" Icon={BarChart3} stat={user.audits.length} />
+      <MetricCard title="Total Audits" Icon={BarChart3} stat={user.n_audits}>
+        <Link href={`/analytics/history?user_address=${user.address}`} className="text-sm">
+          View <ArrowUpRight size={16} className="inline-block align-baseline" color="gray" />
+        </Link>
+      </MetricCard>
       <MetricCard title="Unique Contracts" Icon={BarChart3} stat={user.n_contracts} />
-      <CreditsCard />
+      <CreditsCard remainingCredits={user.remaining_credits} />
       <ApiKeyManagement userAuth={user.auth} />
       <AppManagement userApp={user.app} />
-      <div className="flex flex-col items-center col-span-full">
-        {user.audits && !user.audits.length ? (
-          <>
-            <h3 className="my-4">no recent audits</h3>
-            <Link href="/" className="fit-content">
-              <Button variant="bright">Get Started</Button>
-            </Link>
-          </>
-        ) : (
-          <>
-            <h3 className="my-4 hidden md:block">my recent audits</h3>
-            <div
-              className={cn(
-                "hidden md:flex gap-4 w-full justify-start max-w-full overflow-x-scroll pb-2",
-              )}
-            >
-              {user.audits.slice(0, 5).map((audit) => (
-                <Link
-                  key={audit.id}
-                  href={`/analytics/audit/${audit.id}`}
-                  className={cn(
-                    "border border-gray-800 rounded-md p-4",
-                    "hover:bg-gray-900 transition-colors min-w-52",
-                  )}
-                >
-                  <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center gap-10 whitespace-nowrap">
-                      <p className="font-medium">{audit.audit_type}</p>
-                      <p className="text-sm text-gray-400">{prettyDate(audit.created_at)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Method: {audit.contract.method}</p>
-                      <p className="text-sm text-gray-400">
-                        Network: {audit.contract.network || "N/A"}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Contract:{" "}
-                        {audit.contract.address ? trimAddress(audit.contract.address) : "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="mt-auto md:mt-8 w-full md:w-fit">
-              <Link href={`/analytics/history?user_address=${user.user.address}`} className="w-fit">
-                <Button variant="bright" className="w-full md:w-fit">
-                  View My Audits
-                </Button>
-              </Link>
-            </div>
-          </>
-        )}
+      <div className="col-span-full h-full">
+        <ApiContent />
       </div>
     </div>
   );
