@@ -51,14 +51,15 @@ interface AuditObservationI {
   n: number;
   id: string;
   created_at: string;
-  app_id?: string;
-  user_id?: string;
   audit_type: string;
   results_status: string;
   contract: {
     method: string;
     address?: string;
     network?: string;
+  };
+  user: {
+    address: string;
   };
 }
 
