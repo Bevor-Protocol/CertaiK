@@ -90,7 +90,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
             ...prev,
             {
               type: Message.ASSISTANT,
-              content: candidate.source_code,
+              content: candidate.code,
             },
             {
               type: Message.SYSTEM,
@@ -191,7 +191,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
         },
         {
           type: Message.ASSISTANT,
-          content: candidates[inputNum - 1].source_code,
+          content: candidates[inputNum - 1].code,
         },
         {
           type: Message.SYSTEM,

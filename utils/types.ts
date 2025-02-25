@@ -38,7 +38,6 @@ export interface DropdownOption {
 
 export interface StatsResponseI {
   n_audits: number;
-  n_auths: number;
   n_contracts: number;
   n_users: number;
   n_apps: number;
@@ -52,13 +51,16 @@ interface AuditObservationI {
   id: string;
   created_at: string;
   audit_type: string;
-  results_status: string;
+  status: string;
   contract: {
+    id: string;
     method: string;
     address?: string;
     network?: string;
+    is_available: boolean;
   };
   user: {
+    id: string;
     address: string;
   };
 }
@@ -70,15 +72,20 @@ export interface AuditTableReponseI {
 }
 
 export interface AuditResponseI {
+  id: string;
+  created_at: string;
   status: "waiting" | "processing" | "success" | "failed";
   version: string;
   audit_type: string;
   processing_time_seconds: number;
   result: string;
   contract: {
+    id: string;
+    method: string;
     address: string;
     network: string;
     code: string;
+    is_available: boolean;
   };
   user: {
     id: string;
@@ -124,7 +131,9 @@ export interface ContractResponseI {
   exists: boolean;
   candidates: {
     id: string;
-    source_code: string;
+    method: string;
+    address: string;
+    code: string;
     network: string;
     is_available: boolean;
   }[];
