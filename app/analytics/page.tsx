@@ -12,8 +12,6 @@ import { Suspense } from "react";
 const Stats = async (): Promise<JSX.Element> => {
   const data = await certaikApiAction.getStats();
 
-  console.log(data);
-
   return (
     <>
       <div

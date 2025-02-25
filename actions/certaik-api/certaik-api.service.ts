@@ -151,7 +151,7 @@ class CertaikApiService {
   }
 
   async getStats(): Promise<StatsResponseI> {
-    return api.get("/app/info").then((response) => {
+    return api.get("/app/stats").then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }

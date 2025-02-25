@@ -233,7 +233,7 @@ export const Table = ({ results }: { results: AuditTableReponseI["results"] }): 
               )}
             >
               <div className="col-span-1">{audit.n + 1}</div>
-              <div className="col-span-2">{trimAddress(audit.user_id)}</div>
+              <div className="col-span-2">{trimAddress(audit.user.address)}</div>
               <div className="col-span-1">{audit.audit_type}</div>
               <div className="col-span-1">{audit.contract.method}</div>
               <div className="col-span-2">
