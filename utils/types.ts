@@ -129,14 +129,14 @@ export interface UserInfoResponseI {
 export interface ContractResponseI {
   exact_match: boolean;
   exists: boolean;
-  candidates: {
+  contract?: {
     id: string;
     method: string;
     address: string;
     code: string;
     network: string;
     is_available: boolean;
-  }[];
+  };
 }
 
 export interface CreditSyncResponseI {

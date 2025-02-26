@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { getNetworkImage } from "@/utils/helpers";
 import { QueryKey, useQueryClient } from "@tanstack/react-query";
 import { parseUnits } from "ethers/utils";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Abi, erc20Abi } from "viem";
 import { useAccount } from "wagmi";
@@ -17,8 +18,9 @@ const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
 const contractAddress = process.env.NEXT_PUBLIC_CREDIT_CONTRACT_ADDRESS as `0x${string}`;
 
 const BuyBar = (): JSX.Element => {
+  const router = useRouter();
   const isMobile = useIsMobile();
-  // const [txn, setTxn] = useState("");
+
   const [amount, setAmount] = useState(0);
   const [method, setMethod] = useState<"purchase" | "refund" | "approve" | null>(null);
   const [signState, setSignState] = useState<"sign" | "loading" | "error" | "success" | null>();
@@ -104,9 +106,10 @@ const BuyBar = (): JSX.Element => {
       onError,
       onMutate,
       onTxn,
-      onSuccess: () => {
+      onSuccess: async () => {
         onSuccess({ keys: [credit.queryKey, token.queryKey, deposit.queryKey] });
-        certaikApiAction.syncCredits(); // don't make this blocking.
+        await certaikApiAction.syncCredits();
+        router.refresh();
       },
     });
   };
