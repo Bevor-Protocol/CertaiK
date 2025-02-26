@@ -42,9 +42,8 @@ const UploadStep = ({
         if (!result) {
           throw new Error("bad response");
         }
-        const { candidates } = result;
-        const candidate = candidates[0];
-        setContractId(candidate.id);
+        const { contract } = result;
+        setContractId(contract!.id);
         setUploadAvailable(false);
         setHistory((prev) => [
           ...prev,
