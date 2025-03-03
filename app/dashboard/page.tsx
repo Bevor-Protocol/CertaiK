@@ -1,14 +1,13 @@
 import { certaikApiAction } from "@/actions";
 import Content from "@/components/content";
 import ApiContent from "@/components/screens/api-keys";
-import { ApiKeyManagement, AppManagement } from "@/components/screens/dashboard";
+import CreditsCard, { ApiKeyManagement, AppManagement } from "@/components/screens/dashboard";
 import { LoadWaifu } from "@/components/ui/loader";
 import MetricCard from "@/components/ui/metric-card";
 import { cn } from "@/lib/utils";
-import { ArrowUpRight, BarChart3 } from "lucide-react";
+import { ArrowUpRight, BarChart3, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import CreditsCard from "../components/CreditsCard";
 
 const Dashboard = async (): Promise<JSX.Element> => {
   const user = await certaikApiAction.getUserInfo();
@@ -27,7 +26,8 @@ const Dashboard = async (): Promise<JSX.Element> => {
         </Link>
       </MetricCard>
       <MetricCard title="Unique Contracts" Icon={BarChart3} stat={user.n_contracts} />
-      <CreditsCard remainingCredits={user.remaining_credits} />
+      <CreditsCard />
+      <MetricCard title="Remaining Credits" Icon={DollarSign} stat={user.remaining_credits} />
       <ApiKeyManagement userAuth={user.auth} />
       <AppManagement userApp={user.app} />
       <div className="col-span-full h-full">

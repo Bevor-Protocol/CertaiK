@@ -3,6 +3,7 @@
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import MetricCard from "@/components/ui/metric-card";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { cn } from "@/lib/utils";
 import { UserInfoResponseI } from "@/utils/types";
@@ -10,6 +11,17 @@ import { useMutation } from "@tanstack/react-query";
 import { AppWindowIcon, Check, Copy, Key } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+
+import { useCertaiBalance } from "@/hooks/useBalances";
+import { DollarSign } from "lucide-react";
+
+const CreditsCard = (): JSX.Element => {
+  const { credit } = useCertaiBalance();
+
+  return <MetricCard title="Total Credits" Icon={DollarSign} stat={credit.data} />;
+};
+
+export default CreditsCard;
 
 export const ApiKeyManagement: React.FC<{ userAuth: UserInfoResponseI["auth"] }> = ({
   userAuth,
