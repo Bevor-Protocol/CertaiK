@@ -173,7 +173,7 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
 
   if (isError) {
     return (
-      <div className="flex flex-grow justify-center items-center">
+      <div className="flex grow justify-center items-center">
         <p className="text-red-600">something went wrong...</p>
       </div>
     );
@@ -181,19 +181,19 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
 
   if (data?.results && !data.results.length) {
     return (
-      <div className="flex flex-grow justify-center items-center">
+      <div className="flex grow justify-center items-center">
         <p className="">no audits matched this criteria...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col flex-grow justify-between overflow-x-hidden">
-      <div className="flex flex-col flex-grow overflow-x-scroll w-full">
+    <div className="flex flex-col grow justify-between overflow-x-hidden">
+      <div className="flex flex-col grow overflow-x-scroll w-full">
         <div
           className={cn(
             "grid grid-cols-9 border-gray-800 min-w-[600px]",
-            " *:text-center *:pb-2 *:text-sm *:md:text-base",
+            " *:text-center *:pb-2 *:text-sm md:*:text-base",
           )}
         >
           <div className="col-span-1">#</div>
@@ -215,14 +215,14 @@ export const Content = ({ query }: { query?: { [key: string]: string } }): JSX.E
 
 export const Table = ({ results }: { results: AuditTableReponseI["results"] }): JSX.Element => {
   return (
-    <div className="flex flex-col flex-grow justify-between min-w-[600px]">
-      <div className="flex-grow">
+    <div className="flex flex-col grow justify-between min-w-[600px]">
+      <div className="grow">
         {results.map((audit) => (
           <Link
             key={audit.id}
             href={`/analytics/audit/${audit.id}`}
             className={cn(
-              "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-none",
+              "border-t border-gray-800 hover:bg-gray-900 cursor-pointer block outline-hidden",
               "appearance-none focus:bg-gray-900 focus-within:bg-gray-900",
             )}
           >

@@ -68,7 +68,7 @@ export const ApiKeyManagement: React.FC<{ userAuth: UserInfoResponseI["auth"] }>
           >
             <code
               className={cn(
-                "text-sm font-mono text-gray-300 flex-grow",
+                "text-sm font-mono text-gray-300 grow",
                 "overflow-x-scroll whitespace-nowrap",
               )}
             >
@@ -194,7 +194,7 @@ export const AppManagement: React.FC<{ userApp: UserInfoResponseI["app"] }> = ({
             >
               <code
                 className={cn(
-                  "text-sm font-mono text-gray-300 flex-grow",
+                  "text-sm font-mono text-gray-300 grow",
                   "overflow-x-scroll whitespace-nowrap",
                 )}
               >

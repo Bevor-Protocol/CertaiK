@@ -36,7 +36,7 @@ const TerminalInputBar = ({
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled || overrideLoading}
         className={cn(
-          "flex-1 bg-transparent border-none outline-none",
+          "flex-1 bg-transparent border-none outline-hidden",
           "text-white font-mono",
           "placeholder:text-gray-500",
           "caret-green-400",

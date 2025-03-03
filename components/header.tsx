@@ -43,16 +43,16 @@ export const Web3Network = (): JSX.Element => {
                 size="sm"
                 image={networkImg}
                 className={cn(
-                  !supported && "!bg-auto",
+                  !supported && "bg-auto!",
                   // for localhost for now.
-                  supported && networkImg.includes("unknown") && "!bg-auto",
+                  supported && networkImg.includes("unknown") && "bg-auto!",
                 )}
               />
               <ChevronDown />
             </div>
           </Tooltip.Trigger>
           <Tooltip.Content side="left" align="start">
-            <div className="bg-black shadow rounded-lg cursor-default min-w-40">
+            <div className="bg-black shadow-sm rounded-lg cursor-default min-w-40">
               <div className="px-2 py-1">This is an unsupported network</div>
             </div>
           </Tooltip.Content>
@@ -97,7 +97,7 @@ const Header: React.FC<Props> = ({ address }) => {
   };
 
   return (
-    <header className="w-full text-white z-[100] relative">
+    <header className="w-full text-white z-100 relative">
       <div className="w-full max-w-[1200px] py-4 flex justify-between items-center m-auto">
         <Link
           className="cursor-pointer block relative"
@@ -105,7 +105,7 @@ const Header: React.FC<Props> = ({ address }) => {
           target="_blank"
           referrerPolicy="no-referrer"
         >
-          <div className="block w-[175px] md:w-[200px] lg:w-[220px] aspect-[1430/498] relative">
+          <div className="block w-[175px] md:w-[200px] lg:w-[220px] aspect-1430/498 relative">
             <Image src="/logo.png" alt="BevorAI logo" fill />
           </div>
         </Link>

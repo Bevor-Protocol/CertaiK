@@ -40,7 +40,7 @@ const AdvancedOptionsModal: React.FC<AdvancedOptionsModalProps> = ({
         </div>
         <button
           className={cn(
-            "bg-gradient-to-r from-cyan-500 to-purple-500",
+            "bg-linear-to-r from-cyan-500 to-purple-500",
             "text-white py-2 px-4 rounded mr-2 mt-10",
           )}
           onClick={() => navigator.clipboard.writeText(promptText)}
@@ -49,7 +49,7 @@ const AdvancedOptionsModal: React.FC<AdvancedOptionsModalProps> = ({
         </button>
         <button
           className={cn(
-            "bg-gradient-to-r from-cyan-500 to-purple-500",
+            "bg-linear-to-r from-cyan-500 to-purple-500",
             "text-white py-2 px-4 rounded mt-10",
           )}
           onClick={handleDownloadPrompt}
@@ -71,7 +71,7 @@ const AdvancedOptionsModal: React.FC<AdvancedOptionsModalProps> = ({
         </div>
         <div className="flex justify-center items-center">
           <button
-            className="text-white py-2 px-4 rounded bg-gradient-to-r from-green-500 to-green-700"
+            className="text-white py-2 px-4 rounded bg-linear-to-r from-green-500 to-green-700"
             onClick={onClose}
           >
             Save and Close

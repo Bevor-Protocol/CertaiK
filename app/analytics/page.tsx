@@ -17,8 +17,8 @@ const Stats = async (): Promise<JSX.Element> => {
       <div
         className={cn(
           "size-full gap-4",
-          "grid md:grid-cols-4 md:grid-rows-[min-content,min-content,min-content,1fr]",
-          "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
+          "grid md:grid-cols-4 md:grid-rows-[min-content_min-content_min-content_1fr]",
+          "grid-cols-2 grid-rows-[min-content_min-content_min-content_min-content_1fr]",
         )}
       >
         <MetricCard title="Total Users" Icon={BarChart3} stat={data.n_users} />

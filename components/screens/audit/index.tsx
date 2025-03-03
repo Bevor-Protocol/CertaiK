@@ -136,7 +136,7 @@ export const Content = ({
               <p>Version: {audit.version}</p>
             </div>
           </div>
-          <div className="w-full *:w-1/2 flex flex-row md:flex-col gap-2 *:md:w-full">
+          <div className="w-full *:w-1/2 flex flex-row md:flex-col gap-2 md:*:w-full">
             <Button
               onClick={handleDownload}
               variant="bright"
@@ -169,7 +169,7 @@ export const Content = ({
         </div>
       </div>
       {view === "report" && (
-        <ReactMarkdown className="overflow-scroll no-scrollbar markdown flex-grow">
+        <ReactMarkdown className="overflow-scroll no-scrollbar markdown grow">
           {audit.result}
         </ReactMarkdown>
       )}
@@ -182,7 +182,7 @@ export const Content = ({
         />
       )}
       {view === "contract" && (
-        <pre className="overflow-scroll no-scrollbar flex-grow">{audit.contract.code}</pre>
+        <pre className="overflow-scroll no-scrollbar grow">{audit.contract.code}</pre>
       )}
     </div>
   );
@@ -268,7 +268,7 @@ const Findings: React.FC<FindingsProps> = ({
           if (part.startsWith("```")) {
             const code = part.slice(3, -3).replace(/^solidity\n/, ""); // Remove language identifier
             return (
-              <pre key={idx} className="!text-[0.875em] bg-gray-800/50 p-2 rounded-md my-2">
+              <pre key={idx} className="text-[0.875em]! bg-gray-800/50 p-2 rounded-md my-2">
                 {code}
               </pre>
             );
@@ -281,7 +281,7 @@ const Findings: React.FC<FindingsProps> = ({
               {inlineParts.map((inlinePart, inlineIdx) => {
                 if (inlinePart.startsWith("`") && inlinePart.endsWith("`")) {
                   return (
-                    <code key={inlineIdx} className="!text-[0.875em]">
+                    <code key={inlineIdx} className="text-[0.875em]!">
                       {inlinePart.slice(1, -1)}
                     </code>
                   );
@@ -309,7 +309,7 @@ const Findings: React.FC<FindingsProps> = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full overflow-hidden w-full flex-grow relative">
+    <div className="flex flex-col md:flex-row h-full overflow-hidden w-full grow relative">
       {/* Sidebar */}
       <div className="w-fit block my-2 md:my-0 md:hidden" onClick={() => setIsOpen(true)}>
         <MenuIcon size={16} />
@@ -405,7 +405,7 @@ const Findings: React.FC<FindingsProps> = ({
                 className={cn(
                   isOwner && "border border-gray-600 rounded-md p-1 resize-y",
                   !isOwner && "min-h-fit resize-none",
-                  "flex-1 bg-transparent outline-none min-h-16 w-full",
+                  "flex-1 bg-transparent outline-hidden min-h-16 w-full",
                   "text-white font-mono text-sm",
                   "placeholder:text-gray-500",
                   "caret-green-400",

@@ -15,8 +15,8 @@ const Dashboard = async (): Promise<JSX.Element> => {
   return (
     <div
       className={cn(
-        "grid gap-4 size-full md:grid-cols-4 md:grid-rows-[min-content,min-content,1fr]",
-        "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
+        "grid gap-4 size-full md:grid-cols-4 md:grid-rows-[min-content_min-content_1fr]",
+        "grid-cols-2 grid-rows-[min-content_min-content_min-content_min-content_1fr]",
         "relative",
       )}
     >
