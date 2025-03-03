@@ -27,7 +27,7 @@ const TerminalInputBar = ({
     }
   }, [disabled, overrideLoading, isMobile]);
   return (
-    <form onSubmit={onSubmit} className="mt-4 flex items-center relative">
+    <form onSubmit={onSubmit} className="my-4 flex items-center relative">
       <span className="text-green-400 mr-2">{">"}</span>
       <input
         ref={inputRef}

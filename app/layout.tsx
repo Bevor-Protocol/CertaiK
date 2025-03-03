@@ -1,5 +1,5 @@
-import Footer from "@/components/footer";
 import Header from "@/components/header";
+import Layout from "@/components/ui/layout";
 import sessionOptions from "@/lib/config/session";
 import walletConfig from "@/lib/config/wallet";
 import ModalProvider from "@/providers/modal";
@@ -57,12 +57,11 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
         <WalletProvider initialState={initialState}>
           <SiweProvider>
             <ModalProvider>
-              <div className="background-container">
+              <Layout>
                 <Header address={address} />
                 {children}
                 <Analytics />
-                <Footer />
-              </div>
+              </Layout>
             </ModalProvider>
           </SiweProvider>
         </WalletProvider>

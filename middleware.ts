@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 // Protected routes that require authentication
-const protectedRoutes = ["/", "/dashboard", "/api-keys"];
+const protectedRoutes = ["/terminal", "/dashboard"];
 
 const middleware = async (request: NextRequest): Promise<NextResponse> => {
   const response = NextResponse.next();

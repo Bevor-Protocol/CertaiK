@@ -84,7 +84,7 @@
 }
 
 @utility background-container {
-  @apply relative bg-black text-white z-1 h-svh w-screen flex flex-col px-4 gap-10 sm:gap-12 md:gap-16 items-center justify-center;
+  @apply relative bg-black text-white z-1 h-svh w-screen flex flex-row;
 
   &::before {
     content: "";
@@ -98,13 +98,8 @@
   &::after {
     content: "";
     position: absolute;
-    top: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 900px;
-    height: 16rem;
-    background: radial-gradient(circle, black 0%, rgba(0, 0, 255, 0.4) 120%);
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(0, 0, 255, 0.4) 0%, black 120%);
     filter: blur(60px) opacity(0.8);
     z-index: 0;
   }

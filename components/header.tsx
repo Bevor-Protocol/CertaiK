@@ -3,7 +3,6 @@
 import Networks from "@/components/Dropdown/networks";
 import { Profile } from "@/components/Dropdown/profile";
 import { Wallets } from "@/components/Modal/wallets";
-import NavBar from "@/components/nav-bar";
 import { Button } from "@/components/ui/button";
 import * as Dropdown from "@/components/ui/dropdown";
 import { Icon } from "@/components/ui/icon";
@@ -12,8 +11,6 @@ import { useModal } from "@/hooks/useContexts";
 import { cn } from "@/lib/utils";
 import { getNetworkImage, trimAddress } from "@/utils/helpers";
 import { ChevronDown } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 import { useAccount } from "wagmi";
 
@@ -97,19 +94,8 @@ const Header: React.FC<Props> = ({ address }) => {
   };
 
   return (
-    <header className="w-full text-white z-100 relative">
-      <div className="w-full max-w-[1200px] py-4 flex justify-between items-center m-auto">
-        <Link
-          className="cursor-pointer block relative"
-          href="https://www.certaik.xyz"
-          target="_blank"
-          referrerPolicy="no-referrer"
-        >
-          <div className="block w-[175px] md:w-[200px] lg:w-[220px] aspect-1430/498 relative">
-            <Image src="/logo.png" alt="BevorAI logo" fill />
-          </div>
-        </Link>
-        <NavBar className="md:flex hidden" />
+    <header className="w-full text-white z-20 relative min-h-24 h-24 px-6 border-b border-gray-800">
+      <div className="w-full py-4 flex justify-end items-center h-full">
         <div className="gap-2 items-center relative flex">
           {!!address && (
             <>
