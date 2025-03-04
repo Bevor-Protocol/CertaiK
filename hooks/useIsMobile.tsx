@@ -5,7 +5,8 @@ export const useIsMobile = (): boolean => {
 
   useEffect(() => {
     const handleResize = (): void => {
-      setIsMobile(window.innerWidth <= 768 || window.innerHeight <= 800); // Adjust breakpoint as needed
+      // Adjust breakpoint as needed
+      setIsMobile(window.innerWidth <= 768 || window.innerHeight <= 800);
     };
 
     window.addEventListener("resize", handleResize);

@@ -1,10 +1,235 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-body {
-  font-family: "Figtree", sans-serif;
-  color: white;
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --animate-loading-dots: dots 2s steps(4, end) infinite;
+  --animate-modal: modal 0.25s forwards;
+  --animate-appear: appear 0.15s forwards;
+  --animate-disappear: disappear 0.15s forwards;
+  --animate-pulse-more: pulse-more 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes dots {
+    0% {
+      width: 0px;
+    }
+    33.33% {
+      width: 10px;
+    }
+    66.66% {
+      width: 20px;
+    }
+    100% {
+      width: 30px;
+    }
+  }
+  @keyframes modal {
+    0% {
+      display: none;
+      background-color: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+    }
+    100% {
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(1px);
+    }
+  }
+  @keyframes appear {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes disapper {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+  }
+  @keyframes pulse-more {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.2;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility background-container {
+  @apply relative bg-black text-white z-1 h-svh w-screen flex flex-row;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-size: cover;
+    background-image: url("/bg-pattern.webp");
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(0, 0, 255, 0.4) 0%, black 120%);
+    filter: blur(60px) opacity(0.8);
+    z-index: 0;
+  }
+}
+
+@utility markdown {
+  @apply text-white *:whitespace-pre-wrap;
+
+  /* Headings */
+  h1 {
+    @apply text-2xl font-bold my-4;
+  }
+  h2 {
+    @apply text-xl font-bold my-2;
+  }
+  h3 {
+    @apply text-lg font-bold my-2;
+  }
+
+  /* Lists */
+  ul {
+    @apply list-disc pl-5 inline-block;
+  }
+  ol {
+    @apply list-decimal list-inside pl-2 m-0 inline-block;
+  }
+
+  li,
+  li p {
+    @apply -mt-5;
+  }
+
+  /* Code blocks */
+  pre {
+    @apply bg-gray-900 rounded-lg p-4 my-4 overflow-x-auto;
+    code {
+      @apply block text-sm;
+    }
+  }
+
+  /* Inline code */
+  code {
+    @apply bg-gray-800 rounded px-1 py-0.5 text-sm;
+  }
+
+  /* Links */
+  a {
+    @apply text-blue-400 hover:underline;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    @apply border-l-2 border-gray-600 pl-4 italic my-4;
+  }
+
+  /* Tables */
+  table {
+    @apply w-full border-collapse my-4;
+    th,
+    td {
+      @apply border border-gray-700 p-2;
+    }
+    th {
+      @apply bg-gray-800;
+    }
+  }
+
+  /* Horizontal rule */
+  hr {
+    @apply border-gray-600 my-4;
+  }
+}
+
+@utility avatar {
+  height: var(--size-mobile);
+  width: var(--size-mobile);
+  min-height: var(--size-mobile);
+  min-width: var(--size-mobile);
+  @apply rounded-full transition-all bg-no-repeat bg-cover bg-center;
+
+  @media (width >= theme(--breakpoint-md)) {
+    height: var(--size-desktop);
+    width: var(--size-desktop);
+    min-height: var(--size-desktop);
+    min-width: var(--size-desktop);
+  }
+}
+
+@utility no-scrollbar {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+@utility conic-full {
+  aspect-ratio: 1 / 1;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  @apply aspect-square z-0 p-[3px] rounded-full;
+}
+
+@utility conic {
+  aspect-ratio: 1 / 1;
+  background: conic-gradient(white, transparent);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  @apply aspect-square z-0 p-[3px] rounded-full;
+}
+
+@layer utilities {
+  body {
+    font-family: "Figtree", sans-serif;
+    color: white;
+  }
 }
 
 @layer base {
@@ -36,158 +261,5 @@ body {
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
-  }
-}
-
-@layer components {
-  .background-container {
-    @apply relative bg-black text-white z-[1] h-svh w-screen flex flex-col px-4 gap-10 sm:gap-12 md:gap-16 items-center justify-center;
-  }
-
-  .background-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-position: center;
-    background-size: cover;
-    background-image: url("/bg-pattern.webp");
-  }
-
-  .background-container::after {
-    content: "";
-    position: absolute;
-    top: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 900px;
-    height: 16rem;
-    background: radial-gradient(circle, black 0%, rgba(0, 0, 255, 0.4) 120%);
-    filter: blur(60px) opacity(0.8);
-    z-index: 0;
-  }
-
-  .markdown {
-    @apply text-white *:whitespace-pre-wrap;
-
-    /* Headings */
-    h1 {
-      @apply text-2xl font-bold my-4;
-    }
-    h2 {
-      @apply text-xl font-bold my-2;
-    }
-    h3 {
-      @apply text-lg font-bold my-2;
-    }
-
-    /* Lists */
-    ul {
-      @apply list-disc pl-5 inline-block;
-    }
-    ol {
-      @apply list-decimal list-inside pl-2 m-0 inline-block;
-    }
-
-    li,
-    li p {
-      @apply -mt-5;
-    }
-
-    /* Code blocks */
-    pre {
-      @apply bg-gray-900 rounded-lg p-4 my-4 overflow-x-auto;
-      code {
-        @apply block text-sm;
-      }
-    }
-
-    /* Inline code */
-    code {
-      @apply bg-gray-800 rounded px-1 py-0.5 text-sm;
-    }
-
-    /* Links */
-    a {
-      @apply text-blue-400 hover:underline;
-    }
-
-    /* Blockquotes */
-    blockquote {
-      @apply border-l-2 border-gray-600 pl-4 italic my-4;
-    }
-
-    /* Tables */
-    table {
-      @apply w-full border-collapse my-4;
-      th,
-      td {
-        @apply border border-gray-700 p-2;
-      }
-      th {
-        @apply bg-gray-800;
-      }
-    }
-
-    /* Horizontal rule */
-    hr {
-      @apply border-gray-600 my-4;
-    }
-  }
-
-  .avatar {
-    height: var(--size-mobile);
-    width: var(--size-mobile);
-    min-height: var(--size-mobile);
-    min-width: var(--size-mobile);
-    @apply rounded-full transition-all bg-no-repeat bg-cover bg-center;
-  }
-
-  @media screen(md) {
-    .avatar {
-      height: var(--size-desktop);
-      width: var(--size-desktop);
-      min-height: var(--size-desktop);
-      min-width: var(--size-desktop);
-    }
-  }
-}
-
-@layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-
-  .conic-full {
-    aspect-ratio: 1 / 1;
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    @apply aspect-square z-0 p-[3px] rounded-full;
-  }
-
-  .conic {
-    aspect-ratio: 1 / 1;
-    background: conic-gradient(theme("colors.white"), theme("colors.transparent"));
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    @apply aspect-square z-0 p-[3px] rounded-full;
   }
 }

@@ -164,7 +164,7 @@ const AddressStep = ({
 
   return (
     <>
-      <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
+      <div ref={terminalRef} className="overflow-y-auto font-mono text-sm no-scrollbar grow">
         {history.map((message, i) => (
           <div
             key={i}
@@ -173,7 +173,7 @@ const AddressStep = ({
               message.type === Message.SYSTEM && "text-blue-400",
               message.type === Message.USER && "text-green-400",
               message.type === Message.ERROR && "text-red-400",
-              message.type === Message.ASSISTANT && "text-white",
+              message.type === Message.ASSISTANT && "text-white text-xs",
             )}
           >
             {message.type === Message.USER && "> "}

@@ -48,7 +48,7 @@ export const Content: React.FC<PropsWithClose> = ({
 }) => {
   return (
     <div
-      className={cn("absolute z-[999] cursor-default transition-all animate-appear", className)}
+      className={cn("absolute z-999 cursor-default transition-all animate-appear", className)}
       {...rest}
     >
       {cloneElement(children as ReactElement, hasCloseTrigger ? { close } : {})}

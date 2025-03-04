@@ -57,70 +57,16 @@ export const Content = ({
   const explorerUrl = getBlockExplorer(audit.contract.network, audit.contract.address);
 
   return (
-    <div className="flex flex-col md:flex-row gap-0 md:gap-4 w-full h-full">
-      <div className="flex flex-col gap-2 md:mt-4 justify-between">
+    <div className="flex flex-col gap-0 w-full h-full">
+      <div className="flex flex-col gap-2 justify-between">
         <div
           className={cn(
-            "flex flex-row order-2 items-center",
-            "md:items-start md:flex-col md:order-1",
+            "flex justify-between lg:justify-start",
+            "flex-row gap-4 border-b border-b-gray-600 pb-4",
+            "flex-wrap items-center",
           )}
         >
-          <div
-            className={cn(
-              "flex flex-row gap-2 overflow-x-scroll pb-4",
-              "md:flex-col md:gap-1 md:overflow-x-auto md:pb-0",
-            )}
-          >
-            <p
-              className={cn(
-                "cursor-pointer whitespace-nowrap",
-                view !== "report" && "opacity-50 hover:opacity-70",
-              )}
-              onClick={() => handleToggle("report")}
-            >
-              Report
-            </p>
-            <p
-              className={cn(
-                "cursor-pointer whitespace-nowrap",
-                view !== "breakdown" && "opacity-50 hover:opacity-70",
-              )}
-              onClick={() => handleToggle("breakdown")}
-            >
-              Breakdown
-            </p>
-            <p
-              className={cn(
-                "cursor-pointer whitespace-nowrap",
-                view !== "contract" && "opacity-50 hover:opacity-70",
-              )}
-              onClick={() => handleToggle("contract")}
-            >
-              Contract Code
-            </p>
-          </div>
-          {view === "contract" && explorerUrl && (
-            <Link
-              href={explorerUrl}
-              target="_blank"
-              referrerPolicy="no-referrer"
-              className="w-fit my-0 md:my-2 ml-auto md:ml-0 text-sm md:text-base relative"
-            >
-              <Button variant="bright" className="w-fit my-2 md:my-0">
-                view onchain
-                <ArrowUpRightFromSquareIcon size={10} className="ml-2" />
-              </Button>
-            </Link>
-          )}
-        </div>
-        <div
-          className={cn(
-            "flex order-1 justify-between flex-row gap-4 border-b border-b-gray-600 pb-4",
-            "md:order-2 md:border-none md:flex-col md:pb-0 flex-wrap",
-          )}
-        >
-          <div className="text-sm md:text-base">
-            <h3 className="text-gray-400 mb-2 hidden md:block">Contract Details</h3>
+          <div className="text-sm">
             <div className="space-y-1 *:whitespace-nowrap">
               <p>
                 Address:{" "}
@@ -129,47 +75,68 @@ export const Content = ({
               <p>Network: {audit.contract.network ?? "Not Provided"}</p>
             </div>
           </div>
-          <div className="text-sm md:text-base">
-            <h3 className="text-gray-400 mb-2 hidden md:block">Audit Details</h3>
+          <div className="text-sm">
             <div className="space-y-1 *:whitespace-nowrap">
               <p>Audit Type: {audit.audit_type}</p>
               <p>Version: {audit.version}</p>
             </div>
           </div>
-          <div className="w-full *:w-1/2 flex flex-row md:flex-col gap-2 *:md:w-full">
-            <Button
-              onClick={handleDownload}
-              variant="bright"
-              className="w-full text-sm md:text-base"
-            >
+          <div className="w-full *:w-1/2 ml-0 flex flex-row gap-2 lg:ml-auto lg:w-fit">
+            <Button onClick={handleDownload} variant="bright" className="w-full text-sm">
               Download Report
-              <DownloadIcon size={14} className="ml-1" />
+              <DownloadIcon size={24} className="ml-1" />
             </Button>
             <Link
               href={explorerUrl ?? ""}
               aria-disabled={!explorerUrl}
               target="_blank"
               referrerPolicy="no-referrer"
-              className={cn(
-                "text-sm relative",
-                "md:text-base",
-                !explorerUrl && "pointer-events-none",
-              )}
+              className={cn("text-sm relative", !explorerUrl && "pointer-events-none")}
             >
-              <Button
-                variant="bright"
-                className="w-full text-sm md:text-base"
-                disabled={!explorerUrl}
-              >
+              <Button variant="bright" className="w-full text-sm" disabled={!explorerUrl}>
                 view onchain
                 <ArrowUpRightFromSquareIcon size={10} className="ml-2" />
               </Button>
             </Link>
           </div>
         </div>
+        <div className={cn("flex flex-row items-center")}>
+          <div className={cn("flex flex-row gap-2 overflow-x-scroll pb-4")}>
+            <div
+              className={cn(
+                "cursor-pointer whitespace-nowrap flex justify-center items-center",
+                "border border-gray-500 rounded-2xl py-1 px-2 text-sm",
+                view !== "report" && "opacity-50 hover:opacity-70",
+              )}
+              onClick={() => handleToggle("report")}
+            >
+              Report
+            </div>
+            <div
+              className={cn(
+                "cursor-pointer whitespace-nowrap flex justify-center items-center",
+                "border border-gray-500 rounded-2xl py-1 px-2 text-sm",
+                view !== "breakdown" && "opacity-50 hover:opacity-70",
+              )}
+              onClick={() => handleToggle("breakdown")}
+            >
+              Breakdown
+            </div>
+            <div
+              className={cn(
+                "cursor-pointer whitespace-nowrap flex justify-center items-center",
+                "border border-gray-500 rounded-2xl py-1 px-2 text-sm",
+                view !== "contract" && "opacity-50 hover:opacity-70",
+              )}
+              onClick={() => handleToggle("contract")}
+            >
+              Contract Code
+            </div>
+          </div>
+        </div>
       </div>
       {view === "report" && (
-        <ReactMarkdown className="overflow-scroll no-scrollbar markdown flex-grow">
+        <ReactMarkdown className="overflow-scroll no-scrollbar markdown grow">
           {audit.result}
         </ReactMarkdown>
       )}
@@ -182,7 +149,7 @@ export const Content = ({
         />
       )}
       {view === "contract" && (
-        <pre className="overflow-scroll no-scrollbar flex-grow">{audit.contract.code}</pre>
+        <pre className="overflow-scroll no-scrollbar grow text-xs">{audit.contract.code}</pre>
       )}
     </div>
   );
@@ -209,7 +176,7 @@ const Findings: React.FC<FindingsProps> = ({
 
   const [input, setInput] = useState("");
   const [attestation, setAttestation] = useState(0);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(!selectedFinding);
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -268,7 +235,7 @@ const Findings: React.FC<FindingsProps> = ({
           if (part.startsWith("```")) {
             const code = part.slice(3, -3).replace(/^solidity\n/, ""); // Remove language identifier
             return (
-              <pre key={idx} className="!text-[0.875em] bg-gray-800/50 p-2 rounded-md my-2">
+              <pre key={idx} className="text-[0.875em]! bg-gray-800/50 p-2 rounded-md my-2">
                 {code}
               </pre>
             );
@@ -281,7 +248,7 @@ const Findings: React.FC<FindingsProps> = ({
               {inlineParts.map((inlinePart, inlineIdx) => {
                 if (inlinePart.startsWith("`") && inlinePart.endsWith("`")) {
                   return (
-                    <code key={inlineIdx} className="!text-[0.875em]">
+                    <code key={inlineIdx} className="text-[0.875em]!">
                       {inlinePart.slice(1, -1)}
                     </code>
                   );
@@ -309,17 +276,17 @@ const Findings: React.FC<FindingsProps> = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full overflow-hidden w-full flex-grow relative">
+    <div className="flex flex-col h-full overflow-hidden w-full grow relative">
       {/* Sidebar */}
-      <div className="w-fit block my-2 md:my-0 md:hidden" onClick={() => setIsOpen(true)}>
+      <div className="w-fit block my-2 cursor-pointer" onClick={() => setIsOpen(true)}>
         <MenuIcon size={16} />
       </div>
       <div
         className={cn(
-          "w-full md:w-1/4 border-b md:border-b-0 md:border-r",
+          "w-full",
           "border-gray-800 overflow-y-auto md:pr-4",
-          "md:block inset-0 absolute md:relative bg-black z-20",
-          selectedFinding && !isOpen && "hidden md:block",
+          "inset-0 absolute bg-black z-20",
+          selectedFinding && !isOpen && "hidden",
         )}
       >
         {Object.entries(findingsByLevel).map(([level, levelFindings]) => (
@@ -405,7 +372,7 @@ const Findings: React.FC<FindingsProps> = ({
                 className={cn(
                   isOwner && "border border-gray-600 rounded-md p-1 resize-y",
                   !isOwner && "min-h-fit resize-none",
-                  "flex-1 bg-transparent outline-none min-h-16 w-full",
+                  "flex-1 bg-transparent outline-hidden min-h-16 w-full",
                   "text-white font-mono text-sm",
                   "placeholder:text-gray-500",
                   "caret-green-400",

@@ -1,41 +1,47 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import BalanceBox from "@/components/api/balance-box";
 import BuyBar from "@/components/api/buy-bar";
-import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useCertaiBalance } from "@/hooks/useBalances";
+import { roundToDecimals } from "@/lib/utils";
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 const ApiContent = (): JSX.Element => {
-  const [isOpen, setIsOpen] = useState(false);
-  const isMobile = useIsMobile();
+  const { token } = useCertaiBalance();
+
+  const tokenBalance = roundToDecimals(token.data);
 
   return (
-    <div
-      className={cn(
-        "flex flex-col justify-end w-full font-mono text-sm h-full",
-        isMobile && isOpen && "absolute bg-black inset-0",
-      )}
-    >
-      {(!isMobile || isOpen) && (
-        <>
-          <div className="flex-1">
-            <BalanceBox />
-            <div className="text-yellow-400 my-2">
-              * API credits enable integration into your app and access to premium services and
-              features *
+    <div className="border border-gray-800 rounded-md p-4 col-span-2">
+      <div className="flex flex-col gap-4 mb-10">
+        <div className="flex flex-row w-full justify-between flex-wrap">
+          <p className="text-lg font-medium">Purchase Credits</p>
+          <p>
+            $CERTAI:{" "}
+            <span className="font-bold">
+              {token.isLoading ? "Loading..." : tokenBalance.toString()}
+            </span>
+          </p>
+        </div>
+        <p className="text-sm text-yellow-400 hidden md:block">
+          API credits enable integration into your app and access to premium services and features
+        </p>
+        <div className="hidden md:block">
+          <Link
+            href="https://api.bevor.io/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-fit hover:opacity-80 block transition-opacity duration-200"
+          >
+            <div className="flex flex-row gap-2">
+              read the docs{" "}
+              <ArrowUpRight size={16} className="inline-block align-baseline" color="gray" />
             </div>
-          </div>
-          <BuyBar />
-        </>
-      )}
-      {isMobile && (
-        <Button variant="bright" className="w-full mt-4" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? "Back to Dashboard" : "Get Credits"}
-        </Button>
-      )}
+          </Link>
+        </div>
+      </div>
+      <BuyBar />
     </div>
   );
 };

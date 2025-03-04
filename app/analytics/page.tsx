@@ -17,8 +17,9 @@ const Stats = async (): Promise<JSX.Element> => {
       <div
         className={cn(
           "size-full gap-4",
-          "grid md:grid-cols-4 md:grid-rows-[min-content,min-content,min-content,1fr]",
-          "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
+          "grid md:grid-cols-4 md:grid-rows-[min-content_min-content_min-content_1fr]",
+          "grid-cols-2 grid-rows-[min-content_min-content_min-content_min-content_1fr]",
+          "*:bg-black/90",
         )}
       >
         <MetricCard title="Total Users" Icon={BarChart3} stat={data.n_users} />
@@ -73,7 +74,7 @@ const Stats = async (): Promise<JSX.Element> => {
         </div>
         <TimeSeriesPlot data={data.audits_timeseries} title="# audits" />
         <TimeSeriesPlot data={data.users_timeseries} title="# users" />
-        <div className="col-span-full mt-auto">
+        <div className="col-span-full h-fit">
           <Link href="/analytics/history">
             <Button variant="bright" className="w-full">
               See All Audits

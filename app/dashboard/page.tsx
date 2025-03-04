@@ -1,14 +1,13 @@
 import { certaikApiAction } from "@/actions";
 import Content from "@/components/content";
 import ApiContent from "@/components/screens/api-keys";
-import { ApiKeyManagement, AppManagement } from "@/components/screens/dashboard";
+import { ApiKeyManagement, AppManagement, CreditMetric } from "@/components/screens/dashboard";
 import { LoadWaifu } from "@/components/ui/loader";
 import MetricCard from "@/components/ui/metric-card";
 import { cn } from "@/lib/utils";
-import { ArrowUpRight, BarChart3 } from "lucide-react";
+import { ArrowUpRight, BarChart3, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import CreditsCard from "../components/CreditsCard";
 
 const Dashboard = async (): Promise<JSX.Element> => {
   const user = await certaikApiAction.getUserInfo();
@@ -16,9 +15,8 @@ const Dashboard = async (): Promise<JSX.Element> => {
   return (
     <div
       className={cn(
-        "grid gap-4 size-full md:grid-cols-4 md:grid-rows-[min-content,min-content,1fr]",
-        "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
-        "relative",
+        "grid gap-4 w-full auto-rows-auto overflow-y-scroll max-h-full",
+        "md:grid-cols-4 grid-cols-2 relative *:bg-black/90",
       )}
     >
       <MetricCard title="Total Audits" Icon={BarChart3} stat={user.n_audits}>
@@ -27,10 +25,11 @@ const Dashboard = async (): Promise<JSX.Element> => {
         </Link>
       </MetricCard>
       <MetricCard title="Unique Contracts" Icon={BarChart3} stat={user.n_contracts} />
-      <CreditsCard remainingCredits={user.remaining_credits} />
+      <CreditMetric credits={user.total_credits} />
+      <MetricCard title="Remaining Credits" Icon={DollarSign} stat={user.remaining_credits} />
       <ApiKeyManagement userAuth={user.auth} />
       <AppManagement userApp={user.app} />
-      <div className="col-span-full h-full">
+      <div className="col-span-full">
         <ApiContent />
       </div>
     </div>
