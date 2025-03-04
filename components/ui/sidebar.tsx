@@ -119,7 +119,12 @@ const Sidebar: React.FC = () => {
               >
                 <Virtuals style={{ background: "rgb(68 188 195)", borderRadius: "12px" }} />
               </Link>
-              <Link href="https://docs.certaik.xyz" className="hover:opacity-80 transition-opacity">
+              <Link
+                href="https://docs.certaik.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity"
+              >
                 <FileTextIcon height="24" width="24" />
               </Link>
             </div>

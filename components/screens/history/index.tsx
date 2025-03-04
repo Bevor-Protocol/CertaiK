@@ -146,7 +146,7 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
             )}
           </div>
         </Dropdown.Trigger>
-        <Dropdown.Content className="top-full right-0" hasCloseTrigger>
+        <Dropdown.Content className="top-[150%] right-0 w-72" hasCloseTrigger>
           <AuditSearchDropdown
             address={address}
             setAddress={setAddress}

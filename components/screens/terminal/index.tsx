@@ -139,7 +139,7 @@ const StepsRewind: React.FC<StepsProps> = ({ stack, handleRewind, children, clas
   return (
     <div className={cn("z-1", className)}>
       <div className="flex flex-row gap-2 items-center">
-        <div className="text-gray-500 z-1">Go back to:</div>
+        {stack.length > 0 && <div className="text-gray-500 z-1">Go back to:</div>}
         {stack.map((s) => (
           <div
             key={s}

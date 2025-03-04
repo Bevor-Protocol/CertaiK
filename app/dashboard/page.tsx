@@ -1,7 +1,7 @@
 import { certaikApiAction } from "@/actions";
 import Content from "@/components/content";
 import ApiContent from "@/components/screens/api-keys";
-import CreditsCard, { ApiKeyManagement, AppManagement } from "@/components/screens/dashboard";
+import { ApiKeyManagement, AppManagement, CreditMetric } from "@/components/screens/dashboard";
 import { LoadWaifu } from "@/components/ui/loader";
 import MetricCard from "@/components/ui/metric-card";
 import { cn } from "@/lib/utils";
@@ -15,9 +15,8 @@ const Dashboard = async (): Promise<JSX.Element> => {
   return (
     <div
       className={cn(
-        "grid gap-4 size-full md:grid-cols-4 md:grid-rows-[min-content_min-content_1fr]",
-        "grid-cols-2 grid-rows-[min-content_min-content_min-content_min-content_1fr]",
-        "relative *:bg-black/90",
+        "grid gap-4 w-full auto-rows-auto overflow-y-scroll max-h-full",
+        "md:grid-cols-4 grid-cols-2 relative *:bg-black/90",
       )}
     >
       <MetricCard title="Total Audits" Icon={BarChart3} stat={user.n_audits}>
@@ -26,11 +25,11 @@ const Dashboard = async (): Promise<JSX.Element> => {
         </Link>
       </MetricCard>
       <MetricCard title="Unique Contracts" Icon={BarChart3} stat={user.n_contracts} />
-      <CreditsCard />
+      <CreditMetric credits={user.total_credits} />
       <MetricCard title="Remaining Credits" Icon={DollarSign} stat={user.remaining_credits} />
       <ApiKeyManagement userAuth={user.auth} />
       <AppManagement userApp={user.app} />
-      <div className="col-span-full h-full">
+      <div className="col-span-full">
         <ApiContent />
       </div>
     </div>

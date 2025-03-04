@@ -59,7 +59,48 @@ export const Content = ({
   return (
     <div className="flex flex-col gap-0 w-full h-full">
       <div className="flex flex-col gap-2 justify-between">
-        <div className={cn("flex flex-row order-2 items-center")}>
+        <div
+          className={cn(
+            "flex justify-between lg:justify-start",
+            "flex-row gap-4 border-b border-b-gray-600 pb-4",
+            "flex-wrap items-center",
+          )}
+        >
+          <div className="text-sm">
+            <div className="space-y-1 *:whitespace-nowrap">
+              <p>
+                Address:{" "}
+                {audit.contract.address ? trimAddress(audit.contract.address) : "Not Provided"}
+              </p>
+              <p>Network: {audit.contract.network ?? "Not Provided"}</p>
+            </div>
+          </div>
+          <div className="text-sm">
+            <div className="space-y-1 *:whitespace-nowrap">
+              <p>Audit Type: {audit.audit_type}</p>
+              <p>Version: {audit.version}</p>
+            </div>
+          </div>
+          <div className="w-full *:w-1/2 ml-0 flex flex-row gap-2 lg:ml-auto lg:w-fit">
+            <Button onClick={handleDownload} variant="bright" className="w-full text-sm">
+              Download Report
+              <DownloadIcon size={24} className="ml-1" />
+            </Button>
+            <Link
+              href={explorerUrl ?? ""}
+              aria-disabled={!explorerUrl}
+              target="_blank"
+              referrerPolicy="no-referrer"
+              className={cn("text-sm relative", !explorerUrl && "pointer-events-none")}
+            >
+              <Button variant="bright" className="w-full text-sm" disabled={!explorerUrl}>
+                view onchain
+                <ArrowUpRightFromSquareIcon size={10} className="ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+        <div className={cn("flex flex-row items-center")}>
           <div className={cn("flex flex-row gap-2 overflow-x-scroll pb-4")}>
             <div
               className={cn(
@@ -91,47 +132,6 @@ export const Content = ({
             >
               Contract Code
             </div>
-          </div>
-        </div>
-        <div
-          className={cn(
-            "flex order-1 justify-between lg:justify-start",
-            "flex-row gap-4 border-b border-b-gray-600 pb-4",
-            "flex-wrap items-center",
-          )}
-        >
-          <div className="text-sm">
-            <div className="space-y-1 *:whitespace-nowrap">
-              <p>
-                Address:{" "}
-                {audit.contract.address ? trimAddress(audit.contract.address) : "Not Provided"}
-              </p>
-              <p>Network: {audit.contract.network ?? "Not Provided"}</p>
-            </div>
-          </div>
-          <div className="text-sm">
-            <div className="space-y-1 *:whitespace-nowrap">
-              <p>Audit Type: {audit.audit_type}</p>
-              <p>Version: {audit.version}</p>
-            </div>
-          </div>
-          <div className="w-full *:w-1/2 ml-0 flex flex-row gap-2 lg:ml-auto lg:w-fit">
-            <Button onClick={handleDownload} variant="bright" className="w-full text-sm">
-              Download Report
-              <DownloadIcon size={14} className="ml-1" />
-            </Button>
-            <Link
-              href={explorerUrl ?? ""}
-              aria-disabled={!explorerUrl}
-              target="_blank"
-              referrerPolicy="no-referrer"
-              className={cn("text-sm relative", !explorerUrl && "pointer-events-none")}
-            >
-              <Button variant="bright" className="w-full text-sm" disabled={!explorerUrl}>
-                view onchain
-                <ArrowUpRightFromSquareIcon size={10} className="ml-2" />
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
@@ -278,7 +278,7 @@ const Findings: React.FC<FindingsProps> = ({
   return (
     <div className="flex flex-col h-full overflow-hidden w-full grow relative">
       {/* Sidebar */}
-      <div className="w-fit block my-2" onClick={() => setIsOpen(true)}>
+      <div className="w-fit block my-2 cursor-pointer" onClick={() => setIsOpen(true)}>
         <MenuIcon size={16} />
       </div>
       <div

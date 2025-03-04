@@ -154,7 +154,7 @@ const BuyBar = (): JSX.Element => {
             </Button>
           ) : (
             <>
-              <p className="text-white mt-2 font-mono">
+              <p className="text-white mt-2 font-mono text-xs md:text-sm lg:text-base">
                 <span className="text-blue-400 font-bold">
                   {promotion.data ? amount * promotion.data : amount}
                 </span>{" "}

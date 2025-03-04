@@ -8,20 +8,39 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { cn } from "@/lib/utils";
 import { UserInfoResponseI } from "@/utils/types";
 import { useMutation } from "@tanstack/react-query";
-import { AppWindowIcon, Check, Copy, Key } from "lucide-react";
+import { AppWindowIcon, Check, Copy, DollarSign, Key, RefreshCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-import { useCertaiBalance } from "@/hooks/useBalances";
-import { DollarSign } from "lucide-react";
+export const CreditMetric = ({ credits }: { credits: number }): JSX.Element => {
+  const { mutateAsync, isPending, isSuccess } = useMutation({
+    mutationFn: certaikApiAction.syncCredits,
+  });
 
-const CreditsCard = (): JSX.Element => {
-  const { credit } = useCertaiBalance();
+  const handleSubmit = async (): Promise<void> => {
+    await mutateAsync();
+  };
 
-  return <MetricCard title="Total Credits" Icon={DollarSign} stat={credit.data} />;
+  return (
+    <MetricCard title="Total Credits" Icon={DollarSign} stat={credits}>
+      <div className="text-sm cursor-pointer">
+        {isPending ? (
+          <span className="flex items-center">
+            syncing <RefreshCcw size={14} className="inline-block animate-spin ml-1" color="gray" />
+          </span>
+        ) : isSuccess ? (
+          <span className="flex items-center">
+            synced <Check size={14} className="inline-block ml-1" color="green" />
+          </span>
+        ) : (
+          <span className="flex items-center" onClick={handleSubmit}>
+            sync <RefreshCcw size={14} className="inline-block ml-1" color="gray" />
+          </span>
+        )}
+      </div>
+    </MetricCard>
+  );
 };
-
-export default CreditsCard;
 
 export const ApiKeyManagement: React.FC<{ userAuth: UserInfoResponseI["auth"] }> = ({
   userAuth,
@@ -50,7 +69,7 @@ export const ApiKeyManagement: React.FC<{ userAuth: UserInfoResponseI["auth"] }>
           <Button
             variant="transparent"
             disabled={!userAuth.can_create || isPending}
-            className="px-5 w-fit mt-4 h-8"
+            className="px-5 w-fit mt-1 md:mt-4 h-8 text-sm"
             onClick={handleSubmit}
           >
             {isPending
@@ -134,12 +153,12 @@ export const AppManagement: React.FC<{ userApp: UserInfoResponseI["app"] }> = ({
           <AppWindowIcon size={16} />
         </div>
         <p className="text-sm text-gray-400">{userApp.exists ? userApp.name : "no app exists"}</p>
-        <div className="flex mt-4 items-center gap-4">
+        <div className="flex mt-1 md:mt-4 items-center gap-4">
           {!userApp.exists && !isEditing && !isSuccess && (
             <Button
               variant="transparent"
               disabled={!userApp.can_create}
-              className="px-5 w-fit h-8"
+              className="px-5 w-fit h-8 text-sm"
               onClick={() => setIsEditing(true)}
             >
               create app
@@ -150,7 +169,7 @@ export const AppManagement: React.FC<{ userApp: UserInfoResponseI["app"] }> = ({
               <Button
                 variant="transparent"
                 disabled={!userApp.can_create}
-                className="px-5 w-fit h-8"
+                className="px-5 w-fit h-8 text-sm"
                 onClick={() => setIsEditing(true)}
               >
                 edit app
@@ -158,7 +177,7 @@ export const AppManagement: React.FC<{ userApp: UserInfoResponseI["app"] }> = ({
               <Button
                 variant="transparent"
                 disabled={!userApp.can_create}
-                className="px-5 w-fit h-8"
+                className="px-5 w-fit h-8 text-sm"
                 onClick={handleSubmit}
               >
                 {userApp.exists_auth ? "regenerate api key" : "generate api key"}
