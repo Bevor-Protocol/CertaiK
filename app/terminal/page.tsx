@@ -3,7 +3,7 @@ import TerminalContainer from "@/components/screens/terminal";
 
 const TerminalAuditPage: React.FC = () => {
   return (
-    <Content>
+    <Content className="bg-black/90 border-t border-gray-800">
       <TerminalContainer />
     </Content>
   );

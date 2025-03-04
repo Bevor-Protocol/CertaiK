@@ -17,7 +17,7 @@ const Dashboard = async (): Promise<JSX.Element> => {
       className={cn(
         "grid gap-4 size-full md:grid-cols-4 md:grid-rows-[min-content_min-content_1fr]",
         "grid-cols-2 grid-rows-[min-content_min-content_min-content_min-content_1fr]",
-        "relative",
+        "relative *:bg-black/90",
       )}
     >
       <MetricCard title="Total Audits" Icon={BarChart3} stat={user.n_audits}>

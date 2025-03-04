@@ -57,57 +57,50 @@ export const Content = ({
   const explorerUrl = getBlockExplorer(audit.contract.network, audit.contract.address);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-0 lg:gap-4 w-full h-full">
-      <div className="flex flex-col gap-2 lg:mt-4 justify-between">
-        <div
-          className={cn(
-            "flex flex-row order-2 items-center",
-            "lg:items-start lg:flex-col lg:order-1",
-          )}
-        >
-          <div
-            className={cn(
-              "flex flex-row gap-2 overflow-x-scroll pb-4",
-              "lg:flex-col lg:gap-1 lg:overflow-x-auto lg:pb-0",
-            )}
-          >
-            <p
+    <div className="flex flex-col gap-0 w-full h-full">
+      <div className="flex flex-col gap-2 justify-between">
+        <div className={cn("flex flex-row order-2 items-center")}>
+          <div className={cn("flex flex-row gap-2 overflow-x-scroll pb-4")}>
+            <div
               className={cn(
-                "cursor-pointer whitespace-nowrap",
+                "cursor-pointer whitespace-nowrap flex justify-center items-center",
+                "border border-gray-500 rounded-2xl py-1 px-2 text-sm",
                 view !== "report" && "opacity-50 hover:opacity-70",
               )}
               onClick={() => handleToggle("report")}
             >
               Report
-            </p>
-            <p
+            </div>
+            <div
               className={cn(
-                "cursor-pointer whitespace-nowrap",
+                "cursor-pointer whitespace-nowrap flex justify-center items-center",
+                "border border-gray-500 rounded-2xl py-1 px-2 text-sm",
                 view !== "breakdown" && "opacity-50 hover:opacity-70",
               )}
               onClick={() => handleToggle("breakdown")}
             >
               Breakdown
-            </p>
-            <p
+            </div>
+            <div
               className={cn(
-                "cursor-pointer whitespace-nowrap",
+                "cursor-pointer whitespace-nowrap flex justify-center items-center",
+                "border border-gray-500 rounded-2xl py-1 px-2 text-sm",
                 view !== "contract" && "opacity-50 hover:opacity-70",
               )}
               onClick={() => handleToggle("contract")}
             >
               Contract Code
-            </p>
+            </div>
           </div>
         </div>
         <div
           className={cn(
-            "flex order-1 justify-between flex-row gap-4 border-b border-b-gray-600 pb-4",
-            "lg:order-2 lg:border-none lg:flex-col lg:pb-0 flex-wrap",
+            "flex order-1 justify-between lg:justify-start",
+            "flex-row gap-4 border-b border-b-gray-600 pb-4",
+            "flex-wrap items-center",
           )}
         >
-          <div className="text-sm lg:text-base">
-            <h3 className="text-gray-400 mb-2 hidden lg:block">Contract Details</h3>
+          <div className="text-sm">
             <div className="space-y-1 *:whitespace-nowrap">
               <p>
                 Address:{" "}
@@ -116,19 +109,14 @@ export const Content = ({
               <p>Network: {audit.contract.network ?? "Not Provided"}</p>
             </div>
           </div>
-          <div className="text-sm lg:text-base">
-            <h3 className="text-gray-400 mb-2 hidden lg:block">Audit Details</h3>
+          <div className="text-sm">
             <div className="space-y-1 *:whitespace-nowrap">
               <p>Audit Type: {audit.audit_type}</p>
               <p>Version: {audit.version}</p>
             </div>
           </div>
-          <div className="w-full *:w-1/2 flex flex-row lg:flex-col gap-2 lg:*:w-full">
-            <Button
-              onClick={handleDownload}
-              variant="bright"
-              className="w-full text-sm lg:text-base"
-            >
+          <div className="w-full *:w-1/2 ml-0 flex flex-row gap-2 lg:ml-auto lg:w-fit">
+            <Button onClick={handleDownload} variant="bright" className="w-full text-sm">
               Download Report
               <DownloadIcon size={14} className="ml-1" />
             </Button>
@@ -137,17 +125,9 @@ export const Content = ({
               aria-disabled={!explorerUrl}
               target="_blank"
               referrerPolicy="no-referrer"
-              className={cn(
-                "text-sm relative",
-                "lg:text-base",
-                !explorerUrl && "pointer-events-none",
-              )}
+              className={cn("text-sm relative", !explorerUrl && "pointer-events-none")}
             >
-              <Button
-                variant="bright"
-                className="w-full text-sm lg:text-base"
-                disabled={!explorerUrl}
-              >
+              <Button variant="bright" className="w-full text-sm" disabled={!explorerUrl}>
                 view onchain
                 <ArrowUpRightFromSquareIcon size={10} className="ml-2" />
               </Button>
@@ -296,17 +276,17 @@ const Findings: React.FC<FindingsProps> = ({
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-full overflow-hidden w-full grow relative">
+    <div className="flex flex-col h-full overflow-hidden w-full grow relative">
       {/* Sidebar */}
-      <div className="w-fit block my-2 lg:my-0 lg:hidden" onClick={() => setIsOpen(true)}>
+      <div className="w-fit block my-2" onClick={() => setIsOpen(true)}>
         <MenuIcon size={16} />
       </div>
       <div
         className={cn(
-          "w-full lg:w-1/4 border-b lg:border-b-0 lg:border-r",
+          "w-full",
           "border-gray-800 overflow-y-auto md:pr-4",
-          "lg:block inset-0 absolute lg:relative bg-black z-20",
-          selectedFinding && !isOpen && "hidden lg:block",
+          "inset-0 absolute bg-black z-20",
+          selectedFinding && !isOpen && "hidden",
         )}
       >
         {Object.entries(findingsByLevel).map(([level, levelFindings]) => (
