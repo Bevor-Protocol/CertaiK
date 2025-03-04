@@ -57,18 +57,18 @@ export const Content = ({
   const explorerUrl = getBlockExplorer(audit.contract.network, audit.contract.address);
 
   return (
-    <div className="flex flex-col md:flex-row gap-0 md:gap-4 w-full h-full">
-      <div className="flex flex-col gap-2 md:mt-4 justify-between">
+    <div className="flex flex-col lg:flex-row gap-0 lg:gap-4 w-full h-full">
+      <div className="flex flex-col gap-2 lg:mt-4 justify-between">
         <div
           className={cn(
             "flex flex-row order-2 items-center",
-            "md:items-start md:flex-col md:order-1",
+            "lg:items-start lg:flex-col lg:order-1",
           )}
         >
           <div
             className={cn(
               "flex flex-row gap-2 overflow-x-scroll pb-4",
-              "md:flex-col md:gap-1 md:overflow-x-auto md:pb-0",
+              "lg:flex-col lg:gap-1 lg:overflow-x-auto lg:pb-0",
             )}
           >
             <p
@@ -99,28 +99,15 @@ export const Content = ({
               Contract Code
             </p>
           </div>
-          {view === "contract" && explorerUrl && (
-            <Link
-              href={explorerUrl}
-              target="_blank"
-              referrerPolicy="no-referrer"
-              className="w-fit my-0 md:my-2 ml-auto md:ml-0 text-sm md:text-base relative"
-            >
-              <Button variant="bright" className="w-fit my-2 md:my-0">
-                view onchain
-                <ArrowUpRightFromSquareIcon size={10} className="ml-2" />
-              </Button>
-            </Link>
-          )}
         </div>
         <div
           className={cn(
             "flex order-1 justify-between flex-row gap-4 border-b border-b-gray-600 pb-4",
-            "md:order-2 md:border-none md:flex-col md:pb-0 flex-wrap",
+            "lg:order-2 lg:border-none lg:flex-col lg:pb-0 flex-wrap",
           )}
         >
-          <div className="text-sm md:text-base">
-            <h3 className="text-gray-400 mb-2 hidden md:block">Contract Details</h3>
+          <div className="text-sm lg:text-base">
+            <h3 className="text-gray-400 mb-2 hidden lg:block">Contract Details</h3>
             <div className="space-y-1 *:whitespace-nowrap">
               <p>
                 Address:{" "}
@@ -129,18 +116,18 @@ export const Content = ({
               <p>Network: {audit.contract.network ?? "Not Provided"}</p>
             </div>
           </div>
-          <div className="text-sm md:text-base">
-            <h3 className="text-gray-400 mb-2 hidden md:block">Audit Details</h3>
+          <div className="text-sm lg:text-base">
+            <h3 className="text-gray-400 mb-2 hidden lg:block">Audit Details</h3>
             <div className="space-y-1 *:whitespace-nowrap">
               <p>Audit Type: {audit.audit_type}</p>
               <p>Version: {audit.version}</p>
             </div>
           </div>
-          <div className="w-full *:w-1/2 flex flex-row md:flex-col gap-2 md:*:w-full">
+          <div className="w-full *:w-1/2 flex flex-row lg:flex-col gap-2 lg:*:w-full">
             <Button
               onClick={handleDownload}
               variant="bright"
-              className="w-full text-sm md:text-base"
+              className="w-full text-sm lg:text-base"
             >
               Download Report
               <DownloadIcon size={14} className="ml-1" />
@@ -152,13 +139,13 @@ export const Content = ({
               referrerPolicy="no-referrer"
               className={cn(
                 "text-sm relative",
-                "md:text-base",
+                "lg:text-base",
                 !explorerUrl && "pointer-events-none",
               )}
             >
               <Button
                 variant="bright"
-                className="w-full text-sm md:text-base"
+                className="w-full text-sm lg:text-base"
                 disabled={!explorerUrl}
               >
                 view onchain
@@ -182,7 +169,7 @@ export const Content = ({
         />
       )}
       {view === "contract" && (
-        <pre className="overflow-scroll no-scrollbar grow">{audit.contract.code}</pre>
+        <pre className="overflow-scroll no-scrollbar grow text-xs">{audit.contract.code}</pre>
       )}
     </div>
   );
@@ -209,7 +196,7 @@ const Findings: React.FC<FindingsProps> = ({
 
   const [input, setInput] = useState("");
   const [attestation, setAttestation] = useState(0);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(!selectedFinding);
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -309,17 +296,17 @@ const Findings: React.FC<FindingsProps> = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full overflow-hidden w-full grow relative">
+    <div className="flex flex-col lg:flex-row h-full overflow-hidden w-full grow relative">
       {/* Sidebar */}
-      <div className="w-fit block my-2 md:my-0 md:hidden" onClick={() => setIsOpen(true)}>
+      <div className="w-fit block my-2 lg:my-0 lg:hidden" onClick={() => setIsOpen(true)}>
         <MenuIcon size={16} />
       </div>
       <div
         className={cn(
-          "w-full md:w-1/4 border-b md:border-b-0 md:border-r",
+          "w-full lg:w-1/4 border-b lg:border-b-0 lg:border-r",
           "border-gray-800 overflow-y-auto md:pr-4",
-          "md:block inset-0 absolute md:relative bg-black z-20",
-          selectedFinding && !isOpen && "hidden md:block",
+          "lg:block inset-0 absolute lg:relative bg-black z-20",
+          selectedFinding && !isOpen && "hidden lg:block",
         )}
       >
         {Object.entries(findingsByLevel).map(([level, levelFindings]) => (

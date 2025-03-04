@@ -94,7 +94,7 @@ const Header: React.FC<Props> = ({ address }) => {
   };
 
   return (
-    <header className="w-full text-white z-20 relative min-h-24 h-24 px-6 border-b border-gray-800">
+    <header className="w-full text-white z-100 relative min-h-24 h-24 px-6 border-b border-gray-800">
       <div className="w-full py-4 flex justify-end items-center h-full">
         <div className="gap-2 items-center relative flex">
           {!!address && (

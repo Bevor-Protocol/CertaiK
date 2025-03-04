@@ -73,7 +73,7 @@ const Stats = async (): Promise<JSX.Element> => {
         </div>
         <TimeSeriesPlot data={data.audits_timeseries} title="# audits" />
         <TimeSeriesPlot data={data.users_timeseries} title="# users" />
-        <div className="col-span-full mt-auto">
+        <div className="col-span-full">
           <Link href="/analytics/history">
             <Button variant="bright" className="w-full">
               See All Audits

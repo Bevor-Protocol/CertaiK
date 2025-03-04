@@ -142,12 +142,15 @@ class CertaikApiService {
   async getAudits(filters: { [key: string]: string }): Promise<AuditTableReponseI> {
     const searchParams = new URLSearchParams(filters);
     searchParams.set("status", "success");
-    return api.get(`/audit/list?${searchParams.toString()}`).then((response) => {
-      if (!response.data) {
-        throw new Error(response.statusText);
-      }
-      return response.data;
-    });
+    return api
+      .get(`/audit/list?${searchParams.toString()}`)
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data;
+      })
+      .catch((err) => console.log(err));
   }
 
   async getStats(): Promise<StatsResponseI> {

@@ -9,7 +9,7 @@ const HistoryPage = async ({
   const queryParams = await searchParams;
   return (
     <Wrapper>
-      <div className="flex gap-4 h-full font-mono">
+      <div className="flex flex-col gap-4 h-full font-mono">
         <AuditsSearch query={queryParams} />
         <Content query={queryParams} />
       </div>

@@ -2,6 +2,7 @@
 
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
+import * as Dropdown from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { LoaderFull } from "@/components/ui/loader";
 import { Select } from "@/components/ui/select";
@@ -9,9 +10,10 @@ import { cn, prettyDate } from "@/lib/utils";
 import { constructSearchQuery, trimAddress } from "@/utils/helpers";
 import { AuditTableReponseI, DropdownOption } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
+import { FilterIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const auditTypeOptions: DropdownOption[] = [
   {
@@ -89,7 +91,7 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
   const [networkTypesSelected, setNetworkTypesSelected] = useState<DropdownOption[]>(
     getInitialState(query || {}, "network"),
   );
-  const [address, setAddresss] = useState(query?.user_address ?? "");
+  const [address, setAddress] = useState(query?.user_address ?? "");
   const [contract, setContract] = useState(query?.contract_address ?? "");
 
   const submitHandler = (): void => {
@@ -106,7 +108,7 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
   const resetHandler = (): void => {
     setAuditTypesSelected([]);
     setNetworkTypesSelected([]);
-    setAddresss("");
+    setAddress("");
     setContract("");
     if (query) {
       router.push("/analytics/history");
@@ -114,18 +116,92 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
   };
 
   return (
-    <div className="flex-col gap-4 basis-1 mt-8 hidden md:flex">
+    <div className="flex items-center gap-2 flex-wrap">
+      <Input
+        type="text"
+        placeholder="User address..."
+        className="bg-gray-900 rounded px-3 py-2 text-sm flex-1 !min-w-[80%] md:!min-w-0 md:w-fit"
+        value={address}
+        onChange={(e) => setAddress(e.currentTarget.value)}
+      />
+      <Button
+        variant="bright"
+        onClick={submitHandler}
+        className="order-3 grow md:order-2 md:grow-0"
+      >
+        Search
+      </Button>
+      <Button variant="bright" onClick={resetHandler} className="order-4 grow md:order-3 md:grow-0">
+        Reset
+      </Button>
+      <Dropdown.Main className="cursor-pointer order-2 md:order-4">
+        <Dropdown.Trigger>
+          <div className="relative">
+            <FilterIcon size={20} />
+            {(!!address ||
+              !!contract ||
+              auditTypesSelected.length > 0 ||
+              networkTypesSelected.length > 0) && (
+              <span className="absolute h-2 w-2 bg-green-400 rounded-full -top-2 -right-2" />
+            )}
+          </div>
+        </Dropdown.Trigger>
+        <Dropdown.Content className="top-full right-0" hasCloseTrigger>
+          <AuditSearchDropdown
+            address={address}
+            setAddress={setAddress}
+            auditTypesSelected={auditTypesSelected}
+            setAuditTypesSelected={setAuditTypesSelected}
+            contract={contract}
+            setContract={setContract}
+            networkTypesSelected={networkTypesSelected}
+            setNetworkTypesSelected={setNetworkTypesSelected}
+            submitHandler={submitHandler}
+          />
+        </Dropdown.Content>
+      </Dropdown.Main>
+    </div>
+  );
+};
+
+type DropdownProps = {
+  address: string;
+  setAddress: React.Dispatch<React.SetStateAction<string>>;
+  close?: () => void;
+  auditTypesSelected: DropdownOption[];
+  setAuditTypesSelected: React.Dispatch<React.SetStateAction<DropdownOption[]>>;
+  contract: string;
+  setContract: React.Dispatch<React.SetStateAction<string>>;
+  networkTypesSelected: DropdownOption[];
+  setNetworkTypesSelected: React.Dispatch<React.SetStateAction<DropdownOption[]>>;
+  submitHandler: () => void;
+};
+
+const AuditSearchDropdown: React.FC<DropdownProps> = ({
+  address,
+  setAddress,
+  auditTypesSelected,
+  setAuditTypesSelected,
+  contract,
+  setContract,
+  networkTypesSelected,
+  setNetworkTypesSelected,
+  close,
+  submitHandler,
+}) => {
+  return (
+    <div className="flex flex-col gap-4 p-2 bg-black rounded-md">
       <Input
         type="text"
         placeholder="User address..."
         className="bg-gray-900 rounded px-3 py-2 text-sm flex-1"
         value={address}
-        onChange={(e) => setAddresss(e.currentTarget.value)}
+        onChange={(e) => setAddress(e.currentTarget.value)}
       />
       <Input
         type="text"
         placeholder="Contract address..."
-        className="bg-gray-900 rounded px-3 py-2 text-sm flex-1"
+        className="bg-gray-900 rounded px-3 py-2 text-sm w-full"
         value={contract}
         onChange={(e) => setContract(e.currentTarget.value)}
       />
@@ -137,14 +213,6 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
           setSelectedOptions={setAuditTypesSelected}
         />
       </div>
-      {/* <div className="w-full">
-        <Select
-          title="project type"
-          options={projectTypeOptions}
-          selectedOptions={projectTypeSelected}
-          setSelectedOptions={setProjectTypeSelected}
-        />
-      </div> */}
       <div className="w-full">
         <Select
           title="network"
@@ -153,12 +221,19 @@ export const AuditsSearch = ({ query }: { query?: { [key: string]: string } }): 
           setSelectedOptions={setNetworkTypesSelected}
         />
       </div>
-      <div className="mt-auto space-y-2 w-full *:w-full">
-        <Button variant="bright" onClick={submitHandler}>
-          Search
+      <div className="flex gap-2 w-full">
+        <Button
+          variant="bright"
+          onClick={() => {
+            if (close) close();
+            submitHandler();
+          }}
+          className="flex-1"
+        >
+          Apply Filters
         </Button>
-        <Button variant="bright" onClick={resetHandler}>
-          Reset
+        <Button variant="transparent" className="flex-1" onClick={close}>
+          Close
         </Button>
       </div>
     </div>

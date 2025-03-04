@@ -36,14 +36,20 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <div
-        className={cn("hidden inset-0 bg-black opacity-50 z-40 w-14", isOpen && "fixed md:hidden")}
-        onClick={() => setIsOpen(!isOpen)}
-      />
+      {isMobile && (
+        <div
+          className={cn(
+            "inset-0 bg-black opacity-50 z-200 w-14",
+            isOpen && "fixed w-full",
+            !isOpen && "hidden",
+          )}
+          onClick={() => setIsOpen(!isOpen)}
+        />
+      )}
       <aside
         className={cn(
           "flex flex-col h-screen bg-black border-r border-gray-800",
-          "transition-all duration-300 z-50",
+          "transition-all duration-300 z-300",
           "font-mono fixed md:static",
           isOpen && "w-64",
           !isOpen && "w-14 md:w-20",
