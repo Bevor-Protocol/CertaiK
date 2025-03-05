@@ -1,12 +1,7 @@
-import Content from "@/components/content";
-import TerminalContainer from "@/components/screens/terminal";
+import { redirect } from "next/navigation";
 
-const TerminalAuditPage: React.FC = () => {
-  return (
-    <Content>
-      <TerminalContainer />
-    </Content>
-  );
+const Base = (): void => {
+  return redirect("/terminal");
 };
 
-export default TerminalAuditPage;
+export default Base;

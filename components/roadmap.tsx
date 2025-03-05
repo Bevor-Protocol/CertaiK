@@ -5,7 +5,7 @@ const Roadmap = (): JSX.Element => {
   return (
     <div
       className={cn(
-        "w-full max-w-4xl mx-auto px-4 py-16 backdrop-blur-sm",
+        "w-full max-w-4xl mx-auto px-4 py-16 backdrop-blur-xs",
         "bg-[#0a0a0a]/70 gap-8 mt-20 rounded-lg space-y-8",
       )}
     >

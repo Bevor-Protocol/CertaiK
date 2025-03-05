@@ -53,10 +53,6 @@ const submitFeedback = async (
   return certaikApiController.submitFeedback(id, feedback, verified);
 };
 
-const retryFailedEval = async (jobId: string): Promise<boolean> => {
-  return certaikApiController.retryFailedEval(jobId);
-};
-
 const getCurrentGas = async (): Promise<number> => {
   return certaikApiController.getCurrentGas();
 };
@@ -103,7 +99,6 @@ export {
   getCurrentGas,
   getStats,
   getUserInfo,
-  retryFailedEval,
   runEval,
   submitFeedback,
   syncCredits,

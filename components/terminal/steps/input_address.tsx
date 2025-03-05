@@ -1,7 +1,7 @@
 import { certaikApiAction } from "@/actions";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
-import { ContractResponseI, MessageType } from "@/utils/types";
+import { MessageType } from "@/utils/types";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import TerminalInputBar from "../input-bar";
 
@@ -22,7 +22,6 @@ const AddressStep = ({
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [history, setHistory] = useState<MessageType[]>(state);
-  const [candidates, setCandidates] = useState<ContractResponseI["candidates"]>([]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -59,8 +58,8 @@ const AddressStep = ({
         if (!result) {
           throw new Error("bad response");
         }
-        const { candidates, exists, exact_match } = result;
-        if (!exists) {
+        const { contract, exists } = result;
+        if (!exists || !contract) {
           setHistory((prev) => [
             ...prev,
             {
@@ -70,34 +69,20 @@ const AddressStep = ({
  Try uploading the source code directly.",
             },
           ]);
-        } else if (!exact_match) {
-          setCandidates(candidates);
-          const networks = candidates.map((candidate) => candidate.network);
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.SYSTEM,
-              content: `Found contract on multiple networks. \
-Please select one by entering its number:
-${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
-            },
-          ]);
-          setStep(1);
         } else {
-          const candidate = candidates[0];
-          setContractId(candidate.id);
+          setContractId(contract.id);
           setHistory((prev) => [
             ...prev,
             {
               type: Message.ASSISTANT,
-              content: candidate.source_code,
+              content: contract.code,
             },
             {
               type: Message.SYSTEM,
               content: "Does this look right? (y/n)",
             },
           ]);
-          setStep(2);
+          setStep(1);
         }
       })
       .catch((error) => {
@@ -106,7 +91,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
           ...prev,
           {
             type: Message.ERROR,
-            content: "Something went wrong",
+            content: "Contract not found",
           },
         ]);
       })
@@ -159,51 +144,6 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
     }
   };
 
-  const handleNetwork = (): void => {
-    if (!input) return;
-
-    const inputNum = Number(input);
-    if (isNaN(inputNum) || !Number.isInteger(inputNum)) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.SYSTEM,
-          content: "Please enter a valid number",
-        },
-      ]);
-      return;
-    }
-
-    if (inputNum > candidates.length) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.SYSTEM,
-          content: "Not a valid input, try again...",
-        },
-      ]);
-    } else {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.USER,
-          content: candidates[inputNum - 1].network,
-        },
-        {
-          type: Message.ASSISTANT,
-          content: candidates[inputNum - 1].source_code,
-        },
-        {
-          type: Message.SYSTEM,
-          content: "Does this look right? (y/n)",
-        },
-      ]);
-      setContractId(candidates[inputNum - 1].id);
-      setInput("");
-      setStep(2);
-    }
-  };
-
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
     if (step === 0 || step === 2) {
@@ -217,8 +157,6 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
     }
     if (step === 0) {
       handleScan();
-    } else if (step === 1) {
-      handleNetwork();
     } else {
       handleValidate();
     }
@@ -226,7 +164,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
 
   return (
     <>
-      <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
+      <div ref={terminalRef} className="overflow-y-auto font-mono text-sm no-scrollbar grow">
         {history.map((message, i) => (
           <div
             key={i}
@@ -235,7 +173,7 @@ ${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
               message.type === Message.SYSTEM && "text-blue-400",
               message.type === Message.USER && "text-green-400",
               message.type === Message.ERROR && "text-red-400",
-              message.type === Message.ASSISTANT && "text-white",
+              message.type === Message.ASSISTANT && "text-white text-xs",
             )}
           >
             {message.type === Message.USER && "> "}

@@ -26,7 +26,7 @@ const TerminalTextArea: React.FC<InputBarProps> = ({
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled || overrideLoading}
         className={cn(
-          "flex-1 bg-transparent border-none outline-none h-full resize-none w-full pb-12",
+          "flex-1 bg-transparent border-none outline-hidden h-full resize-none w-full pb-12",
           "text-white font-mono",
           "placeholder:text-gray-500",
           "caret-green-400",

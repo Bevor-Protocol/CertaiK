@@ -45,7 +45,7 @@ export const Wallets = (): JSX.Element => {
         <X height="1.25rem" width="1.25rem" />
       </div>
       <div className="mb-4">Connect a Wallet</div>
-      <div className="flex flex-col gap-2 text-left overflow-y-scroll flex-grow">
+      <div className="flex flex-col gap-2 text-left overflow-y-scroll grow">
         {walletsShow.map((connector) => (
           <div
             key={connector.uid}

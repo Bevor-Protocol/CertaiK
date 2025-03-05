@@ -9,10 +9,10 @@ import React from "react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="relative bottom-0 left-0 right-0 w-full text-white z-[100] py-4">
+    <footer className="relative bottom-0 left-0 right-0 w-full text-white z-100 py-4">
       <NavBar className="md:hidden flex mb-2 w-full px-[20%]" />
       <div className="max-w-[1200px] justify-between m-auto md:flex hidden">
-        <div className="flex flex-grow gap-8 items-center *:cursor-pointer z-10">
+        <div className="flex grow gap-8 items-center *:cursor-pointer z-10">
           <Link
             href="https://x.com/CertaiK_Agent"
             target="_blank"

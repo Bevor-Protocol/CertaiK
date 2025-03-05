@@ -79,14 +79,6 @@ class CertaikApiController {
     return this.certaikApiService.submitFeedback(id, user.user_id, feedback, verified);
   }
 
-  async retryFailedEval(jobId: string): Promise<boolean> {
-    const user = await this.authService.currentUser();
-    if (!user) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    return this.certaikApiService.retryFailedEval(jobId, user.user_id);
-  }
-
   async getCurrentGas(): Promise<number> {
     const user = await this.authService.currentUser();
     if (!user) {

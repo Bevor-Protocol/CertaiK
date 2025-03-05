@@ -1,5 +1,6 @@
 import { certaikApiAction } from "@/actions";
 import Content from "@/components/content";
+import TimeSeriesPlot from "@/components/screens/analytics/plot";
 import { Button } from "@/components/ui/button";
 import { LoadWaifu } from "@/components/ui/loader";
 import MetricCard from "@/components/ui/metric-card";
@@ -16,14 +17,15 @@ const Stats = async (): Promise<JSX.Element> => {
       <div
         className={cn(
           "size-full gap-4",
-          "grid md:grid-cols-4 md:grid-rows-[min-content,min-content,1fr]",
-          "grid-cols-2 grid-rows-[min-content,min-content,min-content,min-content,1fr]",
+          "grid md:grid-cols-4 md:grid-rows-[min-content_min-content_min-content_1fr]",
+          "grid-cols-2 grid-rows-[min-content_min-content_min-content_min-content_1fr]",
+          "*:bg-black/90",
         )}
       >
         <MetricCard title="Total Users" Icon={BarChart3} stat={data.n_users} />
         <MetricCard title="Registered Apps" Icon={BarChart3} stat={data.n_apps} />
         <MetricCard title="Audits Requested" Icon={BarChart3} stat={data.n_audits} />
-        <MetricCard title="Unique Contracts Observed" Icon={BarChart3} stat={data.n_contracts} />
+        <MetricCard title="Smart Contracts" Icon={BarChart3} stat={data.n_contracts} />
         <div className="border border-gray-800 rounded-md p-2 md:p-3 lg:p-4 col-span-2">
           <div className="flex justify-between text-sm">
             <p className="mb-2">Gas Optimizations</p>
@@ -70,9 +72,11 @@ const Stats = async (): Promise<JSX.Element> => {
             </div>
           </div>
         </div>
-        <div className="col-span-full">
-          <Link href="/analytics/history" className="w-fit">
-            <Button variant="bright" className="w-full md:w-fit">
+        <TimeSeriesPlot data={data.audits_timeseries} title="# audits" />
+        <TimeSeriesPlot data={data.users_timeseries} title="# users" />
+        <div className="col-span-full h-fit">
+          <Link href="/analytics/history">
+            <Button variant="bright" className="w-full">
               See All Audits
             </Button>
           </Link>

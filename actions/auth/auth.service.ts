@@ -42,14 +42,14 @@ class AuthService {
     }
     session.siwe = data;
 
-    const response = await api.post("/auth/user", {
+    const response = await api.post("/user", {
       address: data.address,
     });
     if (!response.data) {
       console.log("something went wrong");
       session.destroy();
     }
-    session.user_id = response.data.user_id;
+    session.user_id = response.data.id;
 
     await session.save();
   }

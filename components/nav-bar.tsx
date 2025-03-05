@@ -21,24 +21,24 @@ const NavBar: React.FC<{ className: string }> = ({ className }) => {
           terminal
         </div>
       </Link>
-      <Link href="/api-keys" passHref>
+      <Link href="/analytics/history" passHref>
         <div
-          className={cn("cursor-pointer relative", pathname === "/api-keys" && " text-green-400")}
+          className={cn(
+            "cursor-pointer relative",
+            pathname === "/analytics/history" && " text-green-400",
+          )}
         >
-          {pathname === "/api-keys" && (
+          {pathname === "/analytics/history" && (
             <span className="absolute left-0 -translate-x-full">{">"}</span>
           )}
-          api
+          audits
         </div>
       </Link>
       <Link href="/analytics" passHref>
         <div
-          className={cn(
-            "cursor-pointer relative",
-            pathname.includes("/analytics") && " text-green-400",
-          )}
+          className={cn("cursor-pointer relative", pathname === "/analytics" && " text-green-400")}
         >
-          {pathname.includes("/analytics") && (
+          {pathname === "/analytics" && (
             <span className="absolute left-0 -translate-x-full">{">"}</span>
           )}
           analytics

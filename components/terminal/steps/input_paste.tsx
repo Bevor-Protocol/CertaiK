@@ -59,9 +59,8 @@ const PasteStep = ({
             if (!result) {
               throw new Error("bad response");
             }
-            const { candidates } = result;
-            const candidate = candidates[0];
-            setContractId(candidate.id);
+            const { contract } = result;
+            setContractId(contract!.id);
             handleGlobalState(TerminalStep.INPUT_PASTE, history);
             setTerminalStep(TerminalStep.AUDIT_TYPE);
             setInput("");

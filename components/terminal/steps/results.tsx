@@ -1,7 +1,10 @@
 import { certaikApiAction } from "@/actions";
+import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
+import { cn } from "@/lib/utils";
 import { AuditStatusResponseI, MessageType } from "@/utils/types";
-import { Check, X } from "lucide-react";
+import { Check, DownloadIcon, ExternalLink, X } from "lucide-react";
+import Link from "next/link";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import TerminalInputBar from "../input-bar";
@@ -48,8 +51,8 @@ const ResultsStep = ({
     certaikApiAction
       .getAudit(auditId)
       .then((result) => {
-        if (result.audit.status === "success") {
-          setAuditContent(result.audit.result);
+        if (result.status === "success") {
+          setAuditContent(result.result);
         } else {
           setIsError(true);
         }
@@ -131,15 +134,53 @@ const ResultsStep = ({
           </div>
         )}
       </div>
-      <TerminalInputBar
-        onSubmit={() => {}}
-        onChange={() => {}}
-        disabled={true}
-        value={""}
-        overrideLoading={isLoading}
-        placeholder="Chat feature coming soon..."
-      />
+      {isLoading && (
+        <TerminalInputBar
+          onSubmit={() => {}}
+          onChange={() => {}}
+          disabled={true}
+          value={""}
+          overrideLoading={isLoading}
+          placeholder="Chat feature coming soon..."
+        />
+      )}
+      {!isLoading && !!auditContent && <Download auditId={auditId} auditContent={auditContent} />}
     </>
+  );
+};
+
+type DownloadProps = {
+  auditContent?: string;
+  className?: string;
+  auditId: string;
+};
+
+const Download: React.FC<DownloadProps> = ({ auditContent, className, auditId }) => {
+  const handleDownload = (): void => {
+    if (!auditContent) return;
+    const blob = new Blob([auditContent], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "audit-report.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  return (
+    <div className={cn("flex flex-row gap-2", className)}>
+      <Link href={`/analytics/audit/${auditId}`}>
+        <Button variant="bright">
+          <span className="text-sm">View Breakdown</span>
+          <ExternalLink size={14} className="ml-1" />
+        </Button>
+      </Link>
+      <Button onClick={handleDownload} variant="bright">
+        <span className="text-sm">Download Report</span>
+        <DownloadIcon size={14} className="ml-1" />
+      </Button>
+    </div>
   );
 };
 

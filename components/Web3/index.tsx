@@ -121,15 +121,15 @@ export const Web3Network = (): JSX.Element => {
                 size="sm"
                 image={networkImg}
                 className={cn(
-                  !supported && "!bg-auto",
-                  supported && networkImg.includes("unknown") && "!bg-auto",
+                  !supported && "bg-auto!",
+                  supported && networkImg.includes("unknown") && "bg-auto!",
                 )}
               />
               <ChevronDown />
             </div>
           </Tooltip.Trigger>
           <Tooltip.Content side="left" align="start">
-            <div className="bg-black shadow rounded-lg cursor-default min-w-40">
+            <div className="bg-black shadow-sm rounded-lg cursor-default min-w-40">
               <div className="px-2 py-1">This is an unsupported network</div>
             </div>
           </Tooltip.Content>
@@ -205,7 +205,7 @@ export const Wallets = (): JSX.Element => {
         <X height="1.25rem" width="1.25rem" />
       </div>
       <div className="mb-4">Connect a Wallet</div>
-      <div className="flex flex-col gap-2 text-left overflow-y-scroll flex-grow">
+      <div className="flex flex-col gap-2 text-left overflow-y-scroll grow">
         {walletsShow.map((connector) => (
           <div
             key={connector.uid}
