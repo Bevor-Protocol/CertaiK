@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  AppSearchResponseI,
   AuditResponseI,
   AuditStatusResponseI,
   AuditTableReponseI,
@@ -8,8 +9,37 @@ import {
   CreditSyncResponseI,
   StatsResponseI,
   UserInfoResponseI,
+  UserSearchResponseI,
 } from "@/utils/types";
 import certaikApiController from "./certaik-api.controller";
+
+const isAdmin = async (): Promise<boolean> => {
+  return certaikApiController.isAdmin();
+};
+
+const searchUsers = async (identifier: string): Promise<UserSearchResponseI[]> => {
+  return certaikApiController.searchUsers(identifier);
+};
+
+const searchApps = async (identifier: string): Promise<AppSearchResponseI[]> => {
+  return certaikApiController.searchApps(identifier);
+};
+
+const updateUserPermissions = async (data: {
+  toUpdateId: string;
+  canCreateApp: boolean;
+  canCreateApiKey: boolean;
+}): Promise<boolean> => {
+  return certaikApiController.updateUserPermissions(data);
+};
+
+const updateAppPermissions = async (data: {
+  toUpdateId: string;
+  canCreateApp: boolean;
+  canCreateApiKey: boolean;
+}): Promise<boolean> => {
+  return certaikApiController.updateAppPermissions(data);
+};
 
 const runEval = async (
   contractId: string,
@@ -99,9 +129,14 @@ export {
   getCurrentGas,
   getStats,
   getUserInfo,
+  isAdmin,
   runEval,
+  searchApps,
+  searchUsers,
   submitFeedback,
   syncCredits,
   updateApp,
+  updateAppPermissions,
+  updateUserPermissions,
   uploadSourceCode,
 };

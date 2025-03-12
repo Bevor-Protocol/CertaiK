@@ -8,7 +8,7 @@ const HistoryPage = async ({
 }): Promise<JSX.Element> => {
   const queryParams = await searchParams;
   return (
-    <Wrapper className="bg-black/90 border-t border-gray-800">
+    <Wrapper className="bg-black/90">
       <div className="flex flex-col gap-4 h-full font-mono">
         <AuditsSearch query={queryParams} />
         <Content query={queryParams} />

@@ -152,3 +152,15 @@ export interface AuditStatusResponseI {
     status: string;
   }[];
 }
+
+export interface UserSearchResponseI {
+  id: string;
+  address: string;
+}
+
+export interface AppSearchResponseI {
+  id: string;
+  owner_id: string;
+  name: string;
+  type: string;
+}
