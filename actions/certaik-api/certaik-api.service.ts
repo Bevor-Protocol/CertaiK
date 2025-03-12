@@ -19,12 +19,18 @@ class CertaikApiService {
       },
     };
 
-    return api.get("/admin/status", headers).then((response) => {
-      if (!response.data) {
-        throw new Error(response.statusText);
-      }
-      return response.data.success;
-    });
+    return api
+      .get("/admin/status", headers)
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.success;
+      })
+      .catch((error) => {
+        console.log(error);
+        return false;
+      });
   }
 
   async searchUsers(identifier: string, userId: string): Promise<UserSearchResponseI[]> {

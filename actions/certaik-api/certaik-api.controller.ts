@@ -21,7 +21,7 @@ class CertaikApiController {
   async isAdmin(): Promise<boolean> {
     const user = await this.authService.currentUser();
     if (!user) {
-      throw new Error("user is not signed in with ethereum");
+      return Promise.resolve(false);
     }
     return this.certaikApiService.isAdmin(user.user_id);
   }
