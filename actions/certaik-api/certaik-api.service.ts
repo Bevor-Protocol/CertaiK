@@ -6,6 +6,7 @@ import {
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
+  PromptGroupedResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -355,6 +356,83 @@ class CertaikApiService {
       }
       return response.data;
     });
+  }
+
+  async getPrompts(userId: string): Promise<PromptGroupedResponseI> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get("/admin/prompts", headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async updatePrompt(data: {
+    userId: string;
+    promptId: string;
+    tag?: string;
+    content?: string;
+    version?: string;
+    is_active?: boolean;
+  }): Promise<boolean> {
+    const { userId, promptId, ...rest } = data;
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api
+      .patch(
+        `/admin/prompt/${promptId}`,
+        {
+          ...rest,
+        },
+        headers,
+      )
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.success;
+      });
+  }
+
+  async addPrompt(data: {
+    userId: string;
+    audit_type: string;
+    tag: string;
+    content: string;
+    version: string;
+    is_active?: boolean;
+  }): Promise<string> {
+    const { userId, ...rest } = data;
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api
+      .post(
+        "/admin/prompt",
+        {
+          ...rest,
+        },
+        headers,
+      )
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.id;
+      });
   }
 }
 

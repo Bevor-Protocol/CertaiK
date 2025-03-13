@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import * as Dropdown from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { LoaderFull } from "@/components/ui/loader";
-import { Select } from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { cn, prettyDate } from "@/lib/utils";
 import { constructSearchQuery, trimAddress } from "@/utils/helpers";
 import { AuditTableReponseI, DropdownOption } from "@/utils/types";
@@ -206,7 +206,7 @@ const AuditSearchDropdown: React.FC<DropdownProps> = ({
         onChange={(e) => setContract(e.currentTarget.value)}
       />
       <div className="w-full">
-        <Select
+        <MultiSelect
           title="audit type"
           options={auditTypeOptions}
           selectedOptions={auditTypesSelected}
@@ -214,7 +214,7 @@ const AuditSearchDropdown: React.FC<DropdownProps> = ({
         />
       </div>
       <div className="w-full">
-        <Select
+        <MultiSelect
           title="network"
           options={networkOptions}
           selectedOptions={networkTypesSelected}

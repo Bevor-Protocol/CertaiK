@@ -172,3 +172,21 @@ export interface AppSearchResponseI {
     can_create_app: boolean;
   };
 }
+
+export interface PromptResponseI {
+  id: string;
+  audit_type: string;
+  tag: string;
+  version: string;
+  content: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface PromptGroupedResponseI {
+  result: {
+    [auditType: string]: {
+      [tag: string]: PromptResponseI[];
+    };
+  };
+}

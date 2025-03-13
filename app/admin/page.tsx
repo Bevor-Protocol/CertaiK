@@ -10,7 +10,7 @@ const AdminPage = async (): Promise<JSX.Element> => {
   }
 
   return (
-    <Content>
+    <Content className="bg-black/90">
       <AdminPanel />
     </Content>
   );

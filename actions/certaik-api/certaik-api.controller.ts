@@ -6,6 +6,7 @@ import {
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
+  PromptGroupedResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -201,6 +202,48 @@ class CertaikApiController {
       throw new Error("user is not signed in with ethereum");
     }
     return this.certaikApiService.updateApp(name, user.user_id);
+  }
+
+  async getPrompts(): Promise<PromptGroupedResponseI> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.getPrompts(user.user_id);
+  }
+
+  async addPrompt(data: {
+    audit_type: string;
+    tag: string;
+    content: string;
+    version: string;
+    is_active?: boolean;
+  }): Promise<string> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.addPrompt({
+      ...data,
+      userId: user.user_id,
+    });
+  }
+
+  async updatePrompt(data: {
+    promptId: string;
+    tag?: string;
+    content?: string;
+    version?: string;
+    is_active?: boolean;
+  }): Promise<boolean> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.updatePrompt({
+      ...data,
+      userId: user.user_id,
+    });
   }
 }
 

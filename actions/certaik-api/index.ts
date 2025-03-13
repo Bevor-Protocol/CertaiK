@@ -7,6 +7,7 @@ import {
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
+  PromptGroupedResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -119,7 +120,32 @@ const updateApp = async (name: string): Promise<string> => {
   return certaikApiController.updateApp(name);
 };
 
+const getPrompts = async (): Promise<PromptGroupedResponseI> => {
+  return certaikApiController.getPrompts();
+};
+
+const addPrompt = async (data: {
+  audit_type: string;
+  tag: string;
+  content: string;
+  version: string;
+  is_active?: boolean;
+}): Promise<string> => {
+  return certaikApiController.addPrompt(data);
+};
+
+const updatePrompt = async (data: {
+  promptId: string;
+  tag?: string;
+  content?: string;
+  version?: string;
+  is_active?: boolean;
+}): Promise<boolean> => {
+  return certaikApiController.updatePrompt(data);
+};
+
 export {
+  addPrompt,
   generateApiKey,
   generateApp,
   getAgentSecurityScore,
@@ -127,6 +153,7 @@ export {
   getAudits,
   getAuditStatus,
   getCurrentGas,
+  getPrompts,
   getStats,
   getUserInfo,
   isAdmin,
@@ -137,6 +164,7 @@ export {
   syncCredits,
   updateApp,
   updateAppPermissions,
+  updatePrompt,
   updateUserPermissions,
   uploadSourceCode,
 };
