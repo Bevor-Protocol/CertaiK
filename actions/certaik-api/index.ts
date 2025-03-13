@@ -1,15 +1,46 @@
 "use server";
 
 import {
+  AppSearchResponseI,
   AuditResponseI,
   AuditStatusResponseI,
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
+  PromptGroupedResponseI,
   StatsResponseI,
   UserInfoResponseI,
+  UserSearchResponseI,
 } from "@/utils/types";
 import certaikApiController from "./certaik-api.controller";
+
+const isAdmin = async (): Promise<boolean> => {
+  return certaikApiController.isAdmin();
+};
+
+const searchUsers = async (identifier: string): Promise<UserSearchResponseI[]> => {
+  return certaikApiController.searchUsers(identifier);
+};
+
+const searchApps = async (identifier: string): Promise<AppSearchResponseI[]> => {
+  return certaikApiController.searchApps(identifier);
+};
+
+const updateUserPermissions = async (data: {
+  toUpdateId: string;
+  canCreateApp: boolean;
+  canCreateApiKey: boolean;
+}): Promise<boolean> => {
+  return certaikApiController.updateUserPermissions(data);
+};
+
+const updateAppPermissions = async (data: {
+  toUpdateId: string;
+  canCreateApp: boolean;
+  canCreateApiKey: boolean;
+}): Promise<boolean> => {
+  return certaikApiController.updateAppPermissions(data);
+};
 
 const runEval = async (
   contractId: string,
@@ -89,7 +120,32 @@ const updateApp = async (name: string): Promise<string> => {
   return certaikApiController.updateApp(name);
 };
 
+const getPrompts = async (): Promise<PromptGroupedResponseI> => {
+  return certaikApiController.getPrompts();
+};
+
+const addPrompt = async (data: {
+  audit_type: string;
+  tag: string;
+  content: string;
+  version: string;
+  is_active?: boolean;
+}): Promise<string> => {
+  return certaikApiController.addPrompt(data);
+};
+
+const updatePrompt = async (data: {
+  promptId: string;
+  tag?: string;
+  content?: string;
+  version?: string;
+  is_active?: boolean;
+}): Promise<boolean> => {
+  return certaikApiController.updatePrompt(data);
+};
+
 export {
+  addPrompt,
   generateApiKey,
   generateApp,
   getAgentSecurityScore,
@@ -97,11 +153,18 @@ export {
   getAudits,
   getAuditStatus,
   getCurrentGas,
+  getPrompts,
   getStats,
   getUserInfo,
+  isAdmin,
   runEval,
+  searchApps,
+  searchUsers,
   submitFeedback,
   syncCredits,
   updateApp,
+  updateAppPermissions,
+  updatePrompt,
+  updateUserPermissions,
   uploadSourceCode,
 };

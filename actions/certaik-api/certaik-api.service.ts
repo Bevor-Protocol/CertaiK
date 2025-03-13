@@ -1,15 +1,137 @@
 import api from "@/lib/api";
 import {
+  AppSearchResponseI,
   AuditResponseI,
   AuditStatusResponseI,
   AuditTableReponseI,
   ContractResponseI,
   CreditSyncResponseI,
+  PromptGroupedResponseI,
   StatsResponseI,
   UserInfoResponseI,
+  UserSearchResponseI,
 } from "@/utils/types";
 
 class CertaikApiService {
+  async isAdmin(userId: string): Promise<boolean> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api
+      .get("/admin/status", headers)
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.success;
+      })
+      .catch((error) => {
+        console.log(error);
+        return false;
+      });
+  }
+
+  async searchUsers(identifier: string, userId: string): Promise<UserSearchResponseI[]> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get(`/admin/search/user?identifier=${identifier}`, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data.results;
+    });
+  }
+
+  async searchApps(identifier: string, userId: string): Promise<AppSearchResponseI[]> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get(`/admin/search/app?identifier=${identifier}`, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data.results;
+    });
+  }
+
+  async updateUserPermissions({
+    toUpdateId,
+    userId,
+    canCreateApp,
+    canCreateApiKey,
+  }: {
+    toUpdateId: string;
+    userId: string;
+    canCreateApp: boolean;
+    canCreateApiKey: boolean;
+  }): Promise<boolean> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api
+      .post(
+        `/admin/permissions/user/${toUpdateId}`,
+        {
+          can_create_app: canCreateApp,
+          can_create_api_key: canCreateApiKey,
+        },
+        headers,
+      )
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.status;
+      });
+  }
+
+  async updateAppPermissions({
+    toUpdateId,
+    userId,
+    canCreateApp,
+    canCreateApiKey,
+  }: {
+    toUpdateId: string;
+    userId: string;
+    canCreateApp: boolean;
+    canCreateApiKey: boolean;
+  }): Promise<boolean> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api
+      .post(
+        `/admin/permissions/app/${toUpdateId}`,
+        {
+          can_create_app: canCreateApp,
+          can_create_api_key: canCreateApiKey,
+        },
+        headers,
+      )
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.status;
+      });
+  }
+
   async runEval(
     contractId: string,
     promptType: string,
@@ -20,7 +142,7 @@ class CertaikApiService {
   }> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
 
@@ -44,7 +166,7 @@ class CertaikApiService {
   async syncCredits(userId: string): Promise<CreditSyncResponseI> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.post("/auth/sync/credits", {}, headers).then((response) => {
@@ -95,7 +217,7 @@ class CertaikApiService {
   }): Promise<ContractResponseI> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.post("/contract", { address, network, code }, headers).then((response) => {
@@ -114,7 +236,7 @@ class CertaikApiService {
   ): Promise<{ success: boolean }> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.post(`/audit/${id}/feedback`, { feedback, verified }, headers).then((response) => {
@@ -128,7 +250,7 @@ class CertaikApiService {
   async getCurrentGas(userId: string): Promise<number> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.post("/blockchain/gas", {}, headers).then((response) => {
@@ -183,7 +305,7 @@ class CertaikApiService {
   async getUserInfo(userId: string): Promise<UserInfoResponseI> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.get("/user/info", headers).then((response) => {
@@ -197,7 +319,7 @@ class CertaikApiService {
   async generateApiKey(type: "user" | "app", userId: string): Promise<string> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.post(`/auth/${type}`, {}, headers).then((response) => {
@@ -211,7 +333,7 @@ class CertaikApiService {
   async generateApp(name: string, userId: string): Promise<string> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.post("/app", { name }, headers).then((response) => {
@@ -225,7 +347,7 @@ class CertaikApiService {
   async updateApp(name: string, userId: string): Promise<string> {
     const headers = {
       headers: {
-        "X-User-Identifier": userId,
+        "Bevor-User-Identifier": userId,
       },
     };
     return api.patch("/app", { name }, headers).then((response) => {
@@ -234,6 +356,83 @@ class CertaikApiService {
       }
       return response.data;
     });
+  }
+
+  async getPrompts(userId: string): Promise<PromptGroupedResponseI> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get("/admin/prompts", headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async updatePrompt(data: {
+    userId: string;
+    promptId: string;
+    tag?: string;
+    content?: string;
+    version?: string;
+    is_active?: boolean;
+  }): Promise<boolean> {
+    const { userId, promptId, ...rest } = data;
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api
+      .patch(
+        `/admin/prompt/${promptId}`,
+        {
+          ...rest,
+        },
+        headers,
+      )
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.success;
+      });
+  }
+
+  async addPrompt(data: {
+    userId: string;
+    audit_type: string;
+    tag: string;
+    content: string;
+    version: string;
+    is_active?: boolean;
+  }): Promise<string> {
+    const { userId, ...rest } = data;
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api
+      .post(
+        "/admin/prompt",
+        {
+          ...rest,
+        },
+        headers,
+      )
+      .then((response) => {
+        if (!response.data) {
+          throw new Error(response.statusText);
+        }
+        return response.data.id;
+      });
   }
 }
 

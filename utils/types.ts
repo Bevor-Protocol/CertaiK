@@ -152,3 +152,41 @@ export interface AuditStatusResponseI {
     status: string;
   }[];
 }
+
+export interface UserSearchResponseI {
+  id: string;
+  address: string;
+  permission?: {
+    can_create_api_key: boolean;
+    can_create_app: boolean;
+  };
+}
+
+export interface AppSearchResponseI {
+  id: string;
+  owner_id: string;
+  name: string;
+  type: string;
+  permission?: {
+    can_create_api_key: boolean;
+    can_create_app: boolean;
+  };
+}
+
+export interface PromptResponseI {
+  id: string;
+  audit_type: string;
+  tag: string;
+  version: string;
+  content: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface PromptGroupedResponseI {
+  result: {
+    [auditType: string]: {
+      [tag: string]: PromptResponseI[];
+    };
+  };
+}

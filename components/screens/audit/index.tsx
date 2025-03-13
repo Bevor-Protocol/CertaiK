@@ -67,18 +67,13 @@ export const Content = ({
           )}
         >
           <div className="text-sm">
-            <div className="space-y-1 *:whitespace-nowrap">
+            <div className="*:whitespace-nowrap">
+              <p>Audit Type: {audit.audit_type}</p>
               <p>
                 Address:{" "}
                 {audit.contract.address ? trimAddress(audit.contract.address) : "Not Provided"}
               </p>
               <p>Network: {audit.contract.network ?? "Not Provided"}</p>
-            </div>
-          </div>
-          <div className="text-sm">
-            <div className="space-y-1 *:whitespace-nowrap">
-              <p>Audit Type: {audit.audit_type}</p>
-              <p>Version: {audit.version}</p>
             </div>
           </div>
           <div className="w-full *:w-1/2 ml-0 flex flex-row gap-2 lg:ml-auto lg:w-fit">
