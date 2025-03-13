@@ -16,7 +16,7 @@ interface TabsContextValue {
 
 const TabsContext = React.createContext<TabsContextValue | undefined>(undefined);
 
-function useTabsContext() {
+function useTabsContext(): TabsContextValue {
   const context = React.useContext(TabsContext);
   if (!context) {
     throw new Error("Tabs components must be used within a Tabs provider");
@@ -55,9 +55,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 
 Tabs.displayName = "Tabs";
 
-interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
+export const TabsList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     return (
       <div
@@ -90,7 +88,8 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
         role="tab"
         aria-selected={isSelected}
         className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
+          "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5",
+          "text-sm font-medium transition-all",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
           "cursor-pointer",
           isSelected
