@@ -56,7 +56,7 @@ export const Content: React.FC<ContentProps> = ({
   return (
     <div
       className={cn(
-        "absolute z-[999] text-xs",
+        "absolute z-999 text-xs",
         side == "top" && "bottom-[calc(100%+5px)]",
         side == "left" && "right-[calc(100%+5px)]",
         side == "bottom" && "top-[calc(100%+5px)]",

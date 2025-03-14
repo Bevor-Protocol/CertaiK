@@ -12,10 +12,10 @@ const Button: React.FC<ButtonProps> = (props) => {
     <button
       type={type}
       className={cn(
-        "flex items-center justify-center outline-none whitespace-nowrap",
+        "flex items-center justify-center outline-hidden whitespace-nowrap",
         "focus-visible:opacity-80",
-        "appearance-none bg-gradient-to-r text-white rounded-md text-base",
-        variant !== "transparent" && "min-w-36 h-9 py-2 px-5",
+        "appearance-none bg-linear-to-r text-white rounded-md text-base",
+        variant !== "transparent" && "min-w-36 h-8 py-1 px-4",
         variant === "transparent" && "border border-gray-800 px-2",
         variant === "bright" && "from-cyan-500 to-purple-500",
         variant === "dark" && "from-gray-500 to-gray-700",

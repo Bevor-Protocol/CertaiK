@@ -17,7 +17,7 @@ const Networks = ({ close }: { close?: () => void }): JSX.Element => {
 
   return (
     <Card.Main
-      className={cn("text-sm min-w-44 shadow", "divide-gray-200/10 divide-y divide-solid")}
+      className={cn("text-sm min-w-44 shadow-sm", "divide-gray-200/10 divide-y divide-solid")}
     >
       <div className="flex flex-col px-2 py-2 gap-2">
         <p className="text-white/60 pl-2">Select Network:</p>
@@ -38,7 +38,7 @@ const Networks = ({ close }: { close?: () => void }): JSX.Element => {
               image={ChainPresets[chain && chain.id in ChainPresets ? chain.id : 99999]}
               className={cn(
                 currentChain?.id == chain.id && "opacity-disable",
-                chain.name === "Localhost" && "!bg-auto",
+                chain.name === "Localhost" && "bg-auto!",
               )}
             />
             <span

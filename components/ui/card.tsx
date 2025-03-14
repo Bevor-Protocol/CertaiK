@@ -9,7 +9,7 @@ export const Main: React.FC<Props> = ({ children, className, hover = false, ...r
   return (
     <div
       className={cn(
-        "flex flex-col bg-black shadow rounded-lg",
+        "flex flex-col bg-black shadow-sm rounded-lg",
         "divide-gray-200/10 divide-y divide-solid border border-white",
         hover && "transition-colors hover:bg-slate-700/40",
         className,
@@ -23,7 +23,7 @@ export const Main: React.FC<Props> = ({ children, className, hover = false, ...r
 
 export const Header: React.FC<Props> = ({ children, className, ...rest }) => {
   return (
-    <div className={cn("flex flex-grow justify-between items-center", className)} {...rest}>
+    <div className={cn("flex grow justify-between items-center", className)} {...rest}>
       {children}
     </div>
   );
@@ -31,7 +31,7 @@ export const Header: React.FC<Props> = ({ children, className, ...rest }) => {
 
 export const Content: React.FC<Props> = ({ children, className, ...rest }) => {
   return (
-    <div className={cn("flex flex-grow", className)} {...rest}>
+    <div className={cn("flex grow", className)} {...rest}>
       {children}
     </div>
   );
@@ -39,7 +39,7 @@ export const Content: React.FC<Props> = ({ children, className, ...rest }) => {
 
 export const Footer: React.FC<Props> = ({ children, className, ...rest }) => {
   return (
-    <div className={cn("flex flex-grow justify-between items-center ", className)} {...rest}>
+    <div className={cn("flex grow justify-between items-center ", className)} {...rest}>
       {children}
     </div>
   );

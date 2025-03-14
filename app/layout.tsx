@@ -1,11 +1,12 @@
-import Footer from "@/components/footer";
 import Header from "@/components/header";
+import Layout from "@/components/ui/layout";
 import sessionOptions from "@/lib/config/session";
 import walletConfig from "@/lib/config/wallet";
 import ModalProvider from "@/providers/modal";
 import SiweProvider from "@/providers/siwe";
 import WalletProvider from "@/providers/wallet";
 import { SessionData } from "@/utils/types";
+import { Analytics } from "@vercel/analytics/react";
 import { getIronSession } from "iron-session";
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
@@ -56,11 +57,11 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
         <WalletProvider initialState={initialState}>
           <SiweProvider>
             <ModalProvider>
-              <div className="background-container">
+              <Layout>
                 <Header address={address} />
                 {children}
-                <Footer />
-              </div>
+                <Analytics />
+              </Layout>
             </ModalProvider>
           </SiweProvider>
         </WalletProvider>

@@ -14,7 +14,7 @@ const Audit = async ({ params }: { params: Promise<{ slug: string }> }): Promise
 
 export default function AuditPage({ params }: { params: Promise<{ slug: string }> }): JSX.Element {
   return (
-    <Wrapper>
+    <Wrapper className="bg-black/90">
       <Suspense fallback={<LoadWaifu />}>
         <Audit params={params} />
       </Suspense>

@@ -1,9 +1,13 @@
-const Content: React.FC<{ children: React.ReactNode }> = async ({ children }) => {
+import { cn } from "@/lib/utils";
+
+const Content: React.FC<{ children: React.ReactNode; className?: string }> = async ({
+  children,
+  className,
+}) => {
   return (
-    <div className="relative px-4 z-20 flex-grow max-w-[1200px] w-full">
-      <div className="bg-black/90 border border-gray-800 rounded-lg p-2 md:p-4 absolute inset-0">
-        {children}
-      </div>
+    <div className="relative z-20 grow w-full overflow-hidden">
+      {/* <div className="bg-black/90 p-2 md:p-4 size-full overflow-hidden">{children}</div> */}
+      <div className={cn("p-2 md:p-4 size-full overflow-hidden", className)}>{children}</div>
     </div>
   );
 };

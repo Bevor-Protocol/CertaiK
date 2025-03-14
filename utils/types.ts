@@ -38,25 +38,30 @@ export interface DropdownOption {
 
 export interface StatsResponseI {
   n_audits: number;
-  n_auths: number;
   n_contracts: number;
   n_users: number;
   n_apps: number;
   findings: { [key: string]: { [key: string]: string[] } };
+  users_timeseries: { date: string; count: number }[];
+  audits_timeseries: { date: string; count: number }[];
 }
 
 interface AuditObservationI {
   n: number;
   id: string;
   created_at: string;
-  app_id?: string;
-  user_id?: string;
   audit_type: string;
-  results_status: string;
+  status: string;
   contract: {
+    id: string;
     method: string;
     address?: string;
     network?: string;
+    is_available: boolean;
+  };
+  user: {
+    id: string;
+    address: string;
   };
 }
 
@@ -67,20 +72,24 @@ export interface AuditTableReponseI {
 }
 
 export interface AuditResponseI {
+  id: string;
+  created_at: string;
+  status: "waiting" | "processing" | "success" | "failed";
+  version: string;
+  audit_type: string;
+  processing_time_seconds: number;
+  result: string;
   contract: {
+    id: string;
+    method: string;
     address: string;
     network: string;
     code: string;
+    is_available: boolean;
   };
   user: {
     id: string;
     address: string;
-  };
-  audit: {
-    status: "waiting" | "processing" | "success" | "failed";
-    version: string;
-    audit_type: string;
-    result: string;
   };
   findings: {
     id: string;
@@ -96,13 +105,11 @@ export interface AuditResponseI {
 }
 
 export interface UserInfoResponseI {
-  user: {
-    id: string;
-    address: string;
-    created_at: string;
-    total_credits: number;
-    remaining_credits: number;
-  };
+  id: string;
+  address: string;
+  created_at: string;
+  total_credits: number;
+  remaining_credits: number;
   auth: {
     exists: boolean;
     is_active: boolean;
@@ -115,19 +122,21 @@ export interface UserInfoResponseI {
     exists_auth: boolean;
     can_create_auth: boolean;
   };
-  audits: AuditObservationI[];
+  n_audits: number;
   n_contracts: number;
 }
 
 export interface ContractResponseI {
   exact_match: boolean;
   exists: boolean;
-  candidates: {
+  contract?: {
     id: string;
-    source_code: string;
+    method: string;
+    address: string;
+    code: string;
     network: string;
     is_available: boolean;
-  }[];
+  };
 }
 
 export interface CreditSyncResponseI {
@@ -142,4 +151,42 @@ export interface AuditStatusResponseI {
     step: string;
     status: string;
   }[];
+}
+
+export interface UserSearchResponseI {
+  id: string;
+  address: string;
+  permission?: {
+    can_create_api_key: boolean;
+    can_create_app: boolean;
+  };
+}
+
+export interface AppSearchResponseI {
+  id: string;
+  owner_id: string;
+  name: string;
+  type: string;
+  permission?: {
+    can_create_api_key: boolean;
+    can_create_app: boolean;
+  };
+}
+
+export interface PromptResponseI {
+  id: string;
+  audit_type: string;
+  tag: string;
+  version: string;
+  content: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface PromptGroupedResponseI {
+  result: {
+    [auditType: string]: {
+      [tag: string]: PromptResponseI[];
+    };
+  };
 }

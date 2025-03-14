@@ -1,7 +1,7 @@
 import { certaikApiAction, cookieDaoAction } from "@/actions";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
-import { ContractResponseI, MessageType } from "@/utils/types";
+import { MessageType } from "@/utils/types";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import TerminalInputBar from "../input-bar";
 
@@ -23,8 +23,6 @@ const AgentStep = ({
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [history, setHistory] = useState<MessageType[]>(state);
-
-  const [candidates, setCandidates] = useState<ContractResponseI["candidates"]>([]);
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -107,9 +105,9 @@ Powered by Cookie DAO 🍪
         throw new Error("bad response");
       }
 
-      const { candidates, exists, exact_match } = result;
+      const { contract, exists } = result;
 
-      if (!exists) {
+      if (!exists || !contract) {
         setHistory((prev) => [
           ...prev,
           {
@@ -119,28 +117,14 @@ Powered by Cookie DAO 🍪
  Try uploading the source code directly.",
           },
         ]);
-      } else if (!exact_match) {
-        setCandidates(candidates);
-        const networks = candidates.map((candidate) => candidate.network);
-        setHistory((prev) => [
-          ...prev,
-          {
-            type: Message.SYSTEM,
-            content: `Found contract on multiple networks. \
-Please select one by entering its number:
-${networks.map((network, i) => `${i + 1}. ${network}`).join("\n")}`,
-          },
-        ]);
-        setStep(1);
       } else {
-        const candidate = candidates[0];
-        setContractId(candidate.id);
+        setContractId(contract.id);
 
         setHistory((prev) => [
           ...prev,
           {
             type: Message.ASSISTANT,
-            content: candidate.source_code,
+            content: contract.code,
           },
           ...(agent
             ? [
@@ -158,7 +142,7 @@ Powered by Cookie DAO 🍪
             content: "Does this look right? (y/n)",
           },
         ]);
-        setStep(2);
+        setStep(1);
       }
     } catch (error) {
       console.log(error);
@@ -166,7 +150,7 @@ Powered by Cookie DAO 🍪
         ...prev,
         {
           type: Message.ERROR,
-          content: "Something went wrong",
+          content: "Contract not found",
         },
       ]);
     } finally {
@@ -218,51 +202,6 @@ Powered by Cookie DAO 🍪
     }
   };
 
-  const handleNetwork = (): void => {
-    if (!input) return;
-
-    const inputNum = Number(input);
-    if (isNaN(inputNum) || !Number.isInteger(inputNum)) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.SYSTEM,
-          content: "Please enter a valid number",
-        },
-      ]);
-      return;
-    }
-
-    if (inputNum > candidates.length) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.SYSTEM,
-          content: "Not a valid input, try again...",
-        },
-      ]);
-    } else {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.USER,
-          content: candidates[inputNum - 1].network,
-        },
-        {
-          type: Message.ASSISTANT,
-          content: candidates[inputNum - 1].source_code,
-        },
-        {
-          type: Message.SYSTEM,
-          content: "Does this look right? (y/n)",
-        },
-      ]);
-      setContractId(candidates[inputNum - 1].id);
-      setInput("");
-      setStep(2);
-    }
-  };
-
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (step === 0 || step === 2) {
@@ -276,8 +215,6 @@ Powered by Cookie DAO 🍪
     }
     if (step === 0) {
       await handleFetchSecurityScore(input);
-    } else if (step === 1) {
-      handleNetwork();
     } else {
       handleValidate();
     }
