@@ -1,5 +1,5 @@
 import { type SiweMessage } from "siwe";
-import { Message } from "./enums";
+import { AuditStatus, FindingLevel, Message } from "./enums";
 
 export type MessageType = {
   type: Message;
@@ -71,10 +71,23 @@ export interface AuditTableReponseI {
   results: AuditObservationI[];
 }
 
+export interface FindingI {
+  id: string;
+  created_at: string;
+  level: FindingLevel;
+  name: string;
+  explanation: string;
+  recommendation: string;
+  reference?: string;
+  is_attested: boolean;
+  is_verified: boolean;
+  feedback?: string;
+}
+
 export interface AuditResponseI {
   id: string;
   created_at: string;
-  status: "waiting" | "processing" | "success" | "failed";
+  status: AuditStatus;
   version: string;
   audit_type: string;
   processing_time_seconds: number;
@@ -91,17 +104,7 @@ export interface AuditResponseI {
     id: string;
     address: string;
   };
-  findings: {
-    id: string;
-    level: string;
-    name: string;
-    explanation: string;
-    recommendation: string;
-    reference?: string;
-    is_attested: boolean;
-    is_verified: boolean;
-    feedback?: string;
-  }[];
+  findings: FindingI[];
 }
 
 export interface UserInfoResponseI {
@@ -189,4 +192,24 @@ export interface PromptGroupedResponseI {
       [tag: string]: PromptResponseI[];
     };
   };
+}
+
+export interface AuditWithChildrenResponseI {
+  id: string;
+  created_at: string;
+  status: AuditStatus;
+  audit_type: "gas" | "security";
+  processing_time_seconds: number;
+  result: string;
+  intermediate_responses: {
+    id: string;
+    created_at: string;
+    audit_id: string;
+    prompt_id: string;
+    step: string;
+    status: AuditStatus;
+    processing_time_seconds: number;
+    result: string;
+  }[];
+  findings: FindingI[];
 }

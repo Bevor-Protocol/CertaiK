@@ -215,7 +215,11 @@ const AdminPanel = (): JSX.Element => {
 
   return (
     <div className="grid gap-6 w-full h-full relative">
-      <Tabs defaultValue="users" className="w-full flex flex-col overflow-hidden max-h-full">
+      <Tabs
+        defaultValue="users"
+        className="w-full flex flex-col overflow-hidden max-h-full"
+        onValueChange={handleClose}
+      >
         <TabsList className="mb-4">
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="apps">App Management</TabsTrigger>
@@ -346,7 +350,7 @@ const AdminPanel = (): JSX.Element => {
             </Button>
           </div>
           {selectedPrompt && (
-            <div className="w-full pl-4 overflow-y-scroll">
+            <div className="w-full overflow-y-scroll">
               {selectedPrompt && (
                 <div className="bg-gray-800/30 p-4 rounded-lg">
                   <div className="flex justify-between items-center mb-4">
@@ -428,6 +432,7 @@ const AdminPanel = (): JSX.Element => {
       >
         {selectedApp && (
           <AppPermission
+            key={selectedApp.id} // forces data to refresh
             app={selectedApp}
             handleClose={handleClose}
             handleUpdate={(data) => {
@@ -439,6 +444,7 @@ const AdminPanel = (): JSX.Element => {
         )}
         {selectedUser && (
           <UserPermission
+            key={selectedUser.id} // forces data to refresh
             user={selectedUser}
             handleClose={handleClose}
             handleUpdate={(data) => {
@@ -609,7 +615,7 @@ const AppPermission = ({
   };
 
   return (
-    <div className="bg-black p-6 rounded-lg shadow-lg w-96 transform">
+    <div className="bg-black/90 p-6 rounded-lg shadow-lg w-96 border border-gray-600">
       <button
         className="absolute top-2 right-2 text-gray-400 hover:text-white cursor-pointer"
         onClick={handleClose}
@@ -745,7 +751,11 @@ const PromptEditor = ({
   };
 
   return (
-    <div className="bg-black p-6 rounded-lg shadow-lg max-w-[90%] w-[800px] transform">
+    <div
+      className={cn(
+        "bg-black p-6 rounded-lg shadow-lg max-w-[90%] w-[800px] transform border border-gray-600",
+      )}
+    >
       <button
         className="absolute top-2 right-2 text-gray-400 hover:text-white cursor-pointer"
         onClick={handleClose}

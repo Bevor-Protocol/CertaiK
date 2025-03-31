@@ -4,6 +4,7 @@ import {
   AuditResponseI,
   AuditStatusResponseI,
   AuditTableReponseI,
+  AuditWithChildrenResponseI,
   ContractResponseI,
   CreditSyncResponseI,
   PromptGroupedResponseI,
@@ -41,6 +42,14 @@ class CertaikApiController {
       throw new Error("user is not signed in with ethereum");
     }
     return this.certaikApiService.searchApps(identifier, user.user_id);
+  }
+
+  async getAuditWithChildren(id: string): Promise<AuditWithChildrenResponseI> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.getAuditWithChildren(id, user.user_id);
   }
 
   async updateUserPermissions(data: {

@@ -4,6 +4,7 @@ import {
   AuditResponseI,
   AuditStatusResponseI,
   AuditTableReponseI,
+  AuditWithChildrenResponseI,
   ContractResponseI,
   CreditSyncResponseI,
   PromptGroupedResponseI,
@@ -61,6 +62,21 @@ class CertaikApiService {
         throw new Error(response.statusText);
       }
       return response.data.results;
+    });
+  }
+
+  async getAuditWithChildren(id: string, userId: string): Promise<AuditWithChildrenResponseI> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get(`/admin/audit/${id}`, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
     });
   }
 
