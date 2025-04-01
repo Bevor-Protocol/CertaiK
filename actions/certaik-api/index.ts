@@ -5,9 +5,10 @@ import {
   AuditResponseI,
   AuditStatusResponseI,
   AuditTableReponseI,
+  AuditWithChildrenResponseI,
   ContractResponseI,
   CreditSyncResponseI,
-  PromptGroupedResponseI,
+  PromptResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -24,6 +25,10 @@ const searchUsers = async (identifier: string): Promise<UserSearchResponseI[]> =
 
 const searchApps = async (identifier: string): Promise<AppSearchResponseI[]> => {
   return certaikApiController.searchApps(identifier);
+};
+
+const getAuditWithChildren = async (id: string): Promise<AuditWithChildrenResponseI> => {
+  return certaikApiController.getAuditWithChildren(id);
 };
 
 const updateUserPermissions = async (data: {
@@ -120,7 +125,7 @@ const updateApp = async (name: string): Promise<string> => {
   return certaikApiController.updateApp(name);
 };
 
-const getPrompts = async (): Promise<PromptGroupedResponseI> => {
+const getPrompts = async (): Promise<PromptResponseI[]> => {
   return certaikApiController.getPrompts();
 };
 
@@ -152,6 +157,7 @@ export {
   getAudit,
   getAudits,
   getAuditStatus,
+  getAuditWithChildren,
   getCurrentGas,
   getPrompts,
   getStats,

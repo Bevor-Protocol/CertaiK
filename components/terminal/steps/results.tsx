@@ -24,12 +24,12 @@ const stepToTextMapper = {
   control_flow: "control flow findings",
   data_handling: "data handling findings",
   economic: "economic-related findings",
-  logic: "logic flaw findings",
+  unsafe_logic: "logic flaw findings",
   math: "mathematical findings",
   gas_optimization_1: "gas optimization 1st pass",
   gas_optimization_2: "gas optimization 2nd pass",
   gas_optimization_3: "gas optimization 3rd pass",
-  report: "generating report",
+  reviewer: "generating report",
 };
 
 const ResultsStep = ({

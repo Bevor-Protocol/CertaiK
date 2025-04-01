@@ -4,9 +4,10 @@ import {
   AuditResponseI,
   AuditStatusResponseI,
   AuditTableReponseI,
+  AuditWithChildrenResponseI,
   ContractResponseI,
   CreditSyncResponseI,
-  PromptGroupedResponseI,
+  PromptResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -61,6 +62,21 @@ class CertaikApiService {
         throw new Error(response.statusText);
       }
       return response.data.results;
+    });
+  }
+
+  async getAuditWithChildren(id: string, userId: string): Promise<AuditWithChildrenResponseI> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get(`/admin/audit/${id}`, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
     });
   }
 
@@ -358,7 +374,7 @@ class CertaikApiService {
     });
   }
 
-  async getPrompts(userId: string): Promise<PromptGroupedResponseI> {
+  async getPrompts(userId: string): Promise<PromptResponseI[]> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
@@ -369,7 +385,7 @@ class CertaikApiService {
       if (!response.data) {
         throw new Error(response.statusText);
       }
-      return response.data;
+      return response.data.results;
     });
   }
 
