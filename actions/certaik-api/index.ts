@@ -8,7 +8,7 @@ import {
   AuditWithChildrenResponseI,
   ContractResponseI,
   CreditSyncResponseI,
-  PromptGroupedResponseI,
+  PromptResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -125,7 +125,7 @@ const updateApp = async (name: string): Promise<string> => {
   return certaikApiController.updateApp(name);
 };
 
-const getPrompts = async (): Promise<PromptGroupedResponseI> => {
+const getPrompts = async (): Promise<PromptResponseI[]> => {
   return certaikApiController.getPrompts();
 };
 

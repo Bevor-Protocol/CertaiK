@@ -7,7 +7,7 @@ import {
   AuditWithChildrenResponseI,
   ContractResponseI,
   CreditSyncResponseI,
-  PromptGroupedResponseI,
+  PromptResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -374,7 +374,7 @@ class CertaikApiService {
     });
   }
 
-  async getPrompts(userId: string): Promise<PromptGroupedResponseI> {
+  async getPrompts(userId: string): Promise<PromptResponseI[]> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
@@ -385,7 +385,7 @@ class CertaikApiService {
       if (!response.data) {
         throw new Error(response.statusText);
       }
-      return response.data;
+      return response.data.results;
     });
   }
 

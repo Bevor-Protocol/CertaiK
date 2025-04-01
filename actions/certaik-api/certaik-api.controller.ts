@@ -7,7 +7,7 @@ import {
   AuditWithChildrenResponseI,
   ContractResponseI,
   CreditSyncResponseI,
-  PromptGroupedResponseI,
+  PromptResponseI,
   StatsResponseI,
   UserInfoResponseI,
   UserSearchResponseI,
@@ -213,7 +213,7 @@ class CertaikApiController {
     return this.certaikApiService.updateApp(name, user.user_id);
   }
 
-  async getPrompts(): Promise<PromptGroupedResponseI> {
+  async getPrompts(): Promise<PromptResponseI[]> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");

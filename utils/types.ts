@@ -178,20 +178,12 @@ export interface AppSearchResponseI {
 
 export interface PromptResponseI {
   id: string;
+  created_at: string;
   audit_type: string;
   tag: string;
   version: string;
   content: string;
   is_active: boolean;
-  created_at: string;
-}
-
-export interface PromptGroupedResponseI {
-  result: {
-    [auditType: string]: {
-      [tag: string]: PromptResponseI[];
-    };
-  };
 }
 
 export interface AuditWithChildrenResponseI {
