@@ -14,3 +14,17 @@ export enum Message {
   USER = "USER",
   ERROR = "ERROR",
 }
+
+export enum FindingLevel {
+  CRITICAL = "critical",
+  HIGH = "high",
+  MEDIUM = "medium",
+  LOW = "low",
+}
+
+export enum AuditStatus {
+  WAITING = "waiting",
+  PROCESSING = "processing",
+  SUCCESS = "success",
+  FAILED = "failed",
+}

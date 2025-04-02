@@ -3,6 +3,7 @@
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import * as Tooltip from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { cn } from "@/lib/utils";
 import { BlockExplorerMapper } from "@/utils/constants";
 import { trimAddress } from "@/utils/helpers";
@@ -28,6 +29,7 @@ export const Content = ({
   audit: AuditResponseI;
   address: string | null;
 }): JSX.Element => {
+  console.log(audit);
   const [view, setView] = useState<"contract" | "report" | "breakdown">("report");
   const [selectedFinding, setSelectedFinding] = useState<string | null>(null);
 
@@ -171,8 +173,9 @@ const Findings: React.FC<FindingsProps> = ({
 
   const [input, setInput] = useState("");
   const [attestation, setAttestation] = useState(0);
-  const [isOpen, setIsOpen] = useState(!selectedFinding);
+  const [isOpen, setIsOpen] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!selectedFindingDetails) return;
@@ -271,15 +274,14 @@ const Findings: React.FC<FindingsProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden w-full grow relative">
-      {/* Sidebar */}
-      <div className="w-fit block my-2 cursor-pointer" onClick={() => setIsOpen(true)}>
+    <div className="flex flex-row h-full overflow-hidden w-full grow relative">
+      <div className="w-fit block my-2 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
         <MenuIcon size={16} />
       </div>
       <div
         className={cn(
-          "w-full",
-          "border-gray-800 overflow-y-auto md:pr-4",
+          "w-full md:w-64 md:max-w-1/3",
+          "border-gray-800 overflow-y-auto md:pr-4 md:static md:inset-[unset]",
           "inset-0 absolute bg-black z-20",
           selectedFinding && !isOpen && "hidden",
         )}
@@ -302,7 +304,7 @@ const Findings: React.FC<FindingsProps> = ({
                 <div
                   key={finding.id}
                   onClick={() => {
-                    setIsOpen(false);
+                    if (isMobile) setIsOpen(false);
                     setSelectedFindings(finding.id);
                   }}
                   className={cn(
@@ -320,9 +322,21 @@ const Findings: React.FC<FindingsProps> = ({
       </div>
       <div className="flex-1 p-4 overflow-y-auto">
         {selectedFindingDetails ? (
-          <div className="space-y-4 markdown">
+          <div className="space-y-4 markdown relative">
+            <div className="absolute -top-6 right-0">
+              <span
+                className={cn(
+                  "text-sm font-medium",
+                  selectedFindingDetails.level === "critical" && "text-red-500",
+                  selectedFindingDetails.level === "high" && "text-orange-500",
+                  selectedFindingDetails.level === "medium" && "text-yellow-500",
+                  selectedFindingDetails.level === "low" && "text-green-500",
+                )}
+              >
+                {selectedFindingDetails.level.toUpperCase()}
+              </span>
+            </div>
             <div className="text-xl break-words">{formatter(selectedFindingDetails.name)}</div>
-
             <div>
               <h3 className="text-gray-400 mb-2">Explanation</h3>
               <div className="text-sm break-words">

@@ -29,8 +29,7 @@ const AdminPanel = (): JSX.Element => {
   const [isEditingPrompt, setIsEditingPrompt] = useState(false);
 
   const [selectedPromptType, setSelectedPromptType] = useState<DropdownOption | null>(null);
-  const [selectedPromptTag, setSelectedPromptTag] = useState<DropdownOption | null>(null);
-  const [selectedPromptVersion, setSelectedPromptVersion] = useState<DropdownOption | null>(null);
+  const [showPromptInactive, setShowPromptInactive] = useState(false);
 
   const { data: users } = useQuery({
     queryKey: ["users", userSearch],
@@ -111,71 +110,41 @@ const AdminPanel = (): JSX.Element => {
     }) => certaikApiAction.addPrompt(data),
   });
 
-  const promptTypes: DropdownOption[] = useMemo(() => {
+  const promptTypes = useMemo(() => {
     if (!prompts) return [];
-    return Object.keys(prompts.result).map((type) => ({
-      name: type,
-      value: type,
-    }));
-  }, [prompts]);
-
-  const promptTags: DropdownOption[] = useMemo(() => {
-    if (!prompts || !selectedPromptType) return [];
-    return Object.keys(prompts.result[selectedPromptType.value]).map((tag) => ({
-      name: tag,
-      value: tag,
-    }));
-  }, [prompts, selectedPromptType]);
-
-  const promptVersions: DropdownOption[] = useMemo(() => {
-    if (!prompts || !selectedPromptType || !selectedPromptTag) return [];
-    return prompts.result[selectedPromptType.value][selectedPromptTag.value].map((prompt) => {
-      const name = prompt.is_active ? `${prompt.version} - active` : prompt.version;
+    return Array.from(new Set(prompts.map((prompt) => prompt.audit_type))).map((option) => {
       return {
-        name,
-        value: prompt.id,
+        value: option,
+        name: option,
       };
     });
-  }, [prompts, selectedPromptType, selectedPromptTag]);
-
-  useEffect(() => {
-    if (!selectedPromptVersion || !prompts) return;
-    if (!selectedPromptType || !selectedPromptTag) return;
-    const prompt = prompts.result[selectedPromptType.value][selectedPromptTag.value].find(
-      (prompt) => {
-        return prompt.id === selectedPromptVersion.value;
-      },
-    );
-    if (prompt) setSelectedPrompt(prompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPromptVersion]);
-
-  useEffect(() => {
-    // on invalidation, we have to reset the selectedPrompt
-    if (!prompts) return;
-    if (!selectedPrompt || !selectedPromptTag || !selectedPromptType || !selectedPromptVersion)
-      return;
-    const updatedPrompt = prompts.result[selectedPromptType.value][selectedPromptTag.value].find(
-      (prompt) => {
-        return prompt.id === selectedPromptVersion.value;
-      },
-    );
-    if (updatedPrompt) setSelectedPrompt(updatedPrompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompts]);
 
-  const handlePromptSelect = (option: DropdownOption, type: "type" | "tag" | "version"): void => {
-    if (type == "version") {
-      setSelectedPromptVersion(option);
-    } else if (type === "tag") {
-      setSelectedPromptVersion(null);
-      setSelectedPromptTag(option);
-    } else if (type == "type") {
-      setSelectedPromptVersion(null);
-      setSelectedPromptTag(null);
-      setSelectedPromptType(option);
+  const promptsDisplay = useMemo(() => {
+    if (!prompts || !selectedPromptType) return [];
+    return prompts
+      .filter((prompt) => {
+        if (prompt.audit_type === selectedPromptType.value) {
+          return prompt.is_active || showPromptInactive;
+        }
+        return false;
+      })
+      .sort((a, b) => {
+        // Sort by tag first, then by version
+        if (a.tag !== b.tag) return a.tag.localeCompare(b.tag);
+        return a.version.localeCompare(b.version);
+      });
+  }, [prompts, selectedPromptType, showPromptInactive]);
+
+  useEffect(() => {
+    // on invalidation after an edit or add, we need to re-updated the selectedPrompt
+    if (!selectedPrompt) return;
+    const prompt = prompts?.find((prompt) => prompt.id === selectedPrompt.id);
+    if (prompt) {
+      setSelectedPrompt(prompt);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prompts]);
 
   const handleSelect = ({
     app,
@@ -215,7 +184,11 @@ const AdminPanel = (): JSX.Element => {
 
   return (
     <div className="grid gap-6 w-full h-full relative">
-      <Tabs defaultValue="users" className="w-full flex flex-col overflow-hidden max-h-full">
+      <Tabs
+        defaultValue="users"
+        className="w-full flex flex-col overflow-hidden max-h-full"
+        onValueChange={handleClose}
+      >
         <TabsList className="mb-4">
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="apps">App Management</TabsTrigger>
@@ -321,32 +294,63 @@ const AdminPanel = (): JSX.Element => {
                 options={promptTypes}
                 placeholder="type"
                 current={selectedPromptType}
-                handleCurrent={(option) => handlePromptSelect(option, "type")}
+                handleCurrent={(option) => setSelectedPromptType(option)}
               />
-              <Select
-                className="w-40"
-                options={promptTags}
-                placeholder="tag"
-                current={selectedPromptTag}
-                handleCurrent={(option) => handlePromptSelect(option, "tag")}
-                disabled={!selectedPromptType}
-              />
-              <Select
-                className="w-40"
-                options={promptVersions}
-                placeholder="version"
-                current={selectedPromptVersion}
-                handleCurrent={(option) => handlePromptSelect(option, "version")}
-                disabled={!selectedPromptTag}
-              />
+              <div className="flex items-center ml-4">
+                <input
+                  type="checkbox"
+                  id="showInactive"
+                  className="mr-2 cursor-pointer"
+                  checked={showPromptInactive}
+                  onChange={(e) => setShowPromptInactive(e.target.checked)}
+                />
+                <label htmlFor="showInactive" className="text-sm text-gray-400 whitespace-nowrap">
+                  Show Inactive Prompts
+                </label>
+              </div>
             </div>
             <Button variant="transparent" onClick={() => setIsAddingPrompt(true)}>
               <PlusIcon className="h-4 w-4 mr-2" />
               Add Prompt
             </Button>
           </div>
-          {selectedPrompt && (
-            <div className="w-full pl-4 overflow-y-scroll">
+
+          <div className="flex h-full">
+            {selectedPromptType && (
+              <div className="pr-4 overflow-y-auto border-r border-gray-700 min-w-fit">
+                <h3 className="text-sm font-medium mb-2">Prompts for {selectedPromptType.name}</h3>
+                <div className="space-y-1">
+                  {promptsDisplay.map((prompt) => (
+                    <div
+                      key={prompt.id}
+                      className={cn(
+                        "p-2 rounded cursor-pointer text-sm",
+                        selectedPrompt?.id === prompt.id ? "bg-gray-700" : "hover:bg-gray-800",
+                        !prompt.is_active && "opacity-60",
+                      )}
+                      onClick={() => setSelectedPrompt(prompt)}
+                    >
+                      <div className="flex justify-between items-center gap-4">
+                        <span>{prompt.tag}</span>
+                        <div className="flex items-center">
+                          <span className="text-xs text-gray-400 mr-2">v{prompt.version}</span>
+                          <span
+                            className={cn(
+                              "w-2 h-2 rounded-full",
+                              prompt.is_active ? "bg-green-500" : "bg-red-500",
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div
+              className={cn("overflow-y-auto", selectedPromptType ? "flex-grow pl-4" : "w-full")}
+            >
               {selectedPrompt && (
                 <div className="bg-gray-800/30 p-4 rounded-lg">
                   <div className="flex justify-between items-center mb-4">
@@ -413,11 +417,13 @@ const AdminPanel = (): JSX.Element => {
 
               {!selectedPrompt && (
                 <div className="flex items-center justify-center h-64 text-gray-500">
-                  Select a prompt from the sidebar to view details
+                  {selectedPromptType
+                    ? "Select a prompt from the sidebar to view details"
+                    : "Select an audit type to view available prompts"}
                 </div>
               )}
             </div>
-          )}
+          </div>
         </TabsContent>
       </Tabs>
       <div
@@ -428,6 +434,7 @@ const AdminPanel = (): JSX.Element => {
       >
         {selectedApp && (
           <AppPermission
+            key={selectedApp.id} // forces data to refresh
             app={selectedApp}
             handleClose={handleClose}
             handleUpdate={(data) => {
@@ -439,6 +446,7 @@ const AdminPanel = (): JSX.Element => {
         )}
         {selectedUser && (
           <UserPermission
+            key={selectedUser.id} // forces data to refresh
             user={selectedUser}
             handleClose={handleClose}
             handleUpdate={(data) => {
@@ -609,7 +617,7 @@ const AppPermission = ({
   };
 
   return (
-    <div className="bg-black p-6 rounded-lg shadow-lg w-96 transform">
+    <div className="bg-black/90 p-6 rounded-lg shadow-lg w-96 border border-gray-600">
       <button
         className="absolute top-2 right-2 text-gray-400 hover:text-white cursor-pointer"
         onClick={handleClose}
@@ -745,7 +753,11 @@ const PromptEditor = ({
   };
 
   return (
-    <div className="bg-black p-6 rounded-lg shadow-lg max-w-[90%] w-[800px] transform">
+    <div
+      className={cn(
+        "bg-black p-6 rounded-lg shadow-lg max-w-[90%] w-[800px] transform border border-gray-600",
+      )}
+    >
       <button
         className="absolute top-2 right-2 text-gray-400 hover:text-white cursor-pointer"
         onClick={handleClose}

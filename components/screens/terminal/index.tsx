@@ -16,9 +16,7 @@ import { useState } from "react";
 const TerminalContainer: React.FC = () => {
   const [terminalStep, setTerminalStep] = useState<TerminalStep>(TerminalStep.INITIAL);
   const [contractId, setContractId] = useState("");
-  const [auditId, setAuditId] = useState("");
   const [promptType, setPromptType] = useState<string>("");
-  const [auditContent, setAuditContent] = useState<string>("");
   const [terminalState, setTerminalState] =
     useState<Record<TerminalStep, MessageType[]>>(initialState);
   const [stack, setStack] = useState<TerminalStep[]>([TerminalStep.INITIAL]);
@@ -37,7 +35,6 @@ const TerminalContainer: React.FC = () => {
     const interStack = stack;
     const interState = terminalState;
 
-    const shouldResetAudit = true; // result doesnt get added to stack for now, always true
     let shouldResetContract = false;
     let poppedElement = interStack.pop();
 
@@ -55,9 +52,6 @@ const TerminalContainer: React.FC = () => {
     setTerminalState(interState);
     setStack(interStack.concat(s));
     setTerminalStep(s);
-    if (shouldResetAudit) {
-      setAuditContent("");
-    }
     if (shouldResetContract) {
       setContractId("");
     }
@@ -114,12 +108,8 @@ const TerminalContainer: React.FC = () => {
           {terminalStep == TerminalStep.RESULTS && (
             <ResultsStep
               state={terminalState[TerminalStep.RESULTS]}
-              setAuditContent={setAuditContent}
-              auditContent={auditContent}
               promptType={promptType}
               contractId={contractId}
-              auditId={auditId}
-              setAuditId={setAuditId}
             />
           )}
         </div>

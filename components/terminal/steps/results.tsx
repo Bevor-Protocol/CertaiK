@@ -2,21 +2,18 @@ import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/utils";
-import { AuditStatusResponseI, MessageType } from "@/utils/types";
+import { MessageType } from "@/utils/types";
+import { useQuery } from "@tanstack/react-query";
 import { Check, DownloadIcon, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
-  setAuditContent: Dispatch<SetStateAction<string>>;
   promptType: string;
-  auditContent: string;
   state: MessageType[];
   contractId: string;
-  auditId: string;
-  setAuditId: Dispatch<SetStateAction<string>>;
 };
 
 const stepToTextMapper = {
@@ -24,98 +21,79 @@ const stepToTextMapper = {
   control_flow: "control flow findings",
   data_handling: "data handling findings",
   economic: "economic-related findings",
-  logic: "logic flaw findings",
+  unsafe_logic: "logic flaw findings",
   math: "mathematical findings",
   gas_optimization_1: "gas optimization 1st pass",
   gas_optimization_2: "gas optimization 2nd pass",
   gas_optimization_3: "gas optimization 3rd pass",
-  report: "generating report",
+  reviewer: "generating report",
 };
 
-const ResultsStep = ({
-  setAuditContent,
-  promptType,
-  auditContent,
-  state,
-  contractId,
-  auditId,
-  setAuditId,
-}: TerminalProps): JSX.Element => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-  const [steps, setSteps] = useState<AuditStatusResponseI["steps"]>([]);
+const getReadableText = (step: string): string => {
+  if (step in stepToTextMapper) {
+    return stepToTextMapper[step as keyof typeof stepToTextMapper];
+  }
+  return "other findings";
+};
 
-  useEffect(() => {
-    if (!auditId || !isReady) return;
-    certaikApiAction
-      .getAudit(auditId)
-      .then((result) => {
-        if (result.status === "success") {
-          setAuditContent(result.result);
-        } else {
-          setIsError(true);
-        }
-      })
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [steps, auditId, isReady]);
+const ResultsStep = ({ promptType, state, contractId }: TerminalProps): JSX.Element => {
+  // once removed from the stack, we don't allow going back to this point, so there's
+  // no need to retain a state in the parent Terminal component.
 
-  useEffect(() => {
-    if (!auditId) return;
+  // initiate audit. get the auditId.
+  const {
+    data: evalData,
+    isError: isEvalError,
+    isSuccess: isEvalSuccess,
+  } = useQuery({
+    queryKey: ["eval"],
+    queryFn: async () => certaikApiAction.runEval(contractId, promptType),
+    enabled: !state.length,
+  });
 
-    const interval = setInterval(async () => {
-      try {
-        const result = await certaikApiAction.getAuditStatus(auditId);
-        setSteps(result.steps);
-
-        if (result.status === "success") {
-          clearInterval(interval);
-          setIsReady(true);
-        }
-        if (result.status === "failed") {
-          clearInterval(interval);
-          setIsError(true);
-        }
-      } catch (error) {
-        console.error(error);
-        clearInterval(interval);
-        setIsError(true);
+  // poll for intermediate responses.
+  const { data: pollingData, isError: isPollingError } = useQuery({
+    queryKey: ["polling", evalData?.id],
+    queryFn: async () => certaikApiAction.getAuditStatus(evalData!.id),
+    refetchInterval: (query) => {
+      const { data } = query.state;
+      if (!data) return 1_000;
+      if (["success", "failed"].includes(data.status)) {
+        return false;
       }
-      // poll every second.
-    }, 1000);
+      return 1_000;
+    },
+    enabled: !!evalData?.id,
+  });
 
-    return (): void => clearInterval(interval);
-  }, [auditId]);
+  // fetch the completed audit once it's ready.
+  const {
+    data: auditData,
+    isError: isAuditError,
+    isSuccess,
+  } = useQuery({
+    queryKey: ["audit", evalData?.id],
+    queryFn: async () =>
+      certaikApiAction.getAudit(evalData!.id).then((result) => {
+        if (result.status === "success") {
+          return result.result;
+        }
+        throw new Error("failed audit");
+      }),
+    enabled: pollingData?.status === "success",
+  });
 
   const terminalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (state.length || isLoading) return;
-    setIsLoading(true);
-    certaikApiAction
-      .runEval(contractId, promptType)
-      .then((result) => {
-        const { id } = result;
-        // websocket subscribes to job result
-        setAuditId(id);
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsError(true);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
 
   return (
     <>
       <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
-        {(isLoading || !auditContent || isError) && (
+        {!isEvalSuccess && <p>Starting audit...</p>}
+        {!!pollingData && !isSuccess && (
           <>
-            {steps.map((step) => (
+            {pollingData?.steps.map((step) => (
               <div key={step.step} className="flex gap-4 items-center">
-                <p>{stepToTextMapper[step.step as keyof typeof stepToTextMapper]}</p>
+                <p>{getReadableText(step.step)}</p>
                 {step.status === "processing" && <Loader className="h-4 w-4" />}
                 {step.status === "success" && <Check />}
                 {step.status === "failed" && <X />}
@@ -123,28 +101,28 @@ const ResultsStep = ({
             ))}
           </>
         )}
-        {auditContent && (
+        {isSuccess && auditData && (
           <ReactMarkdown className="overflow-scroll no-scrollbar markdown">
-            {auditContent}
+            {auditData}
           </ReactMarkdown>
         )}
-        {isError && (
+        {(isEvalError || isAuditError || isPollingError) && (
           <div className="mb-2 leading-relaxed whitespace-pre-wrap text-red-400">
             Something went wrong, try again or please reach out
           </div>
         )}
       </div>
-      {isLoading && (
+      {!auditData && (
         <TerminalInputBar
           onSubmit={() => {}}
           onChange={() => {}}
           disabled={true}
           value={""}
-          overrideLoading={isLoading}
+          overrideLoading={!auditData}
           placeholder="Chat feature coming soon..."
         />
       )}
-      {!isLoading && !!auditContent && <Download auditId={auditId} auditContent={auditContent} />}
+      {!!auditData && !!evalData && <Download auditId={evalData.id} auditContent={auditData} />}
     </>
   );
 };
