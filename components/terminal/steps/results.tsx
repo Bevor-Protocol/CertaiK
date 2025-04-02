@@ -32,6 +32,13 @@ const stepToTextMapper = {
   reviewer: "generating report",
 };
 
+const getReadableText = (step: string): string => {
+  if (step in stepToTextMapper) {
+    return stepToTextMapper[step as keyof typeof stepToTextMapper];
+  }
+  return "other findings";
+};
+
 const ResultsStep = ({
   setAuditContent,
   promptType,
@@ -115,7 +122,7 @@ const ResultsStep = ({
           <>
             {steps.map((step) => (
               <div key={step.step} className="flex gap-4 items-center">
-                <p>{stepToTextMapper[step.step as keyof typeof stepToTextMapper]}</p>
+                <p>{getReadableText(step.step)}</p>
                 {step.status === "processing" && <Loader className="h-4 w-4" />}
                 {step.status === "success" && <Check />}
                 {step.status === "failed" && <X />}
