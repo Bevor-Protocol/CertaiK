@@ -159,7 +159,7 @@ export interface AuditStatusResponseI {
 export interface UserSearchResponseI {
   id: string;
   address: string;
-  permission?: {
+  permissions?: {
     can_create_api_key: boolean;
     can_create_app: boolean;
   };
@@ -170,7 +170,7 @@ export interface AppSearchResponseI {
   owner_id: string;
   name: string;
   type: string;
-  permission?: {
+  permissions?: {
     can_create_api_key: boolean;
     can_create_app: boolean;
   };

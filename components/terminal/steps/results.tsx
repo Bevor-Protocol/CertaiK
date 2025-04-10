@@ -2,17 +2,15 @@ import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/utils";
-import { MessageType } from "@/utils/types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, DownloadIcon, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import TerminalInputBar from "../input-bar";
 
 type TerminalProps = {
   promptType: string;
-  state: MessageType[];
   contractId: string;
 };
 
@@ -36,20 +34,22 @@ const getReadableText = (step: string): string => {
   return "other findings";
 };
 
-const ResultsStep = ({ promptType, state, contractId }: TerminalProps): JSX.Element => {
+const ResultsStep = ({ promptType, contractId }: TerminalProps): JSX.Element => {
   // once removed from the stack, we don't allow going back to this point, so there's
   // no need to retain a state in the parent Terminal component.
 
-  // initiate audit. get the auditId.
   const {
+    mutateAsync,
     data: evalData,
     isError: isEvalError,
     isSuccess: isEvalSuccess,
-  } = useQuery({
-    queryKey: ["eval"],
-    queryFn: async () => certaikApiAction.runEval(contractId, promptType),
-    enabled: !state.length,
+  } = useMutation({
+    mutationFn: async () => certaikApiAction.runEval(contractId, promptType),
   });
+
+  useEffect(() => {
+    mutateAsync();
+  }, [mutateAsync]);
 
   // poll for intermediate responses.
   const { data: pollingData, isError: isPollingError } = useQuery({

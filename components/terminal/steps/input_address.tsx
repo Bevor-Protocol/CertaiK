@@ -20,7 +20,7 @@ const AddressStep = ({
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(state.length === 1 ? 0 : 1);
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -146,15 +146,13 @@ const AddressStep = ({
 
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
-    if (step === 0 || step === 2) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.USER,
-          content: input,
-        },
-      ]);
-    }
+    setHistory((prev) => [
+      ...prev,
+      {
+        type: Message.USER,
+        content: input,
+      },
+    ]);
     if (step === 0) {
       handleScan();
     } else {
