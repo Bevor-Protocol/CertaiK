@@ -495,7 +495,7 @@ const UserPermission = ({
     canCreateApiKey: boolean;
   }) => void;
 }): JSX.Element => {
-  const [permission, setPermission] = useState(user.permission);
+  const [permission, setPermission] = useState(user.permissions);
 
   const handleSave = (): void => {
     if (permission === null || permission === undefined) return;
@@ -527,7 +527,7 @@ const UserPermission = ({
           <p className="font-medium truncate">{user.address}</p>
         </div>
         <div className="pt-4 border-t border-gray-700">
-          {!user.permission ? (
+          {!user.permissions ? (
             <h3 className="font-semibold mb-3">No Auth</h3>
           ) : (
             <>
@@ -571,7 +571,7 @@ const UserPermission = ({
             </>
           )}
         </div>
-        {!!user.permission && (
+        {!!user.permissions && (
           <Button
             variant="bright"
             className="w-full mt-4"
@@ -605,7 +605,7 @@ const AppPermission = ({
     canCreateApiKey: boolean;
   }) => void;
 }): JSX.Element => {
-  const [permission, setPermission] = useState(app.permission);
+  const [permission, setPermission] = useState(app.permissions);
 
   const handleSave = (): void => {
     if (permission === null || permission === undefined) return;
@@ -645,7 +645,7 @@ const AppPermission = ({
           <p className="font-medium truncate">{app.owner_id}</p>
         </div>
         <div className="pt-4 border-t border-gray-700">
-          {!app.permission ? (
+          {!app.permissions ? (
             <h3 className="font-semibold mb-3">No Auth</h3>
           ) : (
             <>
@@ -672,7 +672,7 @@ const AppPermission = ({
             </>
           )}
         </div>
-        {!!app.permission && (
+        {!!app.permissions && (
           <Button
             variant="bright"
             className="w-full mt-4"

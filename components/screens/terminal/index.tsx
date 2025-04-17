@@ -106,11 +106,7 @@ const TerminalContainer: React.FC = () => {
             />
           )}
           {terminalStep == TerminalStep.RESULTS && (
-            <ResultsStep
-              state={terminalState[TerminalStep.RESULTS]}
-              promptType={promptType}
-              contractId={contractId}
-            />
+            <ResultsStep promptType={promptType} contractId={contractId} />
           )}
         </div>
       </div>
