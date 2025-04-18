@@ -1,48 +1,44 @@
+import authService from "@/actions/auth/auth.service";
+import { streaming_api } from "@/lib/api";
 import { NextRequest } from "next/server";
 
 export const runtime = "edge";
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {
-    const { messages } = await req.json();
+    const { message, chatId } = await req.json();
+    const user = await authService.currentUser();
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": user?.user_id,
+      },
+    };
 
     // Create a new ReadableStream for streaming the response
     const stream = new ReadableStream({
       async start(controller: ReadableStreamDefaultController): Promise<void> {
         try {
           // Make the API request to your backend
-          const response = await fetch("YOUR_API_ENDPOINT", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await streaming_api.post(
+            `/chat/${chatId}`,
+            {
+              message,
             },
-            body: JSON.stringify({ messages }),
-          });
-
-          if (!response.ok) {
-            throw new Error(`API request failed: ${response.statusText}`);
-          }
+            headers,
+          );
 
           // Get the response as a stream
-          const reader = response.body?.getReader();
-          if (!reader) {
-            throw new Error("No reader available");
-          }
+          // Axios with responseType: 'stream' provides the data directly as a stream
+          const dataStream = response.data;
 
           // Process the stream
-          let reading = true;
-          while (reading) {
-            const { done, value } = await reader.read();
-
-            if (done) {
-              controller.close();
-              reading = false;
-              break;
-            }
-
+          for await (const chunk of dataStream) {
             // Send the chunk to the client
-            controller.enqueue(value);
+            controller.enqueue(chunk);
           }
+
+          // Close the stream when done
+          controller.close();
         } catch (err) {
           controller.error(err);
         }

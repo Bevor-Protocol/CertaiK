@@ -2,6 +2,7 @@ import Header from "@/components/header";
 import Layout from "@/components/ui/layout";
 import sessionOptions from "@/lib/config/session";
 import walletConfig from "@/lib/config/wallet";
+import ChatProvider from "@/providers/chat";
 import ModalProvider from "@/providers/modal";
 import SiweProvider from "@/providers/siwe";
 import WalletProvider from "@/providers/wallet";
@@ -56,13 +57,15 @@ const RootLayout = async ({ children }: { children: React.ReactNode }): Promise<
       <body className={`${figtree.className} antialiased`}>
         <WalletProvider initialState={initialState}>
           <SiweProvider>
-            <ModalProvider>
-              <Layout>
-                <Header address={address} />
-                {children}
-                <Analytics />
-              </Layout>
-            </ModalProvider>
+            <ChatProvider>
+              <ModalProvider>
+                <Layout>
+                  <Header address={address} />
+                  {children}
+                  <Analytics />
+                </Layout>
+              </ModalProvider>
+            </ChatProvider>
           </SiweProvider>
         </WalletProvider>
       </body>

@@ -124,12 +124,19 @@
     @apply list-disc pl-5 inline-block;
   }
   ol {
-    @apply list-decimal list-inside pl-2 m-0 inline-block;
+    @apply list-decimal pl-2 m-0 inline-block;
   }
 
-  li,
+  li {
+    @apply list-item ml-1.5;
+  }
+
+  li::marker {
+    @apply mr-6;
+  }
+
   li p {
-    @apply -mt-5;
+    @apply block m-0 -mt-5;
   }
 
   /* Code blocks */

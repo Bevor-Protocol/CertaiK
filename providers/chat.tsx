@@ -1,59 +1,76 @@
 "use client";
 
+import { certaikApiAction } from "@/actions";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MessageSquare, Send, Settings, X } from "lucide-react";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import { ChatContextType, ChatMessageI } from "@/utils/types";
+import { useQuery } from "@tanstack/react-query";
+import { Clock, MessageSquare, Send, X } from "lucide-react";
+import { createContext, ReactNode, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-};
-
-type ChatSettings = {
-  showTimestamps: boolean;
-  darkMode: boolean;
-  fontSize: "small" | "medium" | "large";
-};
-
-interface ChatContextType {
-  isOpen: boolean;
-  messages: Message[];
-  settings: ChatSettings;
-  openChat: () => void;
-  closeChat: () => void;
-  sendMessage: (content: string) => Promise<void>;
-  clearChat: () => void;
-  updateSettings: (newSettings: Partial<ChatSettings>) => void;
-}
-
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
-
-export const useChat = (): ChatContextType => {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useChat must be used within a ChatProvider");
-  }
-  return context;
-};
+export const ChatContext = createContext<ChatContextType>({
+  isOpen: false,
+  messages: [],
+  openChat: () => {},
+  closeChat: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  sendMessage: (content: string) => Promise.resolve(),
+  clearChat: () => {},
+  currentAuditId: null,
+  setCurrentAuditId: () => {},
+});
 
 export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [settings, setSettings] = useState<ChatSettings>({
-    showTimestamps: true,
-    darkMode: true,
-    fontSize: "medium",
-  });
+  const [messages, setMessages] = useState<ChatMessageI[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showChatHistory, setShowChatHistory] = useState<boolean>(false);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [currentAuditId, setCurrentAuditId] = useState<string | null>(null);
+  const [isInitiatingChat, setIsInitiatingChat] = useState<boolean>(false);
+  const [streamedMessage, setStreamedMessage] = useState("");
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Auto-scroll when messages change or when streaming
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, streamedMessage]);
+
+  const { data: chats, refetch: refetchChats } = useQuery({
+    queryKey: ["chats"],
+    queryFn: async () => certaikApiAction.getChats(),
+  });
 
   const openChat = (): void => setIsOpen(true);
   const closeChat = (): void => {
     setIsOpen(false);
-    setShowSettings(false);
+  };
+
+  const initiateChat = async (): Promise<void> => {
+    if (!currentAuditId) {
+      console.error("Cannot initiate chat without an audit ID");
+      return;
+    }
+
+    setIsInitiatingChat(true);
+    try {
+      const chatId = await certaikApiAction.initiateChat(currentAuditId);
+
+      setCurrentChatId(chatId);
+      setMessages([]);
+      await refetchChats();
+    } catch (error) {
+      console.error("Error initiating chat:", error);
+    } finally {
+      setIsInitiatingChat(false);
+    }
   };
 
   const clearChat = async (): Promise<void> => {
@@ -73,23 +90,31 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
       }
 
       setMessages([]);
+      setCurrentChatId(null);
     } catch (error) {
       console.error("Error clearing chat history:", error);
     }
   };
 
-  const updateSettings = (newSettings: Partial<ChatSettings>): void => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
+  const loadChatHistory = async (chatId: string): Promise<void> => {
+    if (!chats) return;
+
+    const messages = await certaikApiAction.getChatMessages(chatId);
+
+    setMessages(messages);
+    setCurrentChatId(chatId);
+    setShowChatHistory(false);
   };
 
   const sendMessage = async (content: string): Promise<void> => {
-    if (!content.trim()) return;
+    if (!content.trim() || !currentChatId) return;
 
-    const userMessage: Message = {
+    const userMessage: ChatMessageI = {
       id: Date.now().toString(),
+      created_at: Date.now().toString(),
       role: "user",
       content,
-      timestamp: new Date(),
+      timestamp: Date().toString(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -103,10 +128,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          message: content.trim(),
+          chatId: currentChatId,
         }),
       });
 
@@ -115,11 +138,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
       }
 
       const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error("No reader available");
-      }
+      if (!reader) throw new Error("No reader available");
 
       let assistantMessage = "";
+      let buffered = "";
       const decoder = new TextDecoder();
 
       // eslint-disable-next-line no-constant-condition
@@ -127,62 +149,57 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        assistantMessage += chunk;
+        // Accumulate text
+        buffered += decoder.decode(value, { stream: true });
 
-        // Update the message in real-time as chunks arrive
-        setMessages((prev) => {
-          const lastMsg = prev.find((msg) => msg.id === "temp-assistant");
-          if (lastMsg) {
-            return prev.map((msg) =>
-              msg.id === "temp-assistant" ? { ...msg, content: assistantMessage } : msg,
-            );
-          } else {
-            return [
-              ...prev,
-              {
-                id: "temp-assistant",
-                role: "assistant",
-                content: assistantMessage,
-                timestamp: new Date(),
-              },
-            ];
+        // Split by newlines (you yield `... + b"\n"` in Python)
+        const lines = buffered.split("\n");
+
+        // Keep last line (incomplete?) in buffer
+        buffered = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const parsed = JSON.parse(line);
+            assistantMessage = parsed.content;
+            setStreamedMessage(parsed.content);
+          } catch (err) {
+            console.warn("Failed to parse chunk:", line, err);
           }
-        });
+        }
       }
-
-      // Replace the temporary message with a permanent one
-      setMessages((prev) => {
-        const filtered = prev.filter((msg) => msg.id !== "temp-assistant");
-        return [
-          ...filtered,
-          {
-            id: `assistant-${Date.now()}`,
-            role: "assistant",
-            content: assistantMessage,
-            timestamp: new Date(),
-          },
-        ];
-      });
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          created_at: Date.now().toString(),
+          role: "system",
+          content: assistantMessage,
+          timestamp: Date().toString(),
+        },
+      ]);
     } catch (error) {
       console.error("Error sending message:", error);
       setMessages((prev) => [
         ...prev,
         {
-          id: `error-${Date.now()}`,
-          role: "assistant",
+          id: Date.now().toString(),
+          created_at: Date.now().toString(),
+          role: "system",
           content: "Sorry, there was an error processing your request. Please try again.",
-          timestamp: new Date(),
+          timestamp: Date().toString(),
         },
       ]);
     } finally {
+      setStreamedMessage("");
       setIsLoading(false);
     }
   };
 
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
-    if (inputValue.trim()) {
+    if (inputValue.trim() && currentChatId) {
       sendMessage(inputValue);
     }
   };
@@ -192,64 +209,46 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
       value={{
         isOpen,
         messages,
-        settings,
         openChat,
         closeChat,
         sendMessage,
         clearChat,
-        updateSettings,
+        currentAuditId,
+        setCurrentAuditId,
       }}
     >
-      {children}
-
-      {/* Chat Widget Button */}
       {!isOpen && (
-        <button
+        <Button
           onClick={openChat}
+          variant="bright"
           className={cn(
-            "fixed bottom-4 right-4 bg-blue-600 text-white p-3",
-            "rounded-full shadow-lg hover:bg-blue-700 transition-colors z-50",
+            "fixed bottom-4 right-4 p-3 w-fit h-fit min-w-fit",
+            "z-50 rounded-full shadow-lg",
           )}
-          aria-label="Open Chat"
         >
           <MessageSquare size={24} />
-        </button>
+        </Button>
       )}
-
-      {/* Chat Widget */}
       {isOpen && (
         <div
           className={cn(
-            "fixed bottom-4 right-4 w-80 md:w-96 h-[500px] bg-white",
+            "fixed bottom-4 right-4 w-[800px] max-w-[80%] h-[800px] max-h-[80%] bg-gray-900 text-white",
             "rounded-lg shadow-xl flex flex-col z-50",
-            settings.darkMode && "bg-gray-900 text-white",
           )}
         >
-          {/* Header */}
-          <div
-            className={cn(
-              "flex justify-between items-center p-3 border-b",
-              settings.darkMode ? "border-gray-700" : "border-gray-200",
-            )}
-          >
+          <div className={cn("flex justify-between items-center p-3 border-b", "border-gray-700")}>
             <h3 className="font-semibold">BevorAI Chat</h3>
             <div className="flex gap-2">
               <button
-                onClick={() => setShowSettings(!showSettings)}
-                className={cn(
-                  "p-1 rounded-full hover:bg-gray-200",
-                  settings.darkMode && "hover:bg-gray-700",
-                )}
-                aria-label="Settings"
+                onClick={() => setShowChatHistory(!showChatHistory)}
+                className={cn("p-1 rounded-full hover:bg-gray-700")}
+                aria-label="Chat History"
               >
-                <Settings size={18} />
+                <Clock size={18} />
               </button>
               <button
                 onClick={closeChat}
-                className={cn(
-                  "p-1 rounded-full hover:bg-gray-200",
-                  settings.darkMode && "hover:bg-gray-700",
-                )}
+                className={cn("p-1 rounded-full hover:bg-gray-700")}
                 aria-label="Close"
               >
                 <X size={18} />
@@ -257,127 +256,112 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
             </div>
           </div>
 
-          {/* Settings Panel */}
-          {showSettings && (
-            <div
-              className={cn(
-                "p-4 border-b",
-                settings.darkMode ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50",
-              )}
-            >
-              <h4 className="font-medium mb-3">Chat Settings</h4>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="showTimestamps">Show Timestamps</label>
-                  <input
-                    id="showTimestamps"
-                    type="checkbox"
-                    checked={settings.showTimestamps}
-                    onChange={(e) => updateSettings({ showTimestamps: e.target.checked })}
-                    className="toggle"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label htmlFor="darkMode">Dark Mode</label>
-                  <input
-                    id="darkMode"
-                    type="checkbox"
-                    checked={settings.darkMode}
-                    onChange={(e) => updateSettings({ darkMode: e.target.checked })}
-                    className="toggle"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label htmlFor="fontSize">Font Size</label>
-                  <select
-                    id="fontSize"
-                    value={settings.fontSize}
-                    onChange={(e) => updateSettings({ fontSize: e.target.value as any })}
-                    className={cn(
-                      "p-1 rounded border",
-                      settings.darkMode
-                        ? "bg-gray-700 border-gray-600"
-                        : "bg-white border-gray-300",
-                    )}
-                  >
-                    <option value="small">Small</option>
-                    <option value="medium">Medium</option>
-                    <option value="large">Large</option>
-                  </select>
-                </div>
-
-                <button
-                  onClick={clearChat}
-                  className="w-full mt-2 py-1 px-3 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Clear Chat History
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Messages */}
-          <div
-            className={cn(
-              "flex-1 overflow-y-auto p-3 space-y-3",
-              settings.darkMode ? "bg-gray-800" : "bg-gray-50",
-            )}
-          >
-            {messages.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-gray-500">
-                <p>Start a conversation...</p>
-              </div>
-            ) : (
-              messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    "max-w-[85%] p-3 rounded-lg",
-                    message.role === "user"
-                      ? "ml-auto bg-blue-600 text-white"
-                      : settings.darkMode
-                        ? "bg-gray-700 text-white"
-                        : "bg-white text-gray-800 border border-gray-200",
-                    settings.fontSize === "small" && "text-sm",
-                    settings.fontSize === "large" && "text-lg",
-                  )}
-                >
-                  <div>{message.content}</div>
-                  {settings.showTimestamps && (
+          {showChatHistory ? (
+            <div className={cn("flex-1 overflow-y-auto p-3 space-y-3 bg-gray-800")}>
+              <h4 className="font-medium text-sm mb-2">Chat History</h4>
+              {!chats || chats.length === 0 ? (
+                <div className="text-gray-500 text-center py-4">No previous chats found</div>
+              ) : (
+                <div className="space-y-2">
+                  {chats.map((chat) => (
                     <div
+                      key={chat.id}
+                      onClick={() => loadChatHistory(chat.id)}
                       className={cn(
-                        "text-xs mt-1 opacity-70",
-                        settings.fontSize === "small" && "text-[10px]",
-                        settings.fontSize === "large" && "text-sm",
+                        "p-2 rounded cursor-pointer hover:bg-gray-700 transition-colors",
+                        currentChatId === chat.id ? "bg-gray-700" : "bg-gray-800",
                       )}
                     >
-                      {message.timestamp.toLocaleTimeString()}
+                      <div className="font-medium text-sm truncate">{chat.audit.introduction}</div>
+                      <div className="text-xs text-gray-400">
+                        {new Date(chat.created_at || Date.now()).toLocaleDateString()}
+                      </div>
+                      <div className="text-xs text-gray-400">{chat.total_messages} messages</div>
                     </div>
+                  ))}
+                </div>
+              )}
+              <div className="mt-4">
+                <Button
+                  onClick={() => {
+                    setMessages([]);
+                    setCurrentChatId(null);
+                    setShowChatHistory(false);
+                  }}
+                  variant="bright"
+                  className="w-full"
+                >
+                  Start New Chat
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className={cn("flex-1 overflow-y-auto p-3 space-y-3 bg-gray-800")}>
+              {messages.length === 0 && !currentChatId ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-500 p-4">
+                  <p className="mb-4 text-center">
+                    {currentAuditId
+                      ? "Start a new chat about this audit"
+                      : "Select an audit to start chatting"}
+                  </p>
+                  {currentAuditId && (
+                    <Button
+                      onClick={initiateChat}
+                      variant="bright"
+                      className="w-full"
+                      disabled={isInitiatingChat}
+                    >
+                      {isInitiatingChat ? "Initiating..." : "Start New Chat"}
+                    </Button>
                   )}
                 </div>
-              ))
-            )}
-            {isLoading && (
-              <div className="flex justify-center">
-                <div className="loading-dots">
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
+              ) : messages.length === 0 && currentChatId ? (
+                <div className="h-full flex items-center justify-center text-gray-500">
+                  <p>Start a conversation...</p>
                 </div>
-              </div>
-            )}
-          </div>
+              ) : (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={cn(
+                      "max-w-[85%] p-3 rounded-lg text-sm",
+                      message.role === "user"
+                        ? "ml-auto bg-blue-600 text-white"
+                        : "bg-gray-700 text-white",
+                    )}
+                  >
+                    <div>
+                      <ReactMarkdown className="markdown">{message.content}</ReactMarkdown>
+                    </div>
+                    <div className={cn("text-xs mt-1 opacity-70 text-[10px]")}>
+                      {message.timestamp}
+                    </div>
+                  </div>
+                ))
+              )}
+              {streamedMessage && (
+                <div className={cn("max-w-[85%] p-3 rounded-lg text-sm", "bg-gray-700 text-white")}>
+                  <div>{streamedMessage}</div>
+                </div>
+              )}
+              {isLoading && !streamedMessage && (
+                <div className="flex justify-center">
+                  <p>
+                    Loading
+                    <span className="animate-loading-dots inline-block overflow-x-hidden align-bottom">
+                      ...
+                    </span>
+                  </p>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
 
           {/* Input */}
           <form
             onSubmit={handleSubmit}
-            className={cn(
-              "p-3 border-t flex gap-2",
-              settings.darkMode ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white",
-            )}
+            className={cn("p-3 border-t flex gap-2 border-gray-700 bg-gray-900")}
           >
             <input
               type="text"
@@ -385,67 +369,23 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Type a message..."
               className={cn(
-                "flex-1 p-2 rounded border focus:outline-none focus:ring-2",
-                settings.darkMode
-                  ? "bg-gray-800 border-gray-700 text-white focus:ring-blue-500"
-                  : "bg-white border-gray-300 focus:ring-blue-300",
-                settings.fontSize === "small" && "text-sm",
-                settings.fontSize === "large" && "text-lg",
+                "flex-1 p-2 rounded border focus:outline-none focus:ring-2 text-sm",
+                "bg-gray-800 border-gray-700 text-white focus:ring-blue-500",
               )}
-              disabled={isLoading}
+              disabled={isLoading || showChatHistory || !currentChatId}
             />
-            <button
+            <Button
               type="submit"
-              disabled={isLoading || !inputValue.trim()}
-              className={cn(
-                "p-2 rounded bg-blue-600 text-white",
-                "hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-              )}
-              aria-label="Send"
+              variant="bright"
+              disabled={isLoading || !inputValue.trim() || showChatHistory || !currentChatId}
+              className={cn("p-3 w-fit h-fit min-w-fit", "rounded-lg shadow-lg")}
             >
               <Send size={20} />
-            </button>
+            </Button>
           </form>
         </div>
       )}
-
-      {/* CSS for loading animation */}
-      <style jsx global>{`
-        .loading-dots {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .dot {
-          width: 8px;
-          height: 8px;
-          background-color: ${settings.darkMode ? "#9CA3AF" : "#6B7280"};
-          border-radius: 50%;
-          animation: pulse 1.5s infinite ease-in-out;
-        }
-
-        .dot:nth-child(2) {
-          animation-delay: 0.3s;
-        }
-
-        .dot:nth-child(3) {
-          animation-delay: 0.6s;
-        }
-
-        @keyframes pulse {
-          0%,
-          100% {
-            transform: scale(0.8);
-            opacity: 0.6;
-          }
-          50% {
-            transform: scale(1.2);
-            opacity: 1;
-          }
-        }
-      `}</style>
+      {children}
     </ChatContext.Provider>
   );
 };

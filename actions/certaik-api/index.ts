@@ -6,6 +6,8 @@ import {
   AuditStatusResponseI,
   AuditTableReponseI,
   AuditWithChildrenResponseI,
+  ChatMessageI,
+  ChatResponseI,
   ContractResponseI,
   CreditSyncResponseI,
   PromptResponseI,
@@ -129,6 +131,18 @@ const getPrompts = async (): Promise<PromptResponseI[]> => {
   return certaikApiController.getPrompts();
 };
 
+const initiateChat = async (auditId: string): Promise<string> => {
+  return certaikApiController.initiateChat(auditId);
+};
+
+const getChats = async (): Promise<ChatResponseI[]> => {
+  return certaikApiController.getChats();
+};
+
+const getChatMessages = async (chatId: string): Promise<ChatMessageI[]> => {
+  return certaikApiController.getChatMessages(chatId);
+};
+
 const addPrompt = async (data: {
   audit_type: string;
   tag: string;
@@ -158,10 +172,13 @@ export {
   getAudits,
   getAuditStatus,
   getAuditWithChildren,
+  getChatMessages,
+  getChats,
   getCurrentGas,
   getPrompts,
   getStats,
   getUserInfo,
+  initiateChat,
   isAdmin,
   runEval,
   searchApps,

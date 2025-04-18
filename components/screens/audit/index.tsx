@@ -3,6 +3,7 @@
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import * as Tooltip from "@/components/ui/tooltip";
+import { useChat } from "@/hooks/useContexts";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { cn } from "@/lib/utils";
 import { BlockExplorerMapper } from "@/utils/constants";
@@ -29,7 +30,12 @@ export const Content = ({
   audit: AuditResponseI;
   address: string | null;
 }): JSX.Element => {
-  console.log(audit);
+  const { setCurrentAuditId } = useChat();
+
+  useEffect(() => {
+    setCurrentAuditId(audit.id);
+  }, []);
+
   const [view, setView] = useState<"contract" | "report" | "breakdown">("report");
   const [selectedFinding, setSelectedFinding] = useState<string | null>(null);
 

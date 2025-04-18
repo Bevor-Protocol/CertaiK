@@ -25,6 +25,17 @@ export type ModalStateI = {
   hide: () => void;
 };
 
+export interface ChatContextType {
+  isOpen: boolean;
+  messages: ChatMessageI[];
+  openChat: () => void;
+  closeChat: () => void;
+  sendMessage: (content: string) => Promise<void>;
+  clearChat: () => void;
+  currentAuditId: string | null;
+  setCurrentAuditId: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
 export interface SessionData {
   siwe?: SiweMessage;
   nonce?: string;
@@ -204,4 +215,41 @@ export interface AuditWithChildrenResponseI {
     result: string;
   }[];
   findings: FindingI[];
+}
+
+export interface ChatResponseI {
+  id: string;
+  created_at: string;
+  user_id: string;
+  audit_id: string;
+  is_visible: boolean;
+  total_messages: number;
+  audit: {
+    id: string;
+    created_at: string;
+    status: AuditStatus;
+    version: string;
+    audit_type: string;
+    processing_time_seconds: number;
+    result: string;
+    introduction?: string;
+    scope?: string;
+    conclusiong?: string;
+    contract: {
+      id: string;
+      method: string;
+      address: string;
+      network: string;
+      code: string;
+      is_available: boolean;
+    };
+  };
+}
+
+export interface ChatMessageI {
+  id: string;
+  created_at: string;
+  role: "user" | "system";
+  timestamp: string;
+  content: string;
 }

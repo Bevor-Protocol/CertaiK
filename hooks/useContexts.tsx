@@ -1,7 +1,8 @@
+import { ChatContext } from "@/providers/chat";
 import { ModalContext } from "@/providers/modal";
 import { SiweContext } from "@/providers/siwe";
 import { WebSocketContext, WebSocketContextType } from "@/providers/websocket";
-import { ModalStateI, SiweStateI } from "@/utils/types";
+import { ChatContextType, ModalStateI, SiweStateI } from "@/utils/types";
 import { useContext } from "react";
 
 export const useWs = (): WebSocketContextType => useContext(WebSocketContext);
@@ -21,3 +22,5 @@ export const useModal = (): ModalStateI => {
     hide: () => model.setOpen("none"),
   };
 };
+
+export const useChat = (): ChatContextType => useContext(ChatContext);

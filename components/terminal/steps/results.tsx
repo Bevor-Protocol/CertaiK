@@ -1,6 +1,7 @@
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
+import { useChat } from "@/hooks/useContexts";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, DownloadIcon, ExternalLink, X } from "lucide-react";
@@ -37,6 +38,7 @@ const getReadableText = (step: string): string => {
 const ResultsStep = ({ promptType, contractId }: TerminalProps): JSX.Element => {
   // once removed from the stack, we don't allow going back to this point, so there's
   // no need to retain a state in the parent Terminal component.
+  const { setCurrentAuditId } = useChat();
 
   const {
     mutateAsync,
@@ -76,6 +78,7 @@ const ResultsStep = ({ promptType, contractId }: TerminalProps): JSX.Element => 
     queryFn: async () =>
       certaikApiAction.getAudit(evalData!.id).then((result) => {
         if (result.status === "success") {
+          setCurrentAuditId(evalData!.id);
           return result.result;
         }
         throw new Error("failed audit");
