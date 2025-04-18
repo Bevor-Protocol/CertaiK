@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChatContextType, ChatMessageI } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
-import { Clock, MessageSquare, Send, X } from "lucide-react";
-import { createContext, ReactNode, useEffect, useRef, useState } from "react";
+import { Clock, ExternalLink, MessageSquare, Send, X } from "lucide-react";
+import Link from "next/link";
+import { createContext, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 export const ChatContext = createContext<ChatContextType>({
@@ -26,7 +27,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
   const [messages, setMessages] = useState<ChatMessageI[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showChatHistory, setShowChatHistory] = useState<boolean>(false);
+  const [showChatHistory, setShowChatHistory] = useState<boolean>(true);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [currentAuditId, setCurrentAuditId] = useState<string | null>(null);
   const [isInitiatingChat, setIsInitiatingChat] = useState<boolean>(false);
@@ -52,6 +53,16 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
   const closeChat = (): void => {
     setIsOpen(false);
   };
+
+  const chatsForAudit = useMemo(() => {
+    if (!currentAuditId || !chats) return [];
+    return chats.filter((chat) => chat.audit_id === currentAuditId);
+  }, [currentAuditId, chats]);
+
+  const otherChats = useMemo(() => {
+    if (!currentAuditId || !chats) return [];
+    return chats.filter((chat) => chat.audit_id !== currentAuditId);
+  }, [currentAuditId, chats]);
 
   const initiateChat = async (): Promise<void> => {
     if (!currentAuditId) {
@@ -232,87 +243,152 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
       {isOpen && (
         <div
           className={cn(
-            "fixed bottom-4 right-4 w-[800px] max-w-[80%] h-[800px] max-h-[80%] bg-gray-900 text-white",
-            "rounded-lg shadow-xl flex flex-col z-50",
+            "fixed bottom-4 right-4 w-[800px] max-w-[80%] h-[800px] max-h-[80%] bg-black text-white",
+            "rounded-lg flex flex-col z-50 border border-white overflow-hidden",
           )}
         >
-          <div className={cn("flex justify-between items-center p-3 border-b", "border-gray-700")}>
-            <h3 className="font-semibold">BevorAI Chat</h3>
-            <div className="flex gap-2">
+          <div className="flex justify-between items-center p-3 border-b border-gray-500/50">
+            <div className="flex flex-row gap-4">
+              <Button
+                onClick={() => {
+                  setMessages([]);
+                  setCurrentChatId(null);
+                  setShowChatHistory(false);
+                }}
+                variant="bright"
+              >
+                new chat
+              </Button>
+              {currentAuditId && currentChatId && (
+                <Link
+                  href={`/analytics/audit/${currentAuditId}`}
+                  className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300"
+                >
+                  <span>View Audit</span>
+                  <ExternalLink size={14} />
+                </Link>
+              )}
+            </div>
+            <div className="flex gap-2 ml-auto">
               <button
                 onClick={() => setShowChatHistory(!showChatHistory)}
-                className={cn("p-1 rounded-full hover:bg-gray-700")}
-                aria-label="Chat History"
+                className={cn("p-1 rounded-full hover:bg-gray-700 cursor-pointer")}
               >
                 <Clock size={18} />
               </button>
               <button
                 onClick={closeChat}
-                className={cn("p-1 rounded-full hover:bg-gray-700")}
-                aria-label="Close"
+                className={cn("p-1 rounded-full hover:bg-gray-700 cursor-pointer")}
               >
                 <X size={18} />
               </button>
             </div>
           </div>
 
-          {showChatHistory ? (
-            <div className={cn("flex-1 overflow-y-auto p-3 space-y-3 bg-gray-800")}>
-              <h4 className="font-medium text-sm mb-2">Chat History</h4>
-              {!chats || chats.length === 0 ? (
-                <div className="text-gray-500 text-center py-4">No previous chats found</div>
-              ) : (
-                <div className="space-y-2">
-                  {chats.map((chat) => (
-                    <div
-                      key={chat.id}
-                      onClick={() => loadChatHistory(chat.id)}
-                      className={cn(
-                        "p-2 rounded cursor-pointer hover:bg-gray-700 transition-colors",
-                        currentChatId === chat.id ? "bg-gray-700" : "bg-gray-800",
-                      )}
-                    >
-                      <div className="font-medium text-sm truncate">{chat.audit.introduction}</div>
-                      <div className="text-xs text-gray-400">
-                        {new Date(chat.created_at || Date.now()).toLocaleDateString()}
+          {showChatHistory && (
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
+              {chatsForAudit && chatsForAudit.length > 0 && (
+                <div>
+                  <p className="mb-4">chats for current audit</p>
+                  <div className="flex flex-row flex-wrap gap-4">
+                    {chatsForAudit.map((chat) => (
+                      <div
+                        key={chat.id}
+                        onClick={() => loadChatHistory(chat.id)}
+                        className={cn(
+                          "p-2 rounded cursor-pointer hover:bg-gray-700 transition-colors",
+                          "bg-gray-800 w-[200px]",
+                        )}
+                      >
+                        <div className="font-medium text-sm truncate">
+                          {chat.audit.introduction}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {new Date(chat.created_at || Date.now()).toLocaleDateString()}
+                        </div>
+                        <div className="text-xs text-gray-400">{chat.total_messages} messages</div>
                       </div>
-                      <div className="text-xs text-gray-400">{chat.total_messages} messages</div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
-              <div className="mt-4">
-                <Button
-                  onClick={() => {
-                    setMessages([]);
-                    setCurrentChatId(null);
-                    setShowChatHistory(false);
-                  }}
-                  variant="bright"
-                  className="w-full"
-                >
-                  Start New Chat
-                </Button>
-              </div>
+              {otherChats && otherChats.length > 0 && (
+                <div>
+                  <p>chats for other audits</p>
+                  <div className="flex flex-row flex-wrap gap-4">
+                    {otherChats.map((chat) => (
+                      <div
+                        key={chat.id}
+                        onClick={() => loadChatHistory(chat.id)}
+                        className={cn(
+                          "p-2 rounded cursor-pointer hover:bg-gray-700 transition-colors",
+                          "bg-gray-800 w-[200px]",
+                        )}
+                      >
+                        <div className="font-medium text-sm truncate">
+                          {chat.audit.introduction}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {new Date(chat.created_at || Date.now()).toLocaleDateString()}
+                        </div>
+                        <div className="text-xs text-gray-400">{chat.total_messages} messages</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {!chats ||
+                (chats.length === 0 && (
+                  <div className="text-gray-500 text-center py-4">No previous chats found</div>
+                ))}
             </div>
-          ) : (
-            <div className={cn("flex-1 overflow-y-auto p-3 space-y-3 bg-gray-800")}>
+          )}
+          {!showChatHistory && (
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {messages.length === 0 && !currentChatId ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-500 p-4">
-                  <p className="mb-4 text-center">
-                    {currentAuditId
-                      ? "Start a new chat about this audit"
-                      : "Select an audit to start chatting"}
-                  </p>
-                  {currentAuditId && (
-                    <Button
-                      onClick={initiateChat}
-                      variant="bright"
-                      className="w-full"
-                      disabled={isInitiatingChat}
-                    >
-                      {isInitiatingChat ? "Initiating..." : "Start New Chat"}
-                    </Button>
+                  {currentAuditId && chatsForAudit.length > 0 ? (
+                    <>
+                      <p className="mb-4 text-center">Previous chats for this audit:</p>
+                      <div className="flex flex-wrap gap-2 justify-center mb-6">
+                        {chatsForAudit.map((chat) => (
+                          <div
+                            key={chat.id}
+                            onClick={() => loadChatHistory(chat.id)}
+                            className={cn(
+                              "p-2 rounded cursor-pointer hover:bg-gray-700 transition-colors",
+                              "bg-gray-800 w-[200px]",
+                            )}
+                          >
+                            <div className="font-medium text-sm truncate">
+                              {chat.audit.introduction}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {new Date(chat.created_at || Date.now()).toLocaleDateString()}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {chat.total_messages} messages
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <Button onClick={initiateChat} variant="bright" disabled={isInitiatingChat}>
+                        {isInitiatingChat ? "Initiating..." : "Start New Chat"}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mb-4 text-center">
+                        {currentAuditId
+                          ? "Start a new chat about this audit"
+                          : "Select an audit to start chatting"}
+                      </p>
+                      {currentAuditId && (
+                        <Button onClick={initiateChat} variant="bright" disabled={isInitiatingChat}>
+                          {isInitiatingChat ? "Initiating..." : "Start New Chat"}
+                        </Button>
+                      )}
+                    </>
                   )}
                 </div>
               ) : messages.length === 0 && currentChatId ? (
