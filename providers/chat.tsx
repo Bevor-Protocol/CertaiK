@@ -2,11 +2,13 @@
 
 import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/utils";
 import { ChatContextType, ChatMessageI } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
-import { Clock, ExternalLink, MessageSquare, Send, X } from "lucide-react";
+import { Clock, ExternalLink, File, MessageSquare, Send, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { createContext, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
@@ -17,21 +19,22 @@ export const ChatContext = createContext<ChatContextType>({
   closeChat: () => {},
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   sendMessage: (content: string) => Promise.resolve(),
-  clearChat: () => {},
   currentAuditId: null,
   setCurrentAuditId: () => {},
 });
 
 export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element => {
+  const pathname = usePathname();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessageI[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showChatHistory, setShowChatHistory] = useState<boolean>(true);
+  const [showChatHistory, setShowChatHistory] = useState<boolean>(false);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [currentAuditId, setCurrentAuditId] = useState<string | null>(null);
-  const [isInitiatingChat, setIsInitiatingChat] = useState<boolean>(false);
   const [streamedMessage, setStreamedMessage] = useState("");
+  const [currentToolCall, setCurrentToolCall] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +46,14 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
   useEffect(() => {
     scrollToBottom();
   }, [messages, streamedMessage]);
+
+  useEffect(() => {
+    if (pathname.startsWith("/analytics/audit")) {
+      setCurrentAuditId(pathname.split("/").slice(-1)[0]);
+    } else {
+      setCurrentAuditId(null);
+    }
+  }, [pathname]);
 
   const { data: chats, refetch: refetchChats } = useQuery({
     queryKey: ["chats"],
@@ -70,40 +81,15 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
       return;
     }
 
-    setIsInitiatingChat(true);
     try {
       const chatId = await certaikApiAction.initiateChat(currentAuditId);
 
       setCurrentChatId(chatId);
       setMessages([]);
+      setShowChatHistory(false);
       await refetchChats();
     } catch (error) {
       console.error("Error initiating chat:", error);
-    } finally {
-      setIsInitiatingChat(false);
-    }
-  };
-
-  const clearChat = async (): Promise<void> => {
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "clearHistory",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to clear chat history: ${response.statusText}`);
-      }
-
-      setMessages([]);
-      setCurrentChatId(null);
-    } catch (error) {
-      console.error("Error clearing chat history:", error);
     }
   };
 
@@ -132,6 +118,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
     setInputValue("");
     setIsLoading(true);
 
+    let assistantMessage = "";
+    let tools_called = [];
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -151,10 +140,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No reader available");
 
-      let assistantMessage = "";
       let buffered = "";
       const decoder = new TextDecoder();
-
       // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
@@ -168,13 +155,18 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
 
         // Keep last line (incomplete?) in buffer
         buffered = lines.pop() || "";
-
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
             const parsed = JSON.parse(line);
-            assistantMessage = parsed.content;
-            setStreamedMessage(parsed.content);
+            if (parsed.event_type == "text") {
+              assistantMessage += parsed.content;
+              setStreamedMessage(assistantMessage);
+              setCurrentToolCall(null);
+            } else {
+              setCurrentToolCall(parsed.content);
+              tools_called.push(parsed.content);
+            }
           } catch (err) {
             console.warn("Failed to parse chunk:", line, err);
           }
@@ -188,6 +180,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
           role: "system",
           content: assistantMessage,
           timestamp: Date().toString(),
+          ...(tools_called.length > 0 ? { tools_called } : {}),
         },
       ]);
     } catch (error) {
@@ -200,6 +193,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
           role: "system",
           content: "Sorry, there was an error processing your request. Please try again.",
           timestamp: Date().toString(),
+          ...(tools_called.length > 0 ? { tools_called } : {}),
         },
       ]);
     } finally {
@@ -223,7 +217,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
         openChat,
         closeChat,
         sendMessage,
-        clearChat,
         currentAuditId,
         setCurrentAuditId,
       }}
@@ -249,16 +242,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
         >
           <div className="flex justify-between items-center p-3 border-b border-gray-500/50">
             <div className="flex flex-row gap-4">
-              <Button
-                onClick={() => {
-                  setMessages([]);
-                  setCurrentChatId(null);
-                  setShowChatHistory(false);
-                }}
-                variant="bright"
-              >
-                new chat
-              </Button>
+              {!!currentAuditId && (
+                <Button onClick={initiateChat} variant="bright">
+                  new chat
+                </Button>
+              )}
+
               {currentAuditId && currentChatId && (
                 <Link
                   href={`/analytics/audit/${currentAuditId}`}
@@ -271,8 +260,20 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
             </div>
             <div className="flex gap-2 ml-auto">
               <button
-                onClick={() => setShowChatHistory(!showChatHistory)}
-                className={cn("p-1 rounded-full hover:bg-gray-700 cursor-pointer")}
+                onClick={() => setShowChatHistory(false)}
+                className={cn(
+                  "p-1 rounded-full hover:bg-gray-700 cursor-pointer",
+                  !showChatHistory && "bg-gray-700",
+                )}
+              >
+                <File size={18} />
+              </button>
+              <button
+                onClick={() => setShowChatHistory(true)}
+                className={cn(
+                  "p-1 rounded-full hover:bg-gray-700 cursor-pointer",
+                  showChatHistory && "bg-gray-700",
+                )}
               >
                 <Clock size={18} />
               </button>
@@ -339,7 +340,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
               )}
               {!chats ||
                 (chats.length === 0 && (
-                  <div className="text-gray-500 text-center py-4">No previous chats found</div>
+                  <div className="text-gray-500 text-center py-4 flex flex-col justify-center h-full">
+                    No previous chats found
+                  </div>
                 ))}
             </div>
           )}
@@ -347,49 +350,11 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {messages.length === 0 && !currentChatId ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-500 p-4">
-                  {currentAuditId && chatsForAudit.length > 0 ? (
-                    <>
-                      <p className="mb-4 text-center">Previous chats for this audit:</p>
-                      <div className="flex flex-wrap gap-2 justify-center mb-6">
-                        {chatsForAudit.map((chat) => (
-                          <div
-                            key={chat.id}
-                            onClick={() => loadChatHistory(chat.id)}
-                            className={cn(
-                              "p-2 rounded cursor-pointer hover:bg-gray-700 transition-colors",
-                              "bg-gray-800 w-[200px]",
-                            )}
-                          >
-                            <div className="font-medium text-sm truncate">
-                              {chat.audit.introduction}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              {new Date(chat.created_at || Date.now()).toLocaleDateString()}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              {chat.total_messages} messages
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <Button onClick={initiateChat} variant="bright" disabled={isInitiatingChat}>
-                        {isInitiatingChat ? "Initiating..." : "Start New Chat"}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <p className="mb-4 text-center">
-                        {currentAuditId
-                          ? "Start a new chat about this audit"
-                          : "Select an audit to start chatting"}
-                      </p>
-                      {currentAuditId && (
-                        <Button onClick={initiateChat} variant="bright" disabled={isInitiatingChat}>
-                          {isInitiatingChat ? "Initiating..." : "Start New Chat"}
-                        </Button>
-                      )}
-                    </>
-                  )}
+                  <p className="text-center">
+                    {currentAuditId
+                      ? "Start a new chat about this audit"
+                      : "Navigate to an audit, or initiate a new one in the terminal, to start chatting"}
+                  </p>
                 </div>
               ) : messages.length === 0 && currentChatId ? (
                 <div className="h-full flex items-center justify-center text-gray-500">
@@ -406,35 +371,42 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
                         : "bg-gray-700 text-white",
                     )}
                   >
-                    <div>
-                      <ReactMarkdown className="markdown">{message.content}</ReactMarkdown>
-                    </div>
-                    <div className={cn("text-xs mt-1 opacity-70 text-[10px]")}>
-                      {message.timestamp}
-                    </div>
+                    <ReactMarkdown className="markdown">{message.content}</ReactMarkdown>
+                    {message.tools_called && (
+                      <div className="flex flex-row ml-auto justify-end mt-1">
+                        {message.tools_called.map((tool) => (
+                          <code key={tool} className="text-xs">
+                            {tool}
+                          </code>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))
               )}
               {streamedMessage && (
                 <div className={cn("max-w-[85%] p-3 rounded-lg text-sm", "bg-gray-700 text-white")}>
-                  <div>{streamedMessage}</div>
+                  <ReactMarkdown className="markdown">{streamedMessage}</ReactMarkdown>
                 </div>
               )}
-              {isLoading && !streamedMessage && (
-                <div className="flex justify-center">
-                  <p>
-                    Loading
+              {currentToolCall && (
+                <div className="pl-4">
+                  <p className="text-sm">
+                    calling tool <code>{currentToolCall}</code>
                     <span className="animate-loading-dots inline-block overflow-x-hidden align-bottom">
                       ...
                     </span>
                   </p>
                 </div>
               )}
+              {isLoading && !streamedMessage && !currentToolCall && (
+                <div className="flex justify-center">
+                  <Loader className="h-6 w-6" />
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           )}
-
-          {/* Input */}
           <form
             onSubmit={handleSubmit}
             className={cn("p-3 border-t flex gap-2 border-gray-700 bg-gray-900")}

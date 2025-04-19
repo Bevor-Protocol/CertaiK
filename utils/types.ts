@@ -31,7 +31,6 @@ export interface ChatContextType {
   openChat: () => void;
   closeChat: () => void;
   sendMessage: (content: string) => Promise<void>;
-  clearChat: () => void;
   currentAuditId: string | null;
   setCurrentAuditId: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -252,4 +251,5 @@ export interface ChatMessageI {
   role: "user" | "system";
   timestamp: string;
   content: string;
+  tools_called?: string[];
 }
