@@ -5,6 +5,8 @@ import {
   AuditStatusResponseI,
   AuditTableReponseI,
   AuditWithChildrenResponseI,
+  ChatMessageI,
+  ChatResponseI,
   ContractResponseI,
   CreditSyncResponseI,
   PromptResponseI,
@@ -382,6 +384,51 @@ class CertaikApiService {
     };
 
     return api.get("/admin/prompts", headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data.results;
+    });
+  }
+
+  async initiateChat(userId: string, auditId: string): Promise<string> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.post(`/chat/initiate/${auditId}`, {}, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data.id;
+    });
+  }
+
+  async getChats(userId: string): Promise<ChatResponseI[]> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get("/chat/list", headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data.results;
+    });
+  }
+
+  async getChatMessages(userId: string, chatId: string): Promise<ChatMessageI[]> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.get(`/chat/${chatId}`, headers).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }

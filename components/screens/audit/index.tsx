@@ -29,7 +29,6 @@ export const Content = ({
   audit: AuditResponseI;
   address: string | null;
 }): JSX.Element => {
-  console.log(audit);
   const [view, setView] = useState<"contract" | "report" | "breakdown">("report");
   const [selectedFinding, setSelectedFinding] = useState<string | null>(null);
 
