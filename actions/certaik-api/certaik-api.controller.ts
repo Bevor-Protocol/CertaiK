@@ -5,8 +5,9 @@ import {
   AuditStatusResponseI,
   AuditTableReponseI,
   AuditWithChildrenResponseI,
-  ChatMessageI,
+  ChatMessagesResponseI,
   ChatResponseI,
+  ChatWithAuditResponseI,
   ContractResponseI,
   CreditSyncResponseI,
   PromptResponseI,
@@ -223,7 +224,7 @@ class CertaikApiController {
     return this.certaikApiService.getPrompts(user.user_id);
   }
 
-  async initiateChat(auditId: string): Promise<string> {
+  async initiateChat(auditId: string): Promise<ChatResponseI> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");
@@ -231,7 +232,7 @@ class CertaikApiController {
     return this.certaikApiService.initiateChat(user.user_id, auditId);
   }
 
-  async getChats(): Promise<ChatResponseI[]> {
+  async getChats(): Promise<ChatWithAuditResponseI[]> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");
@@ -239,12 +240,12 @@ class CertaikApiController {
     return this.certaikApiService.getChats(user.user_id);
   }
 
-  async getChatMessages(chatId: string): Promise<ChatMessageI[]> {
+  async getChat(chatId: string): Promise<ChatMessagesResponseI> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.getChatMessages(user.user_id, chatId);
+    return this.certaikApiService.getChat(user.user_id, chatId);
   }
 
   async addPrompt(data: {

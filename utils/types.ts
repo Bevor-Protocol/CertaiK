@@ -216,6 +216,14 @@ export interface AuditWithChildrenResponseI {
   findings: FindingI[];
 }
 
+export interface ChatMessageI {
+  id: string;
+  role: "user" | "system";
+  timestamp: string;
+  content: string;
+  tools_called?: string[];
+}
+
 export interface ChatResponseI {
   id: string;
   created_at: string;
@@ -223,6 +231,13 @@ export interface ChatResponseI {
   audit_id: string;
   is_visible: boolean;
   total_messages: number;
+}
+
+export interface ChatMessagesResponseI extends ChatResponseI {
+  messages: ChatMessageI[];
+}
+
+export interface ChatWithAuditResponseI extends ChatResponseI {
   audit: {
     id: string;
     created_at: string;
@@ -243,13 +258,4 @@ export interface ChatResponseI {
       is_available: boolean;
     };
   };
-}
-
-export interface ChatMessageI {
-  id: string;
-  created_at: string;
-  role: "user" | "system";
-  timestamp: string;
-  content: string;
-  tools_called?: string[];
 }

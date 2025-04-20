@@ -4,7 +4,7 @@ import { certaikApiAction } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/utils";
-import { ChatContextType, ChatMessageI } from "@/utils/types";
+import { ChatContextType, ChatMessageI, ChatResponseI } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, ExternalLink, File, MessageSquare, Send, X } from "lucide-react";
 import Link from "next/link";
@@ -31,7 +31,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showChatHistory, setShowChatHistory] = useState<boolean>(false);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [currentChat, setCurrentChat] = useState<ChatResponseI | null>(null);
   const [currentAuditId, setCurrentAuditId] = useState<string | null>(null);
   const [streamedMessage, setStreamedMessage] = useState("");
   const [currentToolCall, setCurrentToolCall] = useState<string | null>(null);
@@ -66,12 +66,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
   };
 
   const chatsForAudit = useMemo(() => {
-    if (!currentAuditId || !chats) return [];
+    if (!chats) return [];
     return chats.filter((chat) => chat.audit_id === currentAuditId);
   }, [currentAuditId, chats]);
 
   const otherChats = useMemo(() => {
-    if (!currentAuditId || !chats) return [];
+    if (!chats) return [];
     return chats.filter((chat) => chat.audit_id !== currentAuditId);
   }, [currentAuditId, chats]);
 
@@ -82,9 +82,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
     }
 
     try {
-      const chatId = await certaikApiAction.initiateChat(currentAuditId);
+      const chat = await certaikApiAction.initiateChat(currentAuditId);
 
-      setCurrentChatId(chatId);
+      setCurrentChat(chat);
       setMessages([]);
       setShowChatHistory(false);
       await refetchChats();
@@ -96,19 +96,20 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
   const loadChatHistory = async (chatId: string): Promise<void> => {
     if (!chats) return;
 
-    const messages = await certaikApiAction.getChatMessages(chatId);
+    const chat = await certaikApiAction.getChat(chatId);
 
-    setMessages(messages);
-    setCurrentChatId(chatId);
+    const { messages, ...rest } = chat;
+
+    setMessages(messages); // easier to store a flattened reference.
+    setCurrentChat(rest);
     setShowChatHistory(false);
   };
 
   const sendMessage = async (content: string): Promise<void> => {
-    if (!content.trim() || !currentChatId) return;
+    if (!content.trim() || !currentChat) return;
 
     const userMessage: ChatMessageI = {
       id: Date.now().toString(),
-      created_at: Date.now().toString(),
       role: "user",
       content,
       timestamp: Date().toString(),
@@ -129,7 +130,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
         },
         body: JSON.stringify({
           message: content.trim(),
-          chatId: currentChatId,
+          chatId: currentChat.id,
         }),
       });
 
@@ -202,9 +203,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
     }
   };
 
-  const handleSubmit = (e: React.FormEvent): void => {
-    e.preventDefault();
-    if (inputValue.trim() && currentChatId) {
+  const handleSubmit = (): void => {
+    if (inputValue.trim() && !!currentChat) {
       sendMessage(inputValue);
     }
   };
@@ -248,9 +248,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
                 </Button>
               )}
 
-              {currentAuditId && currentChatId && (
+              {!!currentChat && (
                 <Link
-                  href={`/analytics/audit/${currentAuditId}`}
+                  href={`/analytics/audit/${currentChat.audit_id}`}
                   className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300"
                 >
                   <span>View Audit</span>
@@ -348,7 +348,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
           )}
           {!showChatHistory && (
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
-              {messages.length === 0 && !currentChatId ? (
+              {messages.length === 0 && !currentChat ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-500 p-4">
                   <p className="text-center">
                     {currentAuditId
@@ -356,7 +356,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
                       : "Navigate to an audit, or initiate a new one in the terminal, to start chatting"}
                   </p>
                 </div>
-              ) : messages.length === 0 && currentChatId ? (
+              ) : messages.length === 0 && !!currentChat ? (
                 <div className="h-full flex items-center justify-center text-gray-500">
                   <p>Start a conversation...</p>
                 </div>
@@ -407,30 +407,38 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
               <div ref={messagesEndRef} />
             </div>
           )}
-          <form
+          <div
             onSubmit={handleSubmit}
             className={cn("p-3 border-t flex gap-2 border-gray-700 bg-gray-900")}
           >
-            <input
-              type="text"
+            <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault(); // Prevent default enter behavior
+                  if (inputValue.trim() && currentChat) {
+                    handleSubmit();
+                  }
+                }
+              }}
               placeholder="Type a message..."
               className={cn(
                 "flex-1 p-2 rounded border focus:outline-none focus:ring-2 text-sm",
                 "bg-gray-800 border-gray-700 text-white focus:ring-blue-500",
+                "min-h-[6em] resize-none",
               )}
-              disabled={isLoading || showChatHistory || !currentChatId}
+              disabled={isLoading || showChatHistory || !currentChat}
             />
             <Button
-              type="submit"
               variant="bright"
-              disabled={isLoading || !inputValue.trim() || showChatHistory || !currentChatId}
+              disabled={isLoading || !inputValue.trim() || showChatHistory || !currentChat}
               className={cn("p-3 w-fit h-fit min-w-fit", "rounded-lg shadow-lg")}
+              onClick={handleSubmit}
             >
               <Send size={20} />
             </Button>
-          </form>
+          </div>
         </div>
       )}
       {children}

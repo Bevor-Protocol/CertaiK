@@ -48,7 +48,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     // Return the stream with appropriate headers
     return new Response(stream, {
       headers: {
-        "Content-Type": "text/event-stream",
+        "Content-Type": "text/plain",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },

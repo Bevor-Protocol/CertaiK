@@ -5,8 +5,9 @@ import {
   AuditStatusResponseI,
   AuditTableReponseI,
   AuditWithChildrenResponseI,
-  ChatMessageI,
+  ChatMessagesResponseI,
   ChatResponseI,
+  ChatWithAuditResponseI,
   ContractResponseI,
   CreditSyncResponseI,
   PromptResponseI,
@@ -391,7 +392,7 @@ class CertaikApiService {
     });
   }
 
-  async initiateChat(userId: string, auditId: string): Promise<string> {
+  async initiateChat(userId: string, auditId: string): Promise<ChatResponseI> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
@@ -402,11 +403,11 @@ class CertaikApiService {
       if (!response.data) {
         throw new Error(response.statusText);
       }
-      return response.data.id;
+      return response.data;
     });
   }
 
-  async getChats(userId: string): Promise<ChatResponseI[]> {
+  async getChats(userId: string): Promise<ChatWithAuditResponseI[]> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
@@ -421,7 +422,7 @@ class CertaikApiService {
     });
   }
 
-  async getChatMessages(userId: string, chatId: string): Promise<ChatMessageI[]> {
+  async getChat(userId: string, chatId: string): Promise<ChatMessagesResponseI> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
@@ -432,7 +433,7 @@ class CertaikApiService {
       if (!response.data) {
         throw new Error(response.statusText);
       }
-      return response.data.results;
+      return response.data;
     });
   }
 
