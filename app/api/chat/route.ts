@@ -2,7 +2,7 @@ import authService from "@/actions/auth/auth.service";
 import { streaming_api } from "@/lib/api";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {
@@ -48,7 +48,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     // Return the stream with appropriate headers
     return new Response(stream, {
       headers: {
-        "Content-Type": "text/plain",
+        "Content-Type": "text/event-stream",
+        "X-Content-Type-Options": "nosniff",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
