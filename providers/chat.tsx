@@ -373,9 +373,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
                   >
                     <ReactMarkdown className="markdown">{message.content}</ReactMarkdown>
                     {message.tools_called && (
-                      <div className="flex flex-row ml-auto justify-end mt-1">
-                        {message.tools_called.map((tool) => (
-                          <code key={tool} className="text-xs">
+                      <div className="flex flex-col ml-auto mt-1">
+                        <p className="text-sm">tools called:</p>
+                        {message.tools_called.map((tool, ind) => (
+                          <code key={ind} className="text-xs">
                             {tool}
                           </code>
                         ))}
