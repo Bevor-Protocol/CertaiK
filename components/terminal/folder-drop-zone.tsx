@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback } from "react";
 
 interface FolderDropZoneProps {
   onFolderSelect: (files: File[]) => void;
@@ -15,40 +15,11 @@ declare module "react" {
 }
 
 const FolderDropZone = ({ onFolderSelect, className }: FolderDropZoneProps): JSX.Element => {
-  const [isDragging, setIsDragging] = useState(false);
-  const dragCounter = useRef(0);
-
   const handleFolder = useCallback((files: File[]) => onFolderSelect(files), [onFolderSelect]);
-
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
-  const handleDragEnter = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dragCounter.current++;
-
-    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-      setIsDragging(true);
-    }
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dragCounter.current--;
-
-    if (dragCounter.current === 0) {
-      setIsDragging(false);
-    }
-  }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const files = Array.from(e.target.files ?? []).filter((file) => file.name.endsWith(".sol"));
     if (files.length) {
-      console.log(files);
       handleFolder(files);
     }
   };
@@ -58,7 +29,7 @@ const FolderDropZone = ({ onFolderSelect, className }: FolderDropZoneProps): JSX
       className={cn(
         "relative border-2 border-dashed rounded-lg p-8",
         "transition-colors duration-200",
-        isDragging ? "border-cyan-500 bg-cyan-500/10" : "border-gray-700",
+        "border-gray-700",
         className,
       )}
     >
