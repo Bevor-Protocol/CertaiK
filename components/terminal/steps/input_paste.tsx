@@ -54,7 +54,7 @@ const PasteStep = ({
     switch (l) {
       case "y": {
         certaikApiAction
-          .uploadSourceCode({ code: tempInput })
+          .uploadSourceCode({ source_type: "paste", code: tempInput })
           .then((result) => {
             if (!result) {
               throw new Error("bad response");

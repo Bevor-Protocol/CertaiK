@@ -99,7 +99,7 @@ Powered by Cookie DAO 🍪
       }
 
       address = encodeURIComponent(address);
-      const result = await certaikApiAction.uploadSourceCode({ address });
+      const result = await certaikApiAction.uploadSourceCode({ source_type: "scan", address });
 
       if (!result) {
         throw new Error("bad response");
