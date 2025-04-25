@@ -3,6 +3,7 @@
 import AuditTypeStep from "@/components/terminal/steps/audit_type";
 import InitialStep from "@/components/terminal/steps/initial";
 import AddressStep from "@/components/terminal/steps/input_address";
+import FolderUploadStep from "@/components/terminal/steps/input_folder";
 import PasteStep from "@/components/terminal/steps/input_paste";
 import UploadStep from "@/components/terminal/steps/input_upload";
 import ResultsStep from "@/components/terminal/steps/results";
@@ -40,9 +41,12 @@ const TerminalContainer: React.FC = () => {
 
     while (poppedElement !== s) {
       if (
-        [TerminalStep.INPUT_UPLOAD, TerminalStep.INPUT_ADDRESS, TerminalStep.INPUT_PASTE].includes(
-          poppedElement as TerminalStep,
-        )
+        [
+          TerminalStep.INPUT_UPLOAD,
+          TerminalStep.INPUT_ADDRESS,
+          TerminalStep.INPUT_PASTE,
+          TerminalStep.INPUT_FOLDER,
+        ].includes(poppedElement as TerminalStep)
       ) {
         shouldResetContract = true;
       }
@@ -86,6 +90,14 @@ const TerminalContainer: React.FC = () => {
               setTerminalStep={handleGlobalStep}
               handleGlobalState={handleGlobalState}
               state={terminalState[TerminalStep.INPUT_UPLOAD]}
+              setContractId={setContractId}
+            />
+          )}
+          {terminalStep == TerminalStep.INPUT_FOLDER && (
+            <FolderUploadStep
+              setTerminalStep={handleGlobalStep}
+              handleGlobalState={handleGlobalState}
+              state={terminalState[TerminalStep.INPUT_FOLDER]}
               setContractId={setContractId}
             />
           )}

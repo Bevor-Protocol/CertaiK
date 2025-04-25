@@ -1,16 +1,24 @@
 import { cn } from "@/lib/utils";
 import React, { useCallback, useRef, useState } from "react";
 
-interface FileDropZoneProps {
-  onFileSelect: (file: File) => void;
+interface FolderDropZoneProps {
+  onFolderSelect: (files: File[]) => void;
   className?: string;
 }
 
-const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JSX.Element => {
+// Add type extension for input element
+declare module "react" {
+  interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+    directory?: string;
+    webkitdirectory?: string;
+  }
+}
+
+const FolderDropZone = ({ onFolderSelect, className }: FolderDropZoneProps): JSX.Element => {
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
 
-  const handleFile = useCallback((file: File) => onFileSelect(file), [onFileSelect]);
+  const handleFolder = useCallback((files: File[]) => onFolderSelect(files), [onFolderSelect]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -37,40 +45,16 @@ const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JSX.Eleme
     }
   }, []);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        if (file.name.endsWith(".sol") || file.name.endsWith(".rs")) {
-          handleFile(file); // Trigger the file upload
-        } else {
-          alert("Invalid file type. Only .sol and .rs files are accepted.");
-        }
-      }
-    },
-    [handleFile],
-  );
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.name.endsWith(".sol") || file.name.endsWith(".rs")) {
-        handleFile(file); // Trigger the file upload
-      } else {
-        alert("Invalid file type. Only .sol and .rs files are accepted.");
-      }
+    const files = Array.from(e.target.files ?? []).filter((file) => file.name.endsWith(".sol"));
+    if (files.length) {
+      console.log(files);
+      handleFolder(files);
     }
   };
-
+  // don't support drag and drop for folders.
   return (
     <div
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDrag}
-      onDrop={handleDrop}
       className={cn(
         "relative border-2 border-dashed rounded-lg p-8",
         "transition-colors duration-200",
@@ -79,10 +63,6 @@ const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JSX.Eleme
       )}
     >
       <div className="flex flex-col items-center justify-center space-y-4">
-        <div className="text-center">
-          <p className="text-gray-400">Drag and drop your .sol or .rs file here, or</p>
-        </div>
-
         <label
           className={cn(
             "flex items-center justify-center text-base py-2 px-5",
@@ -90,12 +70,20 @@ const FileDropZone = ({ onFileSelect, className }: FileDropZoneProps): JSX.Eleme
             "hover:opacity-80 transition-opacity",
           )}
         >
-          <span>Choose file</span>
-          <input type="file" accept=".sol,.rs" onChange={handleFileSelect} className="hidden" />
+          <span>Choose folder</span>
+          <input
+            type="file"
+            accept=".sol,.rs"
+            onChange={handleFileSelect}
+            className="hidden"
+            multiple
+            directory=""
+            webkitdirectory=""
+          />
         </label>
       </div>
     </div>
   );
 };
 
-export default FileDropZone;
+export default FolderDropZone;

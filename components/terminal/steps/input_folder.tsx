@@ -1,4 +1,5 @@
 import { certaikApiAction } from "@/actions";
+import FolderDropZone from "@/components/terminal/folder-drop-zone";
 import { cn } from "@/lib/utils";
 import { Message, TerminalStep } from "@/utils/enums";
 import { MessageType } from "@/utils/types";
@@ -12,15 +13,14 @@ type TerminalProps = {
   state: MessageType[];
 };
 
-const AddressStep = ({
+const FolderUploadStep = ({
   setTerminalStep,
   handleGlobalState,
   setContractId,
   state,
 }: TerminalProps): JSX.Element => {
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(state.length === 1 ? 0 : 1);
+  const [uploadAvailable, setUploadAvailable] = useState(state.length === 1 || state.length === 3);
   const [history, setHistory] = useState<MessageType[]>(state);
 
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -35,55 +35,27 @@ const AddressStep = ({
     scrollToBottom();
   }, [history]);
 
-  const handleScan = (): void => {
-    if (!input) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          type: Message.ERROR,
-          content: "Not a valid address, try again...",
-        },
-      ]);
-      setInput("");
-      return;
-    }
-
-    setInput("");
-    setLoading(true);
-    const address = encodeURIComponent(input);
-
+  const handleUpload = (files: File[]): void => {
     certaikApiAction
-      .uploadSourceCode({ source_type: "scan", address })
+      .uploadFolder(files)
       .then((result) => {
         if (!result) {
           throw new Error("bad response");
         }
-        const { contract, exists } = result;
-        if (!exists || !contract) {
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.ERROR,
-              content:
-                "Address was found, but it appears to not be validated.\
- Try uploading the source code directly.",
-            },
-          ]);
-        } else {
-          setContractId(contract.id);
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.ASSISTANT,
-              content: contract.code,
-            },
-            {
-              type: Message.SYSTEM,
-              content: "Does this look right? (y/n)",
-            },
-          ]);
-          setStep(1);
-        }
+        const { contract } = result;
+        setContractId(contract!.id);
+        setUploadAvailable(false);
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: Message.ASSISTANT,
+            content: "done", // NOTE: come back to this.
+          },
+          {
+            type: Message.SYSTEM,
+            content: "Does this look right? (y/n)",
+          },
+        ]);
       })
       .catch((error) => {
         console.log(error);
@@ -91,12 +63,9 @@ const AddressStep = ({
           ...prev,
           {
             type: Message.ERROR,
-            content: "Contract not found",
+            content: "Something went wrong",
           },
         ]);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
 
@@ -106,7 +75,7 @@ const AddressStep = ({
         ...prev,
         {
           type: Message.ERROR,
-          content: "Not a valid address, try again...",
+          content: "Invalid input, try again",
         },
       ]);
       setInput("");
@@ -116,20 +85,20 @@ const AddressStep = ({
     switch (l) {
       case "y": {
         setInput("");
-        handleGlobalState(TerminalStep.INPUT_ADDRESS, history);
+        handleGlobalState(TerminalStep.INPUT_UPLOAD, history);
         setTerminalStep(TerminalStep.AUDIT_TYPE);
         break;
       }
       case "n": {
         setInput("");
-        setStep(0);
         setHistory((prev) => [
           ...prev,
           {
             type: Message.SYSTEM,
-            content: "Okay, let's try again. Input a smart contract address",
+            content: "Okay, let's try again",
           },
         ]);
+        setUploadAvailable(true);
         break;
       }
       default: {
@@ -153,16 +122,12 @@ const AddressStep = ({
         content: input,
       },
     ]);
-    if (step === 0) {
-      handleScan();
-    } else {
-      handleValidate();
-    }
+    handleValidate();
   };
 
   return (
     <>
-      <div ref={terminalRef} className="overflow-y-auto font-mono text-sm no-scrollbar grow">
+      <div ref={terminalRef} className="flex-1 overflow-y-auto font-mono text-sm no-scrollbar">
         {history.map((message, i) => (
           <div
             key={i}
@@ -171,23 +136,23 @@ const AddressStep = ({
               message.type === Message.SYSTEM && "text-blue-400",
               message.type === Message.USER && "text-green-400",
               message.type === Message.ERROR && "text-red-400",
-              message.type === Message.ASSISTANT && "text-white text-xs",
+              message.type === Message.ASSISTANT && "text-white",
             )}
           >
             {message.type === Message.USER && "> "}
             {message.content}
           </div>
         ))}
+        {uploadAvailable && <FolderDropZone onFolderSelect={handleUpload} className="my-8" />}
       </div>
       <TerminalInputBar
         onSubmit={handleSubmit}
         onChange={(value: string) => setInput(value)}
-        disabled={false}
+        disabled={uploadAvailable}
         value={input}
-        overrideLoading={loading}
       />
     </>
   );
 };
 
-export default AddressStep;
+export default FolderUploadStep;

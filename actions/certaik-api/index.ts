@@ -68,20 +68,22 @@ const getAgentSecurityScore = async (twitterHandle: string): Promise<any> => {
   return certaikApiController.getAgentSecurityScore(twitterHandle);
 };
 
-const uploadSourceCode = async ({
-  address,
-  network,
-  code,
-}: {
+const uploadFolder = async (files: File[]): Promise<ContractResponseI> => {
+  return certaikApiController.uploadFolder(files);
+};
+
+const uploadFile = async (file: File): Promise<ContractResponseI> => {
+  return certaikApiController.uploadFile(file);
+};
+
+const uploadSourceCode = async (data: {
+  source_type: string;
   address?: string;
   network?: string;
   code?: string;
+  repository_url?: string;
 }): Promise<ContractResponseI> => {
-  return certaikApiController.uploadSourceCode({
-    address,
-    network,
-    code,
-  });
+  return certaikApiController.uploadSourceCode(data);
 };
 
 const submitFeedback = async (
@@ -190,5 +192,7 @@ export {
   updateAppPermissions,
   updatePrompt,
   updateUserPermissions,
+  uploadFile,
+  uploadFolder,
   uploadSourceCode,
 };

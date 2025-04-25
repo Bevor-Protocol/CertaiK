@@ -38,7 +38,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (): void => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -120,7 +120,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
     setIsLoading(true);
 
     let assistantMessage = "";
-    let tools_called = [];
+    const tools_called: string[] = [];
 
     try {
       const response = await fetch("/api/chat", {
@@ -236,7 +236,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
       {isOpen && (
         <div
           className={cn(
-            "fixed bottom-4 right-4 w-[800px] max-w-[80%] h-[800px] max-h-[80%] bg-black text-white",
+            "fixed bottom-4 right-4 w-[800px] max-w-[80%] h-[800px] max-h-[80%]",
+            "bg-black text-white",
             "rounded-lg flex flex-col z-50 border border-white overflow-hidden",
           )}
         >
@@ -340,7 +341,11 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
               )}
               {!chats ||
                 (chats.length === 0 && (
-                  <div className="text-gray-500 text-center py-4 flex flex-col justify-center h-full">
+                  <div
+                    className={cn(
+                      "text-gray-500 text-center py-4 flex flex-col justify-center h-full",
+                    )}
+                  >
                     No previous chats found
                   </div>
                 ))}
@@ -353,7 +358,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
                   <p className="text-center">
                     {currentAuditId
                       ? "Start a new chat about this audit"
-                      : "Navigate to an audit, or initiate a new one in the terminal, to start chatting"}
+                      : "Navigate to an audit, or initiate a new one \
+                      in the terminal, to start chatting"}
                   </p>
                 </div>
               ) : messages.length === 0 && !!currentChat ? (
@@ -394,7 +400,11 @@ export const ChatProvider = ({ children }: { children: ReactNode }): JSX.Element
                 <div className="pl-4">
                   <p className="text-sm">
                     calling tool <code>{currentToolCall}</code>
-                    <span className="animate-loading-dots inline-block overflow-x-hidden align-bottom">
+                    <span
+                      className={cn(
+                        "animate-loading-dots inline-block overflow-x-hidden align-bottom",
+                      )}
+                    >
                       ...
                     </span>
                   </p>

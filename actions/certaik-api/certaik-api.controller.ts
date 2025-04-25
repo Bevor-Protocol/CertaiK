@@ -115,23 +115,35 @@ class CertaikApiController {
     return this.certaikApiService.getAgentSecurityScore(twitterHandle);
   }
 
-  async uploadSourceCode({
-    address,
-    network,
-    code,
-  }: {
+  async uploadFolder(files: File[]): Promise<ContractResponseI> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.uploadFolder(files, user.user_id);
+  }
+
+  async uploadFile(file: File): Promise<ContractResponseI> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.uploadFile(file, user.user_id);
+  }
+
+  async uploadSourceCode(data: {
+    source_type: string;
     address?: string;
     network?: string;
     code?: string;
+    repository_url?: string;
   }): Promise<ContractResponseI> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
     return this.certaikApiService.uploadSourceCode({
-      address,
-      network,
-      code,
+      ...data,
       userId: user.user_id,
     });
   }

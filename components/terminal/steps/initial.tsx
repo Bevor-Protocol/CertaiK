@@ -41,6 +41,11 @@ const InitialStep = ({ setTerminalStep, handleGlobalState, state }: TerminalProp
       }
       case "3": {
         handleGlobalState(TerminalStep.INITIAL, history);
+        setTerminalStep(TerminalStep.INPUT_FOLDER);
+        break;
+      }
+      case "4": {
+        handleGlobalState(TerminalStep.INITIAL, history);
         setTerminalStep(TerminalStep.INPUT_PASTE);
         break;
       }

@@ -11,7 +11,7 @@ export const initialState = {
       content:
         "How would like you get started? Choose an option (Type just \
 the number such as '1'):\n\n1. Input contract address\n2. \
-Upload file\n3. Paste code",
+Upload file\n3. Upload folder\n4. Paste code",
     },
   ],
   [TerminalStep.INPUT_ADDRESS]: [
@@ -30,6 +30,12 @@ Upload file\n3. Paste code",
     {
       type: Message.SYSTEM,
       content: "Drag + Drop, or press below, to upload a .sol or .rs file",
+    },
+  ],
+  [TerminalStep.INPUT_FOLDER]: [
+    {
+      type: Message.SYSTEM,
+      content: "Upload folder of .sol files",
     },
   ],
   [TerminalStep.INPUT_AGENT]: [

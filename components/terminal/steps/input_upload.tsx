@@ -35,9 +35,9 @@ const UploadStep = ({
     scrollToBottom();
   }, [history]);
 
-  const handleUpload = (content: string): void => {
+  const handleUpload = (file: File): void => {
     certaikApiAction
-      .uploadSourceCode({ code: content })
+      .uploadFile(file)
       .then((result) => {
         if (!result) {
           throw new Error("bad response");
@@ -49,7 +49,7 @@ const UploadStep = ({
           ...prev,
           {
             type: Message.ASSISTANT,
-            content: content,
+            content: contract?.code ?? "",
           },
           {
             type: Message.SYSTEM,

@@ -223,23 +223,59 @@ class CertaikApiService {
       });
   }
 
-  async uploadSourceCode({
-    address,
-    network,
-    code,
-    userId,
-  }: {
-    address?: string;
-    network?: string;
-    code?: string;
-    userId: string;
-  }): Promise<ContractResponseI> {
+  async uploadFolder(folder: File[], userId: string): Promise<ContractResponseI> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
       },
     };
-    return api.post("/contract", { address, network, code }, headers).then((response) => {
+
+    const formData = new FormData();
+    folder.forEach((f) => formData.append("files", f));
+
+    return api.post("/contract/project/folder", formData, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async uploadFile(file: File, userId: string): Promise<ContractResponseI> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api.post("/contract/project/file", formData, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      return response.data;
+    });
+  }
+
+  async uploadSourceCode(data: {
+    source_type: string;
+    address?: string;
+    network?: string;
+    code?: string;
+    repository_url?: string;
+    userId: string;
+  }): Promise<ContractResponseI> {
+    // generic instance for handling any type of "upload"
+    const { userId, ...rest } = data;
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.post("/contract/project", rest, headers).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }
