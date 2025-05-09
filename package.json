@@ -12,6 +12,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.62.15",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/mcp-adapter": "^0.3.1",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
@@ -28,6 +29,7 @@
     "tailwindcss-animate": "^1.0.7",
     "viem": "^2.22.2",
     "wagmi": "^2.14.6",
+    "zod": "^3.24.4",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
