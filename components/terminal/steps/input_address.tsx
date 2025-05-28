@@ -53,37 +53,37 @@ const AddressStep = ({
     const address = encodeURIComponent(input);
 
     certaikApiAction
-      .uploadSourceCode({ source_type: "scan", address })
+      .contractUploadScan(address)
       .then((result) => {
         if (!result) {
           throw new Error("bad response");
         }
-        const { contract, exists } = result;
-        if (!exists || !contract) {
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.ERROR,
-              content:
-                "Address was found, but it appears to not be validated.\
- Try uploading the source code directly.",
-            },
-          ]);
-        } else {
-          setContractId(contract.id);
-          setHistory((prev) => [
-            ...prev,
-            {
-              type: Message.ASSISTANT,
-              content: contract.code,
-            },
-            {
-              type: Message.SYSTEM,
-              content: "Does this look right? (y/n)",
-            },
-          ]);
-          setStep(1);
-        }
+        const { id, message } = result;
+        //         if (!exists || !contract) {
+        //           setHistory((prev) => [
+        //             ...prev,
+        //             {
+        //               type: Message.ERROR,
+        //               content:
+        //                 "Address was found, but it appears to not be validated.\
+        //  Try uploading the source code directly.",
+        //             },
+        //           ]);
+        //         } else {
+        setContractId(id);
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: Message.ASSISTANT,
+            content: message,
+          },
+          {
+            type: Message.SYSTEM,
+            content: "Does this look right? (y/n)",
+          },
+        ]);
+        setStep(1);
+        // }
       })
       .catch((error) => {
         console.log(error);

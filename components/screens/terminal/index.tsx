@@ -99,6 +99,7 @@ const TerminalContainer: React.FC = () => {
               handleGlobalState={handleGlobalState}
               state={terminalState[TerminalStep.INPUT_FOLDER]}
               setContractId={setContractId}
+              contractId={contractId}
             />
           )}
           {terminalStep == TerminalStep.INPUT_PASTE && (

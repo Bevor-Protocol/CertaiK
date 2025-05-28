@@ -64,26 +64,20 @@ const syncCredits = async (): Promise<CreditSyncResponseI> => {
   return certaikApiController.syncCredits();
 };
 
-const getAgentSecurityScore = async (twitterHandle: string): Promise<any> => {
-  return certaikApiController.getAgentSecurityScore(twitterHandle);
+const contractUploadFolder = async (fileMap: Record<string, File>): Promise<ContractResponseI> => {
+  return certaikApiController.contractUploadFolder(fileMap);
 };
 
-const uploadFolder = async (files: File[]): Promise<ContractResponseI> => {
-  return certaikApiController.uploadFolder(files);
+const contractUploadFile = async (file: File): Promise<ContractResponseI> => {
+  return certaikApiController.contractUploadFile(file);
 };
 
-const uploadFile = async (file: File): Promise<ContractResponseI> => {
-  return certaikApiController.uploadFile(file);
+const contractUploadScan = async (address: string): Promise<ContractResponseI> => {
+  return certaikApiController.contractUploadScan(address);
 };
 
-const uploadSourceCode = async (data: {
-  source_type: string;
-  address?: string;
-  network?: string;
-  code?: string;
-  repository_url?: string;
-}): Promise<ContractResponseI> => {
-  return certaikApiController.uploadSourceCode(data);
+const contractUploadPaste = async (code: string): Promise<ContractResponseI> => {
+  return certaikApiController.contractUploadPaste(code);
 };
 
 const submitFeedback = async (
@@ -168,9 +162,12 @@ const updatePrompt = async (data: {
 
 export {
   addPrompt,
+  contractUploadFile,
+  contractUploadFolder,
+  contractUploadPaste,
+  contractUploadScan,
   generateApiKey,
   generateApp,
-  getAgentSecurityScore,
   getAudit,
   getAudits,
   getAuditStatus,
@@ -192,7 +189,4 @@ export {
   updateAppPermissions,
   updatePrompt,
   updateUserPermissions,
-  uploadFile,
-  uploadFolder,
-  uploadSourceCode,
 };

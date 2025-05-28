@@ -107,45 +107,36 @@ class CertaikApiController {
     return this.certaikApiService.syncCredits(user.user_id);
   }
 
-  async getAgentSecurityScore(twitterHandle: string): Promise<any> {
-    const address = await this.authService.currentUser();
-    if (!address) {
-      throw new Error("user is not signed in with ethereum");
-    }
-    return this.certaikApiService.getAgentSecurityScore(twitterHandle);
-  }
-
-  async uploadFolder(files: File[]): Promise<ContractResponseI> {
+  async contractUploadScan(address: string): Promise<ContractResponseI> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.uploadFolder(files, user.user_id);
+    return this.certaikApiService.contractUploadScan(address, user.user_id);
   }
 
-  async uploadFile(file: File): Promise<ContractResponseI> {
+  async contractUploadFolder(fileMap: Record<string, File>): Promise<ContractResponseI> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.uploadFile(file, user.user_id);
+    return this.certaikApiService.contractUploadFolder(fileMap, user.user_id);
   }
 
-  async uploadSourceCode(data: {
-    source_type: string;
-    address?: string;
-    network?: string;
-    code?: string;
-    repository_url?: string;
-  }): Promise<ContractResponseI> {
+  async contractUploadFile(file: File): Promise<ContractResponseI> {
     const user = await this.authService.currentUser();
     if (!user) {
       throw new Error("user is not signed in with ethereum");
     }
-    return this.certaikApiService.uploadSourceCode({
-      ...data,
-      userId: user.user_id,
-    });
+    return this.certaikApiService.contractUploadFile(file, user.user_id);
+  }
+
+  async contractUploadPaste(code: string): Promise<ContractResponseI> {
+    const user = await this.authService.currentUser();
+    if (!user) {
+      throw new Error("user is not signed in with ethereum");
+    }
+    return this.certaikApiService.contractUploadPaste(code, user.user_id);
   }
 
   async submitFeedback(

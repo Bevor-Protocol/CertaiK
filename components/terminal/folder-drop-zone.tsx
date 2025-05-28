@@ -2,7 +2,8 @@ import { cn } from "@/lib/utils";
 import React, { useCallback } from "react";
 
 interface FolderDropZoneProps {
-  onFolderSelect: (files: File[]) => void;
+  onFolderSelect: (fileMap: Record<string, File>) => void;
+  isDisabled: boolean;
   className?: string;
 }
 
@@ -14,14 +15,40 @@ declare module "react" {
   }
 }
 
-const FolderDropZone = ({ onFolderSelect, className }: FolderDropZoneProps): JSX.Element => {
-  const handleFolder = useCallback((files: File[]) => onFolderSelect(files), [onFolderSelect]);
+const EXCLUDED_DIRS = ["lib", "node_modules", "vendor", "script", "test"];
+
+const FolderDropZone = ({
+  onFolderSelect,
+  isDisabled,
+  className,
+}: FolderDropZoneProps): JSX.Element => {
+  const handleFolder = useCallback(
+    (fileMap: Record<string, File>) => onFolderSelect(fileMap),
+    [onFolderSelect],
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const files = Array.from(e.target.files ?? []).filter((file) => file.name.endsWith(".sol"));
-    if (files.length) {
-      handleFolder(files);
+    const rawFiles = Array.from(e.target.files ?? []);
+
+    const filteredFiles = rawFiles.filter((file) => {
+      if (!file.name.endsWith(".sol")) return false;
+
+      const pathParts = file.webkitRelativePath.split("/");
+      return !pathParts.some((part) => EXCLUDED_DIRS.includes(part));
+    });
+
+    if (!filteredFiles.length) return;
+
+    const folderName = filteredFiles[0].webkitRelativePath.split("/")[0];
+    console.log("Uploading folder:", folderName);
+
+    // Prepare a map of file paths to content
+    const fileMap: Record<string, File> = {};
+    for (const file of filteredFiles) {
+      fileMap[file.webkitRelativePath] = file;
     }
+
+    handleFolder(fileMap);
   };
   // don't support drag and drop for folders.
   return (
@@ -50,6 +77,7 @@ const FolderDropZone = ({ onFolderSelect, className }: FolderDropZoneProps): JSX
             multiple
             directory=""
             webkitdirectory=""
+            disabled={isDisabled}
           />
         </label>
       </div>

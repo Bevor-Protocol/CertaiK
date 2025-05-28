@@ -140,16 +140,20 @@ export interface UserInfoResponseI {
 }
 
 export interface ContractResponseI {
-  exact_match: boolean;
-  exists: boolean;
-  contract?: {
+  id: string;
+  message: string;
+  sources: {
     id: string;
-    method: string;
-    address: string;
-    code: string;
-    network: string;
-    is_available: boolean;
-  };
+    path: string;
+    contracts: {
+      id: string;
+      name: string;
+      entry_point_functions: {
+        id: string;
+        name: string;
+      }[];
+    }[];
+  }[];
 }
 
 export interface CreditSyncResponseI {

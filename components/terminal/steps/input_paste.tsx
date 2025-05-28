@@ -54,13 +54,13 @@ const PasteStep = ({
     switch (l) {
       case "y": {
         certaikApiAction
-          .uploadSourceCode({ source_type: "paste", code: tempInput })
+          .contractUploadPaste(tempInput)
           .then((result) => {
             if (!result) {
               throw new Error("bad response");
             }
-            const { contract } = result;
-            setContractId(contract!.id);
+            const { id } = result;
+            setContractId(id);
             handleGlobalState(TerminalStep.INPUT_PASTE, history);
             setTerminalStep(TerminalStep.AUDIT_TYPE);
             setInput("");

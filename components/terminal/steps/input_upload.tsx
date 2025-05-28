@@ -37,19 +37,19 @@ const UploadStep = ({
 
   const handleUpload = (file: File): void => {
     certaikApiAction
-      .uploadFile(file)
+      .contractUploadFile(file)
       .then((result) => {
         if (!result) {
           throw new Error("bad response");
         }
-        const { contract } = result;
-        setContractId(contract!.id);
+        const { id, message } = result;
+        setContractId(id);
         setUploadAvailable(false);
         setHistory((prev) => [
           ...prev,
           {
             type: Message.ASSISTANT,
-            content: contract?.code ?? "",
+            content: message,
           },
           {
             type: Message.SYSTEM,

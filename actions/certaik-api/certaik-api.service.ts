@@ -196,34 +196,10 @@ class CertaikApiService {
     });
   }
 
-  async getAgentSecurityScore(twitterHandle: string): Promise<any> {
-    // TODO: deprecate
-    return api.get(`/ai/agent-security/${twitterHandle}`).then((response) => {
-      if (!response.data) {
-        throw new Error(response.statusText);
-      }
-      return response.data;
-    });
-  }
-
-  async getAgentContracts(agentId: string): Promise<ContractResponseI> {
-    // TODO: deprecate
-    return api
-      .post("/ai/eval/agent", {
-        agent_id: agentId,
-        encode_code: true,
-        response_type: "markdown",
-        webhook_url: "https://webhook.site/5eec6efd-1fda-486a-aac5-e95a19a0ea5a",
-      })
-      .then((response) => {
-        if (!response.data) {
-          throw new Error(response.statusText);
-        }
-        return response.data;
-      });
-  }
-
-  async uploadFolder(folder: File[], userId: string): Promise<ContractResponseI> {
+  async contractUploadFolder(
+    fileMap: Record<string, File>,
+    userId: string,
+  ): Promise<ContractResponseI> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
@@ -231,7 +207,9 @@ class CertaikApiService {
     };
 
     const formData = new FormData();
-    folder.forEach((f) => formData.append("files", f));
+    Object.entries(fileMap).forEach(([relativePath, file]) => {
+      formData.append("files", file, relativePath);
+    });
 
     return api.post("/contract/project/folder", formData, headers).then((response) => {
       if (!response.data) {
@@ -241,7 +219,7 @@ class CertaikApiService {
     });
   }
 
-  async uploadFile(file: File, userId: string): Promise<ContractResponseI> {
+  async contractUploadFile(file: File, userId: string): Promise<ContractResponseI> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
@@ -259,23 +237,30 @@ class CertaikApiService {
     });
   }
 
-  async uploadSourceCode(data: {
-    source_type: string;
-    address?: string;
-    network?: string;
-    code?: string;
-    repository_url?: string;
-    userId: string;
-  }): Promise<ContractResponseI> {
-    // generic instance for handling any type of "upload"
-    const { userId, ...rest } = data;
+  async contractUploadScan(address: string, userId: string): Promise<ContractResponseI> {
     const headers = {
       headers: {
         "Bevor-User-Identifier": userId,
       },
     };
 
-    return api.post("/contract/project", rest, headers).then((response) => {
+    return api.post("/contract/project/scan", { address }, headers).then((response) => {
+      if (!response.data) {
+        throw new Error(response.statusText);
+      }
+      console.log(response.data);
+      return response.data;
+    });
+  }
+
+  async contractUploadPaste(code: string, userId: string): Promise<ContractResponseI> {
+    const headers = {
+      headers: {
+        "Bevor-User-Identifier": userId,
+      },
+    };
+
+    return api.post("/contract/project/paste", { code }, headers).then((response) => {
       if (!response.data) {
         throw new Error(response.statusText);
       }
